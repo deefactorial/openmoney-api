@@ -520,11 +520,18 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     space.namespace = "cc";
     space.parent_namespace = ""; //references the parent space building a tree graph from the root.
     space.created = new Date().getTime(); //static
-    space.stewards = [deefactorial.id, michael.id];
+    space.stewards = [ deefactorial.id, michael.id ];
     space.type = "namespaces";
     space.id = 'namespaces~' + space.namespace;
-    spaces.push( space );
+    //spaces.push( space );
     steward_bucket.namespaces.push(space.id);
+
+    if (installation) {
+        openmoney_bucket.insert(space.id, space, function(err, res) {
+            if(err) { console.log(err); }
+            console.log(res);
+        });
+    }
 
     //This is the community currency all stewards get an account in this currency when they use the register api.
     var currency = {};
@@ -534,8 +541,15 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     currency.stewards = [ deefactorial.id , michael.id ];
     currency.type = "currencies";
     currency.id = 'currencies~' + currency.currency;
-    currencies.push(currency);
+    //currencies.push(currency);
     steward_bucket.currencies.push(currency.id);
+
+    if (installation) {
+        openmoney_bucket.insert(currency.id, currency, function(err, res) {
+            if(err) { console.log(err); }
+            console.log(res);
+        });
+    }
 
     //accounts don't store journal entries, journal entries reference accounts.
     var account = {};
@@ -607,34 +621,30 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
             });
         };
         spaces.forEach(function(space){
-            if(space.stewards[0] == steward.id) {
-                parallelTasks[space.namespace] = function (callback) {
-                    openmoney_bucket.get("namespaces~" + space.namespace.toLowerCase(), function (err, res) {
-                        if (err) {
-                            // doc doesn't exist insert it.
-                            callback(null, false);
-                        } else {
-                            // space already exists through error
-                            callback({status:403, code:1013, message: "A space exists with the name: " + space.namespace.toLowerCase()}, true);
-                        }
-                    });
-                };
-            }
+            parallelTasks[space.namespace] = function (callback) {
+                openmoney_bucket.get("namespaces~" + space.namespace.toLowerCase(), function (err, res) {
+                    if (err) {
+                        // doc doesn't exist insert it.
+                        callback(null, false);
+                    } else {
+                        // space already exists through error
+                        callback({status:403, code:1013, message: "A space exists with the name: " + space.namespace.toLowerCase()}, true);
+                    }
+                });
+            };
         });
         currencies.forEach(function(currency){
-            if(currency.stewards[0] == steward.id) {
-                parallelTasks[currency.currency] = function (callback) {
-                    openmoney_bucket.get("currencies~" + currency.currency.toLowerCase() + "." + currency.currency_namespace.toLowerCase(), function (err, res) {
-                        if (err) {
-                            // doc doesn't exist insert it.
-                            callback(null, false);
-                        } else {
-                            // doc already exists through error
-                            callback({status:403, code:1014, message: "A currency exists with the name: " + currency.currency.toLowerCase() + "." + currency.currency_namespace.toLowerCase()}, true);
-                        }
-                    });
-                };
-            }
+            parallelTasks[currency.currency] = function (callback) {
+                openmoney_bucket.get("currencies~" + currency.currency.toLowerCase() + "." + currency.currency_namespace.toLowerCase(), function (err, res) {
+                    if (err) {
+                        // doc doesn't exist insert it.
+                        callback(null, false);
+                    } else {
+                        // doc already exists through error
+                        callback({status:403, code:1014, message: "A currency exists with the name: " + currency.currency.toLowerCase() + "." + currency.currency_namespace.toLowerCase()}, true);
+                    }
+                });
+            };
         });
 
         if (space_currency != 'cc') {
@@ -696,7 +706,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
                     var value_references = {};
                     value_references.type = "value_reference";
-                    value_references.documents = [getHash(steward.publicKey)];
+                    value_references.documents = ["steward_bucket~" + getHash(steward.publicKey)];
 
                     //update stewards
                     steward_bucket.stewards.forEach(function(stewardID){
@@ -716,7 +726,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                         callback(err, false);
                                     }
                                 } else {
-                                    val_ref.value.documents.push(getHash(steward.publicKey));
+                                    val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
                                     stewards_bucket.upsert(stewardID, val_ref.value, function(err, ok){
                                         if(err) {
                                             callback(err, false);
@@ -747,7 +757,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                         callback(err, false);
                                     }
                                 } else {
-                                    val_ref.value.documents.push(getHash(steward.publicKey));
+                                    val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
                                     stewards_bucket.upsert(namespaceID, val_ref.value, function(err, ok){
                                         if(err) {
                                             callback(err, false);
@@ -778,7 +788,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                         callback(err, false);
                                     }
                                 } else {
-                                    val_ref.value.documents.push(getHash(steward.publicKey));
+                                    val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
                                     stewards_bucket.upsert(currencyID, val_ref.value, function(err, ok){
                                         if(err) {
                                             callback(err, false);
@@ -810,7 +820,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                         callback(err, false);
                                     }
                                 } else {
-                                    val_ref.value.documents.push(getHash(steward.publicKey));
+                                    val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
                                     stewards_bucket.upsert(accountID, val_ref.value, {cas : val_ref.cas}, function(err, ok){
                                         if(err) {
                                             callback(err, false);
@@ -884,36 +894,30 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
                     // persist the spaces, currencies, and accounts for the steward.
                     spaces.forEach(function(space){
-                        if (space.stewards[0] == steward.id || installation) {
-                            insertTasks[space.id] = function(callback) {
-                                openmoney_bucket.insert(space.id, space, function (err, res) {
-                                    if (err) {
-                                        callback(err, false);
-                                    } else {
-                                        // success
-                                        callback(null, res);
-                                    }
-                                });
-                            };
-                        }
+                        insertTasks[space.id] = function(callback) {
+                            openmoney_bucket.insert(space.id, space, function (err, res) {
+                                if (err) {
+                                    callback(err, false);
+                                } else {
+                                    // success
+                                    callback(null, res);
+                                }
+                            });
+                        };
                     });
                     currencies.forEach(function(currency) {
-                        if (currency.stewards[0] == steward.id || installation) {
-
-                            insertTasks[currency.id] = function(callback) {
-                                openmoney_bucket.insert( currency.id, currency, function (err, res) {
-                                    if (err) {
-                                        callback(err, false);
-                                    } else {
-                                        // success
-                                        callback(null, res);
-                                    }
-                                });
-                            };
-                        }
+                        insertTasks[currency.id] = function(callback) {
+                            openmoney_bucket.insert( currency.id, currency, function (err, res) {
+                                if (err) {
+                                    callback(err, false);
+                                } else {
+                                    // success
+                                    callback(null, res);
+                                }
+                            });
+                        };
                     });
                     accounts.forEach(function(account){
-
                         insertTasks[account.id] = function(callback) {
                             openmoney_bucket.insert(account.id, account, function (err, res) {
                                 if (err) {
