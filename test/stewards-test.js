@@ -25,7 +25,7 @@ function getHash(value) {
 }
 
 var steward = {};
-if(typeof process.env.STEWARDNAME == 'undefined'){
+if(typeof process.env.STEWARDNAME == 'undefined' || process.env.STEWARDNAME.match(/test/)){
     steward.stewardname = 'test' + new Date().getTime();
 } else {
     steward.stewardname = process.env.STEWARDNAME;
