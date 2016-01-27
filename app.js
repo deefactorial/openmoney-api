@@ -9,7 +9,7 @@ var passport = require('passport');
 var session = require('express-session');
 var CouchbaseStore = require('connect-couchbase')(session);
 var couchbaseStore = new CouchbaseStore({
-  bucket:"session",               //optional
+  bucket:"oauth2server",               //optional
   host:"127.0.0.1:8091",          //optional
   connectionTimeout: 2000,        //optional
   operationTimeout: 2000,         //optional
