@@ -1,9 +1,7 @@
 # openmoney-api
 
-Openmoney API
-
 The Openmoney API is a domain driven model of stewards, namespaces, currencies, accounts, and journals.
-Stewards are the patrons of these accounts, currencies, namespaces and journals.
+Stewards are the patrons of these namespaces, currencies, accounts and journals.
 
 #Install
 
