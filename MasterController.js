@@ -329,7 +329,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     var currencies = [];
     var accounts = [];
 
-    var installation = false;
+    var installation = process.env.INSTALL;
 
     if(installation) {
         openmoney_bucket.enableN1ql(['http://127.0.0.1:8093/']);
