@@ -930,7 +930,8 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                         function(err, results) {
                             // results is now equals to: {stewards: false, spacename: false}
                             if (err) {
-
+                                console.log(err);
+                                console.log(results);
                                 registerPostCallback(err, false);
 
                             } else {
