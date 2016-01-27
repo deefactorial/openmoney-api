@@ -1,0 +1,3176 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "2.0.0",
+        "title": "Openmoney API",
+        "description": "Openmoney API",
+        "termsOfService": "http://openmoney.cc/index.php?page=terms",
+        "contact": {
+            "name": "Openmoney Development Team",
+            "url": "http://openmoney.cc"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0"
+        }
+    },
+    "host": "deefactorial.proudleo.com",
+    "basePath": "/V2",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json",
+        "text/html"
+    ],
+    "paths": {
+        "/stewards": {
+            "get": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsList",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9/+=.]+$"
+                    }
+                ],
+                "description": "Get a listing of known stewards",
+                "tags": [
+                    "stewards"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of stewards",
+                        "schema": {
+                            "$ref": "#/definitions/stewards_list"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsPost",
+                "parameters": [
+                    {
+                        "name": "register_request",
+                        "in": "body",
+                        "description": "Registration Request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/register_request"
+                        }
+                    }
+                ],
+                "description": "Register a steward on the system",
+                "tags": [
+                    "stewards"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Registration Success",
+                        "schema": {
+                            "$ref": "#/definitions/register_response"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/login": {
+            "get": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "loginGet",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A login page for the steward",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "loginPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Basic [A-Za-z0-9/+=.]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect to account page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/logout": {
+            "get": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "logoutPost",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirect to login page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/account": {
+            "get": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "accountGet",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "produces": [
+                    "text/html"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An account page",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/oauth/application": {
+            "post": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthApplicationPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Basic [A-Za-z0-9/+=.]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "application",
+                        "in": "body",
+                        "description": "Application Object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/application_request"
+                        }
+                    }
+                ],
+                "description": "Existing steward Registers an application with the openmoney network.",
+                "tags": [
+                    "auth"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "security": [
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Application Response",
+                        "schema": {
+                            "$ref": "#/definitions/application_response"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/oauth/dialoge": {
+            "get": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthDialogeGet",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "query",
+                        "description": "Client ID received during registration",
+                        "required": true,
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 800,
+                        "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "description": "A uri to redirect steward after authorization",
+                        "type": "string",
+                        "format": "url",
+                        "maxLength": 512
+                    },
+                    {
+                        "name": "scopes",
+                        "in": "query",
+                        "description": "A comma separated list of scopes. If not provided, scope defaults to an empty list of scopes for stewards that don’t have a valid token for the app. For stewards who do already have a valid token for the app, the steward won’t be shown the OAuth authorization page with the list of scopes. Instead, this step of the flow will automatically complete with the same scopes that were used last time the steward completed the flow.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 32
+                        }
+                    }
+                ],
+                "description": "Presents an oauth dialoge to the user to grant the application access to the scopes",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Authroize",
+                "produces": [
+                    "text/html"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "redirect to client redirect uri"
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/oauth/dialoge/decision": {
+            "post": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthDialogePost",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "oauth_authorize_request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/oauth_authorize_request"
+                        }
+                    }
+                ],
+                "description": "Authorizes a steward on the openmoney network",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Authroize",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "redirect to client redirect uri"
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/oauth/authorize": {
+            "get": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthAuthorizeGet",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Basic [A-Za-z0-9/+=.]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "response_type",
+                        "in": "query",
+                        "description": "One of code, password, refresh_token, client_credentials",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z_]+$"
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "query",
+                        "description": "Client ID received during registration",
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 800,
+                        "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "description": "A uri to redirect steward after authorization",
+                        "type": "string",
+                        "format": "url",
+                        "maxLength": 512
+                    },
+                    {
+                        "name": "scopes",
+                        "in": "query",
+                        "description": "A comma separated list of scopes. If not provided, scope defaults to an empty list of scopes for stewards that don’t have a valid token for the app. For stewards who do already have a valid token for the app, the steward won’t be shown the OAuth authorization page with the list of scopes. Instead, this step of the flow will automatically complete with the same scopes that were used last time the steward completed the flow.",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 5,
+                            "maxLength": 32
+                        }
+                    }
+                ],
+                "description": "Authorizes a steward on the openmoney network",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Authroize",
+                "produces": [
+                    "text/html"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "redirect to client redirect uri"
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthAuthorizePost",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "oauth_authorize_request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/oauth_authorize_request"
+                        }
+                    }
+                ],
+                "description": "Authorizes a steward on the openmoney network",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Authroize",
+                "produces": [
+                    "text/html"
+                ],
+                "responses": {
+                    "302": {
+                        "description": "redirect to client redirect uri"
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/oauth/token": {
+            "post": {
+                "x-swagger-router-controller": "Auth",
+                "operationId": "oauthAccessTokenPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer|Basic [A-Za-z0-9/+=.]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "access_token_request",
+                        "in": "body",
+                        "description": "Access Token Request Object",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/access_token_request"
+                        }
+                    }
+                ],
+                "description": "Gets an authorization token",
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Gets an authorization token",
+                "security": [
+                    {
+                        "password": []
+                    },
+                    {
+                        "oauth2Refresh": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Access Token is returned",
+                        "schema": {
+                            "$ref": "#/definitions/access_token_response"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}": {
+            "get": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsGet",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "description": "Get a single steward",
+                "tags": [
+                    "stewards"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:stewards"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "steward",
+                        "schema": {
+                            "$ref": "#/definitions/stewards_get"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsPut",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "steward",
+                        "required": true,
+                        "description": "Steward Document",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/stewards"
+                        }
+                    }
+                ],
+                "description": "Update your steward account",
+                "tags": [
+                    "stewards"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "steward",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsDelete",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 1024,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "description": "Delete your steward account",
+                "tags": [
+                    "stewards"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:stewards"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "steward",
+                        "schema": {
+                            "$ref": "#/definitions/delete_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces": {
+            "get": {
+                "x-swagger-router-controller": "Spaces",
+                "operationId": "spacesList",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "parent_namespace",
+                        "in": "query",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "description": "List of spaces",
+                "tags": [
+                    "namespaces"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of spaces",
+                        "schema": {
+                            "$ref": "#/definitions/namespaces_list"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Spaces",
+                "operationId": "spacesPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "space",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/namespaces"
+                        }
+                    }
+                ],
+                "description": "Create New Spaces",
+                "tags": [
+                    "namespaces"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces/{namespace}": {
+            "get": {
+                "x-swagger-router-controller": "Spaces",
+                "operationId": "spacesGet",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "space name"
+                    }
+                ],
+                "description": "Get a space by name, use this API to discover other users spaces.",
+                "tags": [
+                    "namespaces"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:namespaces"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/namespaces_get"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-swagger-router-controller": "Spaces",
+                "operationId": "spacesPut",
+                "description": "Update Space",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 512,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "space name"
+                    },
+                    {
+                        "name": "space",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/namespaces"
+                        }
+                    }
+                ],
+                "tags": [
+                    "namespaces"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-swagger-router-controller": "Spaces",
+                "operationId": "spacesDelete",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 1048,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "space name"
+                    }
+                ],
+                "description": "Delete a space you are a steward of",
+                "tags": [
+                    "namespaces"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:namespaces"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete success",
+                        "schema": {
+                            "$ref": "#/definitions/delete_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces/{namespace}/currencies": {
+            "get": {
+                "x-swagger-router-controller": "Currencies",
+                "operationId": "currenciesList",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "description": "List currencies",
+                "tags": [
+                    "currencies"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of currencies",
+                        "schema": {
+                            "$ref": "#/definitions/currencies_list"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Currencies",
+                "operationId": "currenciesPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/currencies"
+                        }
+                    }
+                ],
+                "description": "Create a currency",
+                "tags": [
+                    "currencies"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}": {
+            "get": {
+                "x-swagger-router-controller": "Currencies",
+                "operationId": "currenciesGet",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 512,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "Name of a currency"
+                    }
+                ],
+                "description": "Get a currency by its name",
+                "tags": [
+                    "currencies"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:currencies"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/currencies_get"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-swagger-router-controller": "Currencies",
+                "operationId": "currenciesPut",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 512,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "Name of a currency"
+                    },
+                    {
+                        "name": "currencies",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/currencies"
+                        }
+                    }
+                ],
+                "description": "Update Currency",
+                "tags": [
+                    "currencies"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-swagger-router-controller": "Currencies",
+                "operationId": "currenciesDelete",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 512,
+                        "pattern": "^[A-Za-z0-9_-]+$",
+                        "description": "Currency name"
+                    }
+                ],
+                "description": "Delete a currency you are a steward of",
+                "tags": [
+                    "currencies"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:currencies"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/delete_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces/{namespace}/accounts": {
+            "get": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsList",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency_namespace",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]*$"
+                    }
+                ],
+                "description": "List accounts in a namespace",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of accounts",
+                        "schema": {
+                            "$ref": "#/definitions/accounts_list"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/accounts"
+                        }
+                    }
+                ],
+                "description": "create an account",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/delete_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/space/{namespace}/accounts/{account}": {
+            "get": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsGet",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency_namespace",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]*$"
+                    }
+                ],
+                "description": "Get an account by id",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/accounts_get"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsPut",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 1024,
+                        "pattern": "^[A-Za-z0-9_.-]+$",
+                        "description": "Account Name"
+                    },
+                    {
+                        "name": "accounts",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/accounts"
+                        }
+                    }
+                ],
+                "description": "Update account",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsDelete",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 1024,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    }
+                ],
+                "description": "Delete a account",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/delete_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/space/{namespace}/accounts/discovery": {
+            "get": {
+                "x-swagger-router-controller": "Accounts",
+                "operationId": "accountsDiscovery",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "publicKey",
+                        "in": "query",
+                        "description": "Accounts public Key",
+                        "type": "string",
+                        "minLength": 266,
+                        "maxLength": 800,
+                        "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                    }
+                ],
+                "description": "Discover other stewards account by the accounts public key, this is how you add an account to make a payment to them.",
+                "tags": [
+                    "accounts"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:stewards",
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:stewards",
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:stewards",
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:stewards",
+                            "read:accounts"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lookup Results",
+                        "schema": {
+                            "$ref": "#/definitions/accounts"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals/{currency}": {
+            "get": {
+                "x-swagger-router-controller": "Journals",
+                "operationId": "journalsList",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency_namespace",
+                        "in": "query",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]*$"
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    {
+                        "name": "range",
+                        "in": "query",
+                        "type": "integer",
+                        "minimum": 5
+                    }
+                ],
+                "description": "List Journal Entries for this accountname",
+                "tags": [
+                    "journals"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "read:journals"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "read:journals"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "read:journals"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "read:journals"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/journals_list"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "x-swagger-router-controller": "Journals",
+                "operationId": "journalsPost",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "description": "Authorization Token",
+                        "in": "header",
+                        "type": "string",
+                        "pattern": "^Bearer [A-Za-z0-9=/+]+$"
+                    },
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "required": true,
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "namespace",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "account",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "currency",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    {
+                        "name": "currency_namespace",
+                        "in": "query",
+                        "type": "string",
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]*$"
+                    },
+                    {
+                        "name": "journal",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/journals"
+                        }
+                    }
+                ],
+                "description": "Create a journal entry for this account",
+                "tags": [
+                    "journals"
+                ],
+                "security": [
+                    {
+                        "oauth2Password": [
+                            "write:journals"
+                        ]
+                    },
+                    {
+                        "oauth2Implicit": [
+                            "write:journals"
+                        ]
+                    },
+                    {
+                        "oauth2ClientCredentials": [
+                            "write:journals"
+                        ]
+                    },
+                    {
+                        "oauth2Code": [
+                            "write:journals"
+                        ]
+                    },
+                    {
+                        "apiKey": []
+                    },
+                    {
+                        "password": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/create_response"
+                        }
+                    },
+                    "default": {
+                        "description": "error payload",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "oauth2Password": {
+            "type": "oauth2",
+            "scopes": {
+                "read:stewards": "Read access to stewards",
+                "write:stewards": "Write access to stewards",
+                "read:accounts": "Read access to accounts",
+                "write:accounts": "Write access to accounts",
+                "read:currencies": "Read access to currencies",
+                "write:currencies": "Write access to currencies",
+                "manage:currencies": "Manage currencies",
+                "read:namespaces": "Read access to namespaces",
+                "write:namespaces": "Write access to namespaces",
+                "manage:namespaces": "Manage namespaces",
+                "read:journals": "Read access to journals",
+                "write:journals": "Write access  to journals"
+            },
+            "flow": "password",
+            "tokenUrl": "https://deefactorial.proudleo.com/V2/stewards/{stewardname}/token"
+        },
+        "oauth2Implicit": {
+            "type": "oauth2",
+            "scopes": {
+                "read:stewards": "Read access to stewards",
+                "write:stewards": "Write access to stewards",
+                "read:accounts": "Read access to accounts",
+                "write:accounts": "Write access to accounts",
+                "read:currencies": "Read access to currencies",
+                "write:currencies": "Write access to currencies",
+                "manage:currencies": "Manage currencies",
+                "read:namespaces": "Read access to namespaces",
+                "write:namespaces": "Write access to namespaces",
+                "manage:namespaces": "Manage namespaces",
+                "read:journals": "Read access to journals",
+                "write:journals": "Write access  to journals"
+            },
+            "flow": "implicit",
+            "authorizationUrl": "http://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/dialoge"
+        },
+        "oauth2ClientCredentials": {
+            "type": "oauth2",
+            "scopes": {
+                "read:stewards": "Read access to stewards",
+                "write:stewards": "Write access to stewards",
+                "read:accounts": "Read access to accounts",
+                "write:accounts": "Write access to accounts",
+                "read:currencies": "Read access to currencies",
+                "write:currencies": "Write access to currencies",
+                "manage:currencies": "Manage currencies",
+                "read:namespaces": "Read access to namespaces",
+                "write:namespaces": "Write access to namespaces",
+                "manage:namespaces": "Manage namespaces",
+                "read:journals": "Read access to journals",
+                "write:journals": "Write access  to journals"
+            },
+            "flow": "application",
+            "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
+        },
+        "oauth2Code": {
+            "type": "oauth2",
+            "scopes": {
+                "read:stewards": "Read access to stewards",
+                "write:stewards": "Write access to stewards",
+                "read:accounts": "Read access to accounts",
+                "write:accounts": "Write access to accounts",
+                "read:currencies": "Read access to currencies",
+                "write:currencies": "Write access to currencies",
+                "manage:currencies": "Manage currencies",
+                "read:namespaces": "Read access to namespaces",
+                "write:namespaces": "Write access to namespaces",
+                "manage:namespaces": "Manage namespaces",
+                "read:journals": "Read access to journals",
+                "write:journals": "Write access  to journals"
+            },
+            "flow": "accessCode",
+            "authorizationUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/authorize",
+            "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
+        },
+        "apiKey": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        },
+        "oauth2Refresh": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        },
+        "password": {
+            "type": "basic"
+        }
+    },
+    "definitions": {
+        "stewards_list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/stewards_get"
+            }
+        },
+        "namespaces_list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/namespaces_get"
+            }
+        },
+        "currencies_list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/currencies_get"
+            }
+        },
+        "accounts_list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/accounts_get"
+            }
+        },
+        "journals_list": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/encrypted_journals"
+            }
+        },
+        "namespaces_get": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/get_response"
+                },
+                {
+                    "$ref": "#/definitions/namespaces"
+                }
+            ]
+        },
+        "currencies_get": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/get_response"
+                },
+                {
+                    "$ref": "#/definitions/currencies"
+                }
+            ]
+        },
+        "accounts_get": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/get_response"
+                },
+                {
+                    "$ref": "#/definitions/accounts"
+                }
+            ]
+        },
+        "stewards_get": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/get_response"
+                },
+                {
+                    "$ref": "#/definitions/stewards"
+                }
+            ]
+        },
+        "delete_response": {
+            "type": "object",
+            "required": [
+                "id",
+                "ok"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "get_response": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.~-]+$"
+                }
+            }
+        },
+        "create_response": {
+            "type": "object",
+            "required": [
+                "id",
+                "ok"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "modification": {
+            "type": "object",
+            "properties": {
+                "modified": {
+                    "type": "integer",
+                    "description": "timestamp in milliseconds since epoch"
+                },
+                "modified_by": {
+                    "type": "string",
+                    "description": "stewardname of steward who made modification"
+                },
+                "modification": {
+                    "type": "string",
+                    "description": "human readable description of modification"
+                }
+            }
+        },
+        "stewardid": {
+            "type": "string",
+            "maxLength": 512,
+            "pattern": "^stewards~[A-Za-z0-9_.-]+$"
+        },
+        "stewards": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 10,
+            "required": [
+                "stewardname",
+                "password"
+            ],
+            "properties": {
+                "stewardname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 1024
+                },
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "pattern": "^([\\w-]+(?:\\.[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                },
+                "email_notifications": {
+                    "type": "boolean"
+                },
+                "created": {
+                    "type": "integer",
+                    "description": "timestamp in milliseconds since epoch"
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "stewardname of steward who made change"
+                },
+                "modifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/modification"
+                    }
+                }
+            }
+        },
+        "accounts": {
+            "type": "object",
+            "minProperties": 5,
+            "maxProperties": 10,
+            "required": [
+                "account",
+                "account_namespace",
+                "currency",
+                "currency_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "account_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "currency": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "currency_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "created": {
+                    "type": "integer",
+                    "description": "timestamp in milliseconds since epoch"
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "stewardname of steward who made change"
+                },
+                "modifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/modification"
+                    }
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stewardid"
+                    }
+                },
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                }
+            }
+        },
+        "currencies": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 7,
+            "required": [
+                "currency",
+                "currency_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "currency": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "currency_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "created": {
+                    "type": "integer",
+                    "description": "timestamp in milliseconds since epoch"
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "stewardname of steward who made change"
+                },
+                "modifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/modification"
+                    }
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stewardid"
+                    }
+                }
+            }
+        },
+        "namespaces": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 7,
+            "required": [
+                "namespace",
+                "parent_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "parent_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "created": {
+                    "type": "integer",
+                    "description": "timestamp in milliseconds since epoch"
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "stewardname of who created space"
+                },
+                "modifications": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/modification"
+                    }
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stewardid"
+                    }
+                }
+            }
+        },
+        "encrypted_journals": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "algorithm": {
+                    "type": "string"
+                },
+                "publicKeyEncryptedSymetricKey": {
+                    "type": "string"
+                },
+                "initializationVector": {
+                    "type": "string"
+                },
+                "encryptedJournal": {
+                    "type": "object",
+                    "$ref": "#/definitions/aes_encryption"
+                }
+            }
+        },
+        "aes_encryption": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "object"
+                }
+            }
+        },
+        "journals": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 9,
+            "required": [
+                "to_account",
+                "to_account_namespace",
+                "amount"
+            ],
+            "properties": {
+                "to_account": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "to_account_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "from_account": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "from_account_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "currency": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "currency_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "amount": {
+                    "type": "number",
+                    "minimum": 0
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "type": "string",
+                    "description": "stewardname of who created entry"
+                }
+            }
+        },
+        "application_request": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 4,
+            "required": [
+                "application_name",
+                "homepage_uri",
+                "authorization_callback_uri"
+            ],
+            "properties": {
+                "application_name": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$",
+                    "description": "Applications Name"
+                },
+                "homepage_uri": {
+                    "type": "string",
+                    "maxLength": 512,
+                    "pattern": "^((https?:)(\\/\\/\\/?)([\\w]*(?::[\\w]*)?@)?([\\d\\w\\.-]+)(?::(\\d+))?)?([\\/\\\\\\w\\.()-]*)?(?:([?][^#]*)?(#.*)?)*",
+                    "description": "Applications home page"
+                },
+                "application_description": {
+                    "type": "string",
+                    "maxLength": 1048,
+                    "description": "Application Description"
+                },
+                "authorization_callback_uri": {
+                    "type": "string",
+                    "maxLength": 512,
+                    "pattern": "^((https?:)(\\/\\/\\/?)([\\w]*(?::[\\w]*)?@)?([\\d\\w\\.-]+)(?::(\\d+))?)?([\\/\\\\\\w\\.()-]*)?(?:([?][^#]*)?(#.*)?)*",
+                    "description": "Callback url after authorization."
+                }
+            }
+        },
+        "application_response": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 2,
+            "required": [
+                "application_id",
+                "application_secret"
+            ],
+            "properties": {
+                "application_id": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                },
+                "application_secret": {
+                    "type": "string",
+                    "minLength": 893,
+                    "maxLength": 899,
+                    "pattern": "^-----BEGIN PRIVATE KEY-----[A-Za-z0-9/+]{845,848}[=]{0,3}-----END PRIVATE KEY-----$"
+                }
+            }
+        },
+        "authorize_request": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 2,
+            "required": [
+                "publicKey",
+                "cors_token"
+            ],
+            "properties": {
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$",
+                    "description": "Stewards public key"
+                },
+                "cors_token": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9]*$",
+                    "description": "An unguessable random string. It is used to protect against cross-site request forgery attacks."
+                }
+            }
+        },
+        "authorize_response": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 2,
+            "required": [
+                "challenge_token",
+                "cors_token"
+            ],
+            "properties": {
+                "challenge_token": {
+                    "type": "string",
+                    "minLength": 86,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9/=+]+$",
+                    "description": "An unguessable random string encoded using stewards public key."
+                },
+                "cors_token": {
+                    "type": "string",
+                    "minLength": 20,
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9]*$",
+                    "description": "An unguessable random string sent in the request. If it does not match request cors_token the response should be thrown away and error reported."
+                }
+            }
+        },
+        "access_token_request": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 3,
+            "required": [
+                "grant_type"
+            ],
+            "properties": {
+                "grant_type": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "pattern": "^[A-Za-z_]+$",
+                    "description": "one of code, password, refresh_token, client_credentials"
+                },
+                "client_id": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 800,
+                    "pattern": "^[A-Za-z0-9\\\\\\s/=+-]*$",
+                    "description": "Stewards Public Key"
+                },
+                "client_secret": {
+                    "type": "string",
+                    "minLength": 32,
+                    "maxLength": 1600,
+                    "pattern": "^[A-Za-z0-9\\\\\\\\\\\\s/=+-]*$",
+                    "description": "Client Secret"
+                },
+                "username": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "string",
+                    "minLength": 39,
+                    "maxLength": 1600,
+                    "pattern": "^[A-Za-z0-9]+$",
+                    "description": "authorization code receieved during /oauth/authorize response"
+                }
+            }
+        },
+        "access_token_response": {
+            "type": "object",
+            "minProperties": 5,
+            "maxProperties": 6,
+            "required": [
+                "access_token",
+                "refresh_token",
+                "expires",
+                "scope",
+                "token_type"
+            ],
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "minLength": 32,
+                    "pattern": "^[A-Za-z0-9=/+]+$",
+                    "description": "This is the access token used to authenticate successive requests."
+                },
+                "refresh_token": {
+                    "type": "string",
+                    "minLength": 32,
+                    "pattern": "^[A-Za-z0-9=/+]+$",
+                    "description": "This is the refresh token used to refresh access tokens."
+                },
+                "token_type": {
+                    "type": "string",
+                    "pattern": "^Bearer$"
+                },
+                "expires": {
+                    "type": "string",
+                    "description": "time when token expires"
+                },
+                "scope": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 32
+                    }
+                }
+            }
+        },
+        "oauth_authorize_request": {
+            "type": "object",
+            "required": [
+                "response_type"
+            ],
+            "properties": {
+                "response_type": {
+                    "type": "string",
+                    "maxLength": 20,
+                    "pattern": "^[A-Za-z_]+$",
+                    "description": "One of code, password, refresh_token, client_credentials"
+                },
+                "client_id": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                },
+                "redirect_uri": {
+                    "type": "string",
+                    "format": "url",
+                    "maxLength": 512,
+                    "description": "A uri to redirect steward after authorization"
+                },
+                "username": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z_]+$",
+                    "description": "stewardname of user"
+                },
+                "scopes": {
+                    "description": "A comma separated list of scopes. If not provided, scope defaults to an empty list of scopes for stewards that don’t have a valid token for the app. For stewards who do already have a valid token for the app, the steward won’t be shown the OAuth authorization page with the list of scopes. Instead, this step of the flow will automatically complete with the same scopes that were used last time the steward completed the flow.",
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 5,
+                        "maxLength": 32
+                    }
+                }
+            }
+        },
+        "register_response": {
+            "type": "object",
+            "minProperties": 4,
+            "maxProperties": 4,
+            "required": [
+                "stewards",
+                "accounts",
+                "currencies",
+                "namespaces"
+            ],
+            "properties": {
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/stewards_get"
+                    }
+                },
+                "accounts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/accounts_get"
+                    }
+                },
+                "currencies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/currencies_get"
+                    }
+                },
+                "namespaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/namespaces_get"
+                    }
+                }
+            }
+        },
+        "register_request": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 4,
+            "required": [
+                "stewardname",
+                "password"
+            ],
+            "properties": {
+                "stewardname": {
+                    "type": "string",
+                    "description": "Stewards name",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "Stewards password",
+                    "minLength": 4,
+                    "maxLength": 1024
+                },
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "description": "Stewards 1024bit - 4096bit RSA public key. command: openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096 ,openssl rsa -pubout -in private_key.pem -out public_key.pem , you can deterministically generate an RSA key from a passphrase http://crypto.stackexchange.com/questions/24514/deterministically-generate-a-rsa-public-private-key-pair-from-a-passphrase-with you can also use this service to generate a key online: http://travistidwell.com/blog/2013/09/06/an-online-rsa-public-and-private-key-generator/",
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                },
+                "email": {
+                    "type": "string",
+                    "description": "Stewards email address",
+                    "format": "email",
+                    "maxLength": 255,
+                    "pattern": "^([\\w-]+(?:\\.[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                },
+                "email_notifications": {
+                    "type": "boolean",
+                    "description": "Does steward wish to receive email notifications"
+                }
+            }
+        },
+        "ErrorModel": {
+            "type": "object",
+            "required": [
+                "code",
+                "message"
+            ],
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
