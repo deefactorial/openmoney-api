@@ -14,8 +14,8 @@ Setup buckets with the names `oauth2server`, `openmoney_global`, `openmoney_stew
 ```sh
 
 git clone https://github.com/deefactorial/openmoney-api.git
+cd openmoney-api
 npm install
-
 
 ```
 
@@ -24,7 +24,17 @@ npm install
 ```sh
 
 node .
-mocha ./test/steward-test.js
-https://127.0.0.1:8080/docs/
 
 ```
+
+#Test
+
+```sh
+
+mocha
+
+```
+
+#Documentation
+
+https://127.0.0.1:8080/docs/
