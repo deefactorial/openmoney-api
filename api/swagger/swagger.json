@@ -45,30 +45,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -282,7 +282,7 @@
                 ],
                 "security": [
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -556,7 +556,7 @@
                 "summary": "Gets an authorization token",
                 "security": [
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     },
                     {
                         "oauth2Refresh": []
@@ -604,30 +604,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:stewards"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -679,30 +679,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -745,30 +745,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:stewards"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -820,30 +820,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -894,30 +894,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -971,30 +971,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:namespaces"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1053,30 +1053,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1128,30 +1128,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:namespaces"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1204,30 +1204,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1285,30 +1285,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1370,30 +1370,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:currencies"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1460,30 +1460,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1543,30 +1543,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:currencies"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1635,30 +1635,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1716,30 +1716,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1816,30 +1816,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1906,30 +1906,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -1988,30 +1988,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -2073,34 +2073,34 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:stewards",
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:stewards",
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:stewards",
                             "read:accounts"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:stewards",
                             "read:accounts"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -2188,30 +2188,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "read:journals"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "read:journals"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "read:journals"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "read:journals"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -2292,30 +2292,30 @@
                 ],
                 "security": [
                     {
-                        "oauth2Password": [
+                        "oauth2PasswordSecurity": [
                             "write:journals"
                         ]
                     },
                     {
-                        "oauth2Implicit": [
+                        "oauth2ImplicitSecurity": [
                             "write:journals"
                         ]
                     },
                     {
-                        "oauth2ClientCredentials": [
+                        "oauth2ApplicationSecurity": [
                             "write:journals"
                         ]
                     },
                     {
-                        "oauth2Code": [
+                        "oauth2AccessCodeSecurity": [
                             "write:journals"
                         ]
                     },
                     {
-                        "apiKey": []
+                        "apiKeySecurity": []
                     },
                     {
-                        "password": []
+                        "basicAuthenticationSecurity": []
                     }
                 ],
                 "responses": {
@@ -2336,7 +2336,7 @@
         }
     },
     "securityDefinitions": {
-        "oauth2Password": {
+        "oauth2PasswordSecurity": {
             "type": "oauth2",
             "scopes": {
                 "read:stewards": "Read access to stewards",
@@ -2355,7 +2355,7 @@
             "flow": "password",
             "tokenUrl": "https://deefactorial.proudleo.com/V2/stewards/{stewardname}/token"
         },
-        "oauth2Implicit": {
+        "oauth2ImplicitSecurity": {
             "type": "oauth2",
             "scopes": {
                 "read:stewards": "Read access to stewards",
@@ -2374,7 +2374,7 @@
             "flow": "implicit",
             "authorizationUrl": "http://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/dialoge"
         },
-        "oauth2ClientCredentials": {
+        "oauth2ApplicationSecurity": {
             "type": "oauth2",
             "scopes": {
                 "read:stewards": "Read access to stewards",
@@ -2393,7 +2393,7 @@
             "flow": "application",
             "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
         },
-        "oauth2Code": {
+        "oauth2AccessCodeSecurity": {
             "type": "oauth2",
             "scopes": {
                 "read:stewards": "Read access to stewards",
@@ -2413,7 +2413,7 @@
             "authorizationUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/authorize",
             "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
         },
-        "apiKey": {
+        "apiKeySecurity": {
             "type": "apiKey",
             "in": "header",
             "name": "Authorization"
@@ -2423,7 +2423,7 @@
             "in": "header",
             "name": "Authorization"
         },
-        "password": {
+        "basicAuthenticationSecurity": {
             "type": "basic"
         }
     },

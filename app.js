@@ -84,20 +84,20 @@ var config = {
       console.log('in oauth2Password (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
-    oauth2Implicit: function(req, def, scopes, callback) {
-      console.log('in oauth2Implicit (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
+    oauth2ImplicitSecurity: function(req, def, scopes, callback) {
+      console.log('in oauth2ImplicitSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
-    oauth2ClientCredentials: function(req, def, scopes, callback) {
-      console.log('in oauth2ClientCredentials (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
+    oauth2ApplicationSecurity: function(req, def, scopes, callback) {
+      console.log('in oauth2ApplicationSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
-    oauth2Code: function(req, def, scopes, callback) {
-      console.log('in oauth2Code (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
+    oauth2AccessCodeSecurity: function(req, def, scopes, callback) {
+      console.log('in oauth2AccessCodeSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
-    apiKey: function(req, def, scopes, callback) {
-      console.log('in apiKey (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
+    apiKeySecurity: function(req, def, scopes, callback) {
+      console.log('in apiKeySecurity (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       passport.authenticate('bearer', function (err, user, info) {
         if (err) {
           callback(new Error('Error in passport authenticate'));
@@ -110,8 +110,8 @@ var config = {
 
       })(req, null, callback);
     },
-    password: function(req, def, scopes, callback){
-      console.log('in password (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
+    basicAuthenticationSecurity: function(req, def, scopes, callback){
+      console.log('in basicAuthenticationSecurity (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       passport.authenticate('basic', function (err, user, info) {
         if (err) {
           callback(new Error('Error in passport authenticate'));
