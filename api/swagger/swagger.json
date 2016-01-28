@@ -14,7 +14,7 @@
             "url": "http://www.apache.org/licenses/LICENSE-2.0"
         }
     },
-    "host": "deefactorial.proudleo.com",
+    "host": "cloud.openmoney.cc",
     "basePath": "/V2",
     "schemes": [
         "https"
@@ -2899,56 +2899,6 @@
                     "minLength": 893,
                     "maxLength": 899,
                     "pattern": "^-----BEGIN PRIVATE KEY-----[A-Za-z0-9/+]{845,848}[=]{0,3}-----END PRIVATE KEY-----$"
-                }
-            }
-        },
-        "authorize_request": {
-            "type": "object",
-            "minProperties": 2,
-            "maxProperties": 2,
-            "required": [
-                "publicKey",
-                "cors_token"
-            ],
-            "properties": {
-                "publicKey": {
-                    "type": "string",
-                    "minLength": 266,
-                    "maxLength": 800,
-                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$",
-                    "description": "Stewards public key"
-                },
-                "cors_token": {
-                    "type": "string",
-                    "minLength": 20,
-                    "maxLength": 255,
-                    "pattern": "^[A-Za-z0-9]*$",
-                    "description": "An unguessable random string. It is used to protect against cross-site request forgery attacks."
-                }
-            }
-        },
-        "authorize_response": {
-            "type": "object",
-            "minProperties": 2,
-            "maxProperties": 2,
-            "required": [
-                "challenge_token",
-                "cors_token"
-            ],
-            "properties": {
-                "challenge_token": {
-                    "type": "string",
-                    "minLength": 86,
-                    "maxLength": 255,
-                    "pattern": "^[A-Za-z0-9/=+]+$",
-                    "description": "An unguessable random string encoded using stewards public key."
-                },
-                "cors_token": {
-                    "type": "string",
-                    "minLength": 20,
-                    "maxLength": 255,
-                    "pattern": "^[A-Za-z0-9]*$",
-                    "description": "An unguessable random string sent in the request. If it does not match request cors_token the response should be thrown away and error reported."
                 }
             }
         },
