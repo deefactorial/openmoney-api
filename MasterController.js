@@ -708,7 +708,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     }
                                 } else {
                                     val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
-                                    stewards_bucket.replace(currencyID, val_ref.value, {cas: valref.cas},function(err, ok){
+                                    stewards_bucket.replace(currencyID, val_ref.value, {cas: val_ref.cas},function(err, ok){
                                         if(err) {
                                             callback(err, false);
                                         } else {
