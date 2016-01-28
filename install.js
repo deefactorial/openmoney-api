@@ -2,10 +2,18 @@
  * Created by deefactorial on 28/01/16.
  */
 
+
+if(typeof process.env.COUCHBASE_ADMIN_USERNAME == 'undefined'){
+    console.error("Did you forget to set the COUCHBASE_ADMIN_USERNAME environment variable?");
+}
+if(typeof process.env.COUCHBASE_ADMIN_PASSWORD == 'undefined'){
+    console.error("Did you forget to set the COUCHBASE_ADMIN_PASSWORD environment variable?");
+}
+
 var couchbase = require('couchbase'),
     serverAddress = '127.0.0.1',
     cluster = new couchbase.Cluster('couchbase://' + serverAddress),
-    clusterManager = cluster.manager('Administrator', 'password'),
+    clusterManager = cluster.manager(process.env.COUCHBASE_ADMIN_USERNAME, process.env.COUCHBASE_ADMIN_PASSWORD),
     N1qlQuery = couchbase.N1qlQuery,
     async = require('async'),
     tasks = {},
@@ -16,7 +24,7 @@ tasks.create_bucket_oauth2Server = function(callback){
     //Create the bucket
     clusterManager.createBucket('oauth2Server', {}, function(err, results){
         if(err){
-            callback("CREATE oauth2Server BUCKET ERROR: (did you forget to change the cluster Administrator credentials in ./install.js ?) :" + err, null);
+            callback("CREATE oauth2Server BUCKET ERROR: (check that your couchbase admin credentials are set properly.) :" + err, null);
         } else {
             callback(null,"Successfully created oauth2Server bucket.");
         }
