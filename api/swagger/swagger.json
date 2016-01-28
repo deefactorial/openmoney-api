@@ -2557,11 +2557,6 @@
                 }
             }
         },
-        "stewardid": {
-            "type": "string",
-            "maxLength": 512,
-            "pattern": "^stewards~[A-Za-z0-9_.-]+$"
-        },
         "stewards": {
             "type": "object",
             "minProperties": 2,
@@ -2661,7 +2656,9 @@
                 "stewards": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/stewardid"
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
                     }
                 },
                 "publicKey": {
@@ -2709,7 +2706,9 @@
                 "stewards": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/stewardid"
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
                     }
                 }
             }
@@ -2751,7 +2750,9 @@
                 "stewards": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/stewardid"
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
                     }
                 }
             }
