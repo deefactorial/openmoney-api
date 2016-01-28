@@ -7,6 +7,7 @@
 1004 : Failed public key evaluation!
 1005 : That public key is not registered.
 1006 : Authorization Failed.
+1007 : Schema Validation Failed.
 
 # Stewards
 

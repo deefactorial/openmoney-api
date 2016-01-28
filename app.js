@@ -73,7 +73,7 @@ module.exports = app; // for testing
 
 // Set the DEBUG environment variable to enable debug output
 if(typeof process.env.DEBUG == 'undefined'){
-  process.env.DEBUG = 'swagger:*';
+  process.env.DEBUG = 'swagger-tools:*';
 }
 
 
@@ -181,13 +181,8 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   app.get('/V2/stewards/:stewardname/dialog/authorize', oauth2.authorization);
   app.post('/V2/stewards/:stewardname/dialog/authroize/decision', oauth2.decision);
 
-
   // Route validated requests to appropriate controller
   app.use(middleware.swaggerRouter({useStubs: true, controllers: './api/controllers'}));
-
-
-
-
 
   // Serve the Swagger documents and Swagger UI
   //   http://localhost:3000/docs => Swagger UI

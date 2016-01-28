@@ -35,7 +35,8 @@
     "dotenv": "^1.2.0"
   },
   "scripts": {
-    "start": "node app.js",
-    "test": "swagger project test"
+    "install": "node install",
+    "start": "DEBUG=swagger-tools:* node app.js",
+    "test": "mocha"
   }
 }

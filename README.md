@@ -5,9 +5,8 @@ Stewards are the patrons of these namespaces, currencies, accounts and journals.
 
 #Install
 
-Go to [couchbase downloads](http://www.couchbase.com/nosql-databases/downloads) and install the couchbase server
-
-Setup buckets with the names `oauth2server`, `openmoney_global`, `openmoney_stewards` create a primary index using GSI on the buckets.
+- Go to [couchbase downloads](http://www.couchbase.com/nosql-databases/downloads) and install the latest couchbase server.
+- Edit `install.js` with the administrator credentials for your couchbase server.
 
 ```sh
 
@@ -21,7 +20,7 @@ npm install
 
 ```sh
 
-node .
+npm start
 
 ```
 

@@ -329,35 +329,6 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     var currencies = [];
     var accounts = [];
 
-    var installation = process.env.INSTALL;
-
-    if(installation) {
-        openmoney_bucket.enableN1ql(['http://127.0.0.1:8093/']);
-        stewards_bucket.enableN1ql(['http://127.0.0.1:8093/']);
-
-        ////create primary index on bucket
-        //var N1qlQuery = couchbase.N1qlQuery;
-        //var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_stewards` USING GSI;";
-        //console.log(queryString);
-        //var query = N1qlQuery.fromString(queryString);
-        //stewards_bucket.get(query, function(err,doc){
-        //    if(err) {
-        //        registerPostCallback(err, false);
-        //    }
-        //});
-        //
-        ////create primary index on bucket
-        //var N1qlQuery = couchbase.N1qlQuery;
-        //var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_global` USING GSI;";
-        //console.log(queryString);
-        //var query = N1qlQuery.fromString(queryString);
-        //openmoney_bucket.get(query, function(err,doc){
-        //    if(err) {
-        //        registerPostCallback(err, false);
-        //    }
-        //});
-    }
-
     var scrypt = require("scrypt");
     var scryptParameters = scrypt.paramsSync(0.5);
 
@@ -391,52 +362,15 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     // stewards view of default accounts
 
     var deefactorial = {};
-    deefactorial.stewardname = 'deefactorial';
-    deefactorial.password = scrypt.kdfSync('password', scryptParameters).toString('base64');
-    deefactorial.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAuoreAzUFyumy3TxoohvkSrukPSX994GUxMg0u1K03m+kI+Uscl+aCJ9y9gtEIxRfZ9fGcDceAZDBA0neZS0aUHu7tH9oI9NzJPhl9A9ORMovdGOrFLqDaSKY6FvDxxQAWT0CbAGfUDGB20Y1793j4bqd1iQHSdo+oVM8bv54THCwFIpjcNW0llbO910t1FE32CWt2Y1kGheMrt0w8du3gFUNIykGoCau2E4q7iDbnID2gl7jNHQQbZbHJX42ywTgFd6a9RuH6c/0vUO2M4u6qXaabOML67uMIpOo77YYEe7VzhL1rqavAvLO4weV0FZ76E8GWMsu9jeKLG4f88OVrFd3QgF55FU8dgbypboeI/e048sNeuEVDRYg4tZUjbzONSSPUk4ZNKbYnhcgYoPWs/DBYFXSssYnQzl5dWgAc8yuYREhqy0Uhr4EzuOBjf/j161UPRrz622jUztN95+idIXwc+sbP76tW4w+8Jm3Z1By+I+2JCRPhcdJYywsH41nDMekKs8xV85mpIkLABompZ5llpKeJkyZboMgF3ynziCMZt7T1zk5dROeHE7GtyhM2Q3BJD+VGteRV1WUmBC1Y9CWTR7/qn4lk6Fa4QNymdx8IfM1uEINFLhAHr+AALwotwHwISjnN2mx8X+mjxXX+w85u3uO1clzPzBLGzrZ/IcCAwEAAQ==-----END PUBLIC KEY-----';
-    deefactorial.email = 'deefactorial@gmail.com';
-    deefactorial.email_notifications = true;
-    deefactorial.type = "stewards";
-    deefactorial.id = 'stewards~' + deefactorial.stewardname.toLowerCase();
-    if (installation) {
-        openmoney_bucket.insert(deefactorial.id, deefactorial, function(err, res) {
-            if(err) { console.log(err); }
-            console.log(res);
-        });
-    }
-    stewards.push(deefactorial);
+    deefactorial.id = 'stewards~deefactorial';
     steward_bucket.stewards.push(deefactorial.id);
 
     var michael = {};
-    michael.stewardname = 'mwl';
-    michael.password = scrypt.kdfSync('password', scryptParameters).toString('base64');
-    michael.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA5JW4L83dOXtWhlQ64F3DAcdckwabV+kYDUIYVSSPxFcPPHAVTDOBwk0NANiEfZQs/uFZgQMfjtz3QGy9LIOp7hVQYhCXtNnL+40iCBFo2uVUrcr5oQpIzQmEuNO1t5d46kRKTMDhg5nWuoPgF5EkLhaUnw0jRuKbM7b4enEijyOFJm9aYWYl/0Czp15bdwhm/q9Et3gvR5ag30GLViTi5dJakV+LI1rTR9SP9Z2wkViy1t3nO7De5dUsIOra67XClUtqCt9x4R8+yEllFMalb02fzgXpSL01lMa6naIIg3LjcP+pmGY1pZcbZj8NBr+Mg9PKOjz4YfHSB66Q73zCvHt+uoeEE0p8+v67pWleZlnckPVSRk0jRY095wNVw4mgso08XtJ4pO/TcmfsI/SgH6LjRPpakyfHVrwm2uBjK+u2HtKSq53UcuxoENP5PJodIt+6a+GqvdHuqE37np77+51lbFC7A4oJT13py/cDng3X0l+glLNJaxm67pVa4CgR9n7aPXaCcHLN/lvHkzctUa5k30uuAoZB2TiWcq1gWyGJYl1FKcxNxniYwpu9WJ05VwwVHoW1FvKVz/hpKEN4febifqOR/+JhpxkyrsDfmaWabXgMZygAlAGW9hCxfi5OagrslMNyuF8OTyrg6VQtNKO6QYcflReHRPDzUz/54UsCAwEAAQ==-----END PUBLIC KEY-----';
-    michael.email = 'michael.linton@gmail.com';
-    michael.email_notifications = true;
-    michael.type = "stewards";
-    michael.id = 'stewards~' + michael.stewardname.toLowerCase();
-    if (installation) {
-        openmoney_bucket.insert(michael.id, michael, function(err, res) {
-            if(err) { console.log(err); }
-            console.log(res);
-        });
-    }
-    stewards.push(michael);
+    michael.id = 'stewards~mwl';
     steward_bucket.stewards.push(michael.id);
 
     var les = {};
-    les.stewardname = 'les';
-    les.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAss/XIJKfafrpWizysIaxz8yp/92mnu+bP24f+OOXcZfo6LVHFUNnWABCWvui5c4/I68SvKDcjr/WCGlfRVmiRCdoGAt4JT3biaBJUkO3ng4JYi6l17PKnMUDw/d525gnU/uFQJ1HlzovT7GNJ1pUS9vy9attgNgkrGce5n9W03wSU5CAwWD5iZnMKK7TzBrwWO1AEh272vvyomgNO9sKU+g86B0Zj0HuP4feTJQ1RPXNZd5LYFjrtrfqi1lw+/fLPWhB4TfV7nFE/tSvrigA5f8pxPzeunUgh2JZlubtC/3fwOMI2WXNtvkUaGE/bbRGCEFwxdk4U20MQ2G4goEvMsMZZNmD3mygHmXRPTSOQvbT6Iamoxq1qhzzWBXCO7NoJyARw/RpVy+wjXIWXtm1BtrEF2j9JsbDorFQy1jkDijVdAGB6DXi0YhK5mjggIp77RClN1ulpaG8Tdso9Xp3xh490AnoQDSvIsEIG9WuYEhWZEbTGSkESf76ll7qff1d3Hy1sl+9iCPIfCcNu58jGclLw8xjX25Z8SJMJBlAXPPEEj5sBzgpQ+Q6jaVTfkxnopkq6CsSsSzcdhLv2oAijLdjmevDiYy5KsFLSFai3GkkCZk9K3PCdgPv3uf8N2vjkWp+gTmL+PUXM9uZItOPhpZVPEtZjqgzX9166qnybqkCAwEAAQ==-----END PUBLIC KEY-----';
-    les.email = 'les.moore@commonresource.net';
-    les.email_notificaitons = true;
-    les.type = "stewards";
-    les.id = 'stewards~' + les.stewardname.toLowerCase();
-    if (installation) {
-        openmoney_bucket.insert(les.id, les, function(err, res) {
-            if(err) { console.log(err); }
-            console.log(res);
-        });
-    }
+    les.id = 'stewards~les';
 
     var space_root = "cc";
     var stewards_space = "cc";
@@ -474,7 +408,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                     space.namespace = "ca";
                     space.parent_namespace = "";
                     space.created = new Date().getTime(); //static
-                    space.stewards = [deefactorial.id, michael.id];
+                    space.stewards = [ deefactorial.id, michael.id ];
                     space.type = "namespaces";
                     space.id = 'namespaces~' + space.namespace;
                     spaces.push( space );
@@ -486,14 +420,13 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                     space.namespace = "uk";
                     space.parent_namespace = "";
                     space.created = new Date().getTime(); //static
-                    space.stewards = [les.id];
+                    space.stewards = [ les.id ];
                     space.type = "namespaces";
                     space.id = 'namespaces~' + space.namespace;
                     spaces.push( space );
                     steward_bucket.namespaces.push(space.id);
 
-                    //push this steward account onto the stewards stack of accounts known
-                    stewards.push(les);
+                    //push les on the knowns stewards on this stewards bucket
                     steward_bucket.stewards.push(les.id);
                 }
 
@@ -501,7 +434,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                 steward_space.namespace = steward.stewardname.toLowerCase().substring(0, indexOf(steward.stewardname, '.'));
                 steward_space.parent_namespace = space_parent.toLowerCase();
                 steward_space.created = new Date().getTime();
-                steward_space.stewards = [steward.id];
+                steward_space.stewards = [ steward.id ];
                 steward_space.type = "namespaces";
                 steward_space.id = 'namespaces~' + steward_space.namespace + "." + steward_space.space_parent;
                 spaces.push( space );
@@ -526,13 +459,6 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     //spaces.push( space );
     steward_bucket.namespaces.push(space.id);
 
-    if (installation) {
-        openmoney_bucket.insert(space.id, space, function(err, res) {
-            if(err) { console.log(err); }
-            console.log(res);
-        });
-    }
-
     //This is the community currency all stewards get an account in this currency when they use the register api.
     var currency = {};
     currency.currency = "cc";
@@ -543,13 +469,6 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     currency.id = 'currencies~' + currency.currency;
     //currencies.push(currency);
     steward_bucket.currencies.push(currency.id);
-
-    if (installation) {
-        openmoney_bucket.insert(currency.id, currency, function(err, res) {
-            if(err) { console.log(err); }
-            console.log(res);
-        });
-    }
 
     //accounts don't store journal entries, journal entries reference accounts.
     var account = {};
@@ -727,7 +646,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     }
                                 } else {
                                     val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
-                                    stewards_bucket.upsert(stewardID, val_ref.value, function(err, ok){
+                                    stewards_bucket.replace(stewardID, val_ref.value, {cas: val_ref.cas}, function(err, ok){
                                         if(err) {
                                             callback(err, false);
                                         } else {
@@ -758,7 +677,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     }
                                 } else {
                                     val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
-                                    stewards_bucket.upsert(namespaceID, val_ref.value, function(err, ok){
+                                    stewards_bucket.replace(namespaceID, val_ref.value, {cas: val_ref.cas}, function(err, ok){
                                         if(err) {
                                             callback(err, false);
                                         } else {
@@ -789,7 +708,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     }
                                 } else {
                                     val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
-                                    stewards_bucket.upsert(currencyID, val_ref.value, function(err, ok){
+                                    stewards_bucket.replace(currencyID, val_ref.value, {cas: valref.cas},function(err, ok){
                                         if(err) {
                                             callback(err, false);
                                         } else {
@@ -821,7 +740,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     }
                                 } else {
                                     val_ref.value.documents.push("steward_bucket~" + getHash(steward.publicKey));
-                                    stewards_bucket.upsert(accountID, val_ref.value, {cas : val_ref.cas}, function(err, ok){
+                                    stewards_bucket.replace(accountID, val_ref.value, {cas : val_ref.cas}, function(err, ok){
                                         if(err) {
                                             callback(err, false);
                                         } else {
