@@ -644,7 +644,7 @@ describe('/stewards/{stewardname}/oauth/token', function() {
             request.password = steward.password;
 
             var basic = new Buffer("openmoney-api" + ":" + process.env.OPENMONEY_API_KEY).toString("base64");
-            console.log(basic);
+            //console.log(basic);
             /*eslint-enable*/
             api.post('/V2/stewards/' + steward.stewardname + '/oauth/token')
                 .set('Accept', 'application/json')
