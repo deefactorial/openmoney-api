@@ -124,6 +124,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "loginGet",
+                "description": "Login Page for the steward",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -152,6 +153,7 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "loginPost",
+                "description": "Login steward",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -191,6 +193,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "logoutPost",
+                "description": "Logout steward",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -218,6 +221,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "accountGet",
+                "description": "Get Steward account information",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -248,6 +252,7 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthApplicationPost",
+                "description": "Existing steward Registers an application with the openmoney network.",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -273,7 +278,6 @@
                         }
                     }
                 ],
-                "description": "Existing steward Registers an application with the openmoney network.",
                 "tags": [
                     "auth"
                 ],
@@ -295,10 +299,11 @@
                 }
             }
         },
-        "/stewards/{stewardname}/oauth/dialoge": {
+        "/stewards/{stewardname}/dialog/authorize": {
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthDialogeGet",
+                "description": "Implicit authorization dialog presented to steward to authorize client_id to access API resources on their behalf.",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -338,7 +343,6 @@
                         }
                     }
                 ],
-                "description": "Presents an oauth dialoge to the user to grant the application access to the scopes",
                 "tags": [
                     "auth"
                 ],
@@ -359,10 +363,11 @@
                 }
             }
         },
-        "/stewards/{stewardname}/oauth/dialoge/decision": {
+        "/stewards/{stewardname}/dialog/authorize/decision": {
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthDialogePost",
+                "description": "Authorizes a steward on the openmoney network",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -381,7 +386,6 @@
                         }
                     }
                 ],
-                "description": "Authorizes a steward on the openmoney network",
                 "tags": [
                     "auth"
                 ],
@@ -402,128 +406,11 @@
                 }
             }
         },
-        "/stewards/{stewardname}/oauth/authorize": {
-            "get": {
-                "x-swagger-router-controller": "Auth",
-                "operationId": "oauthAuthorizeGet",
-                "parameters": [
-                    {
-                        "name": "Authorization",
-                        "in": "header",
-                        "type": "string",
-                        "pattern": "^Basic [A-Za-z0-9/+=.]+$"
-                    },
-                    {
-                        "name": "stewardname",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "response_type",
-                        "in": "query",
-                        "description": "One of code, password, refresh_token, client_credentials",
-                        "required": true,
-                        "type": "string",
-                        "pattern": "^[A-Za-z_]+$"
-                    },
-                    {
-                        "name": "client_id",
-                        "in": "query",
-                        "description": "Client ID received during registration",
-                        "type": "string",
-                        "minLength": 0,
-                        "maxLength": 800,
-                        "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
-                    },
-                    {
-                        "name": "redirect_uri",
-                        "in": "query",
-                        "description": "A uri to redirect steward after authorization",
-                        "type": "string",
-                        "format": "url",
-                        "maxLength": 512
-                    },
-                    {
-                        "name": "scopes",
-                        "in": "query",
-                        "description": "A comma separated list of scopes. If not provided, scope defaults to an empty list of scopes for stewards that don’t have a valid token for the app. For stewards who do already have a valid token for the app, the steward won’t be shown the OAuth authorization page with the list of scopes. Instead, this step of the flow will automatically complete with the same scopes that were used last time the steward completed the flow.",
-                        "type": "array",
-                        "items": {
-                            "type": "string",
-                            "minLength": 5,
-                            "maxLength": 32
-                        }
-                    }
-                ],
-                "description": "Authorizes a steward on the openmoney network",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Authorize",
-                "produces": [
-                    "text/html"
-                ],
-                "responses": {
-                    "302": {
-                        "description": "redirect to client redirect uri"
-                    },
-                    "default": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorModel"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "x-swagger-router-controller": "Auth",
-                "operationId": "oauthAuthorizePost",
-                "parameters": [
-                    {
-                        "name": "stewardname",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "oauth_authorize_request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/oauth_authorize_request"
-                        }
-                    }
-                ],
-                "description": "Authorizes a steward on the openmoney network",
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Authorize",
-                "produces": [
-                    "text/html"
-                ],
-                "responses": {
-                    "302": {
-                        "description": "redirect to client redirect uri"
-                    },
-                    "default": {
-                        "description": "Error",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorModel"
-                        }
-                    }
-                }
-            }
-        },
         "/stewards/{stewardname}/oauth/token": {
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthAccessTokenPost",
+                "description": "Exchanges the user or client credentials for an access token used to access resource end points.",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -549,7 +436,6 @@
                         }
                     }
                 ],
-                "description": "Gets an authorization token",
                 "tags": [
                     "auth"
                 ],
@@ -673,7 +559,7 @@
                         }
                     }
                 ],
-                "description": "Update your steward account",
+                "description": "Update a steward account",
                 "tags": [
                     "stewards"
                 ],
@@ -739,7 +625,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Delete your steward account",
+                "description": "Delete a steward account",
                 "tags": [
                     "stewards"
                 ],
@@ -814,7 +700,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "List of spaces",
+                "description": "Get a Listing of namespaces known by steward.",
                 "tags": [
                     "namespaces"
                 ],
@@ -888,7 +774,7 @@
                         }
                     }
                 ],
-                "description": "Create New Spaces",
+                "description": "Create a namespace",
                 "tags": [
                     "namespaces"
                 ],
@@ -965,7 +851,7 @@
                         "description": "space name"
                     }
                 ],
-                "description": "Get a space by name, use this API to discover other users spaces.",
+                "description": "Get a namespace by it's name",
                 "tags": [
                     "namespaces"
                 ],
@@ -1015,7 +901,7 @@
             "put": {
                 "x-swagger-router-controller": "Spaces",
                 "operationId": "spacesPut",
-                "description": "Update Space",
+                "description": "Update a namespace",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -1119,10 +1005,10 @@
                         "required": true,
                         "maxLength": 1048,
                         "pattern": "^[A-Za-z0-9_.-]+$",
-                        "description": "space name"
+                        "description": "namespace name"
                     }
                 ],
-                "description": "Delete a space you are a steward of",
+                "description": "Delete a namespace",
                 "tags": [
                     "namespaces"
                 ],
@@ -1198,7 +1084,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "List currencies",
+                "description": "Get a Listing currencies known by steward.",
                 "tags": [
                     "currencies"
                 ],
@@ -1454,7 +1340,7 @@
                         }
                     }
                 ],
-                "description": "Update Currency",
+                "description": "Update a Currency",
                 "tags": [
                     "currencies"
                 ],
@@ -1537,7 +1423,7 @@
                         "description": "Currency name"
                     }
                 ],
-                "description": "Delete a currency you are a steward of",
+                "description": "Delete a currency",
                 "tags": [
                     "currencies"
                 ],
@@ -1629,7 +1515,7 @@
                         "pattern": "^[A-Za-z0-9_.-]*$"
                     }
                 ],
-                "description": "List accounts in a namespace",
+                "description": "Get a Listing of accounts in a namespace",
                 "tags": [
                     "accounts"
                 ],
@@ -1710,7 +1596,7 @@
                         }
                     }
                 ],
-                "description": "create an account",
+                "description": "create an account in a namespace",
                 "tags": [
                     "accounts"
                 ],
@@ -1810,7 +1696,7 @@
                         "pattern": "^[A-Za-z0-9_.-]*$"
                     }
                 ],
-                "description": "Get an account by id",
+                "description": "Get an account by account name",
                 "tags": [
                     "accounts"
                 ],
@@ -1900,7 +1786,7 @@
                         }
                     }
                 ],
-                "description": "Update account",
+                "description": "Update an account",
                 "tags": [
                     "accounts"
                 ],
@@ -1982,7 +1868,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Delete a account",
+                "description": "Delete an account",
                 "tags": [
                     "accounts"
                 ],
@@ -2030,7 +1916,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/namespaces/{namespace}/accounts/discovery": {
+        "/stewards/{stewardname}/accounts/lookup": {
             "get": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsDiscovery",
@@ -2050,24 +1936,16 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {
-                        "name": "namespace",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
                         "name": "publicKey",
                         "in": "query",
                         "description": "Accounts public Key",
                         "type": "string",
-                        "minLength": 266,
+                        "minLength": 1,
                         "maxLength": 800,
-                        "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                        "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
                     }
                 ],
-                "description": "Discover other stewards account by the accounts public key, this is how you add an account to make a payment to them.",
+                "description": "Lookup an account by it's public key",
                 "tags": [
                     "accounts"
                 ],
@@ -2353,7 +2231,7 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "password",
-            "tokenUrl": "https://deefactorial.proudleo.com/V2/stewards/{stewardname}/token"
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
         },
         "oauth2ImplicitSecurity": {
             "type": "oauth2",
@@ -2372,7 +2250,7 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "implicit",
-            "authorizationUrl": "http://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/dialoge"
+            "authorizationUrl": "http://cloud.openmoney.cc/V2/stewards/{stewardname}/dialog/authorize"
         },
         "oauth2ApplicationSecurity": {
             "type": "oauth2",
@@ -2391,7 +2269,7 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "application",
-            "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
         },
         "oauth2AccessCodeSecurity": {
             "type": "oauth2",
@@ -2410,8 +2288,8 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "accessCode",
-            "authorizationUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/authorize",
-            "tokenUrl": "https://deefactorial.proudleo.com/V2/steward/{stewardname}/oauth/token"
+            "authorizationUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token",
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
         },
         "apiKeySecurity": {
             "type": "apiKey",
