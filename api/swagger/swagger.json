@@ -2814,6 +2814,9 @@
                 },
                 "password": {
                     "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
                 }
             }
         },
