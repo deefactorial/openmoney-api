@@ -342,7 +342,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authroize",
+                "summary": "Authorize",
                 "produces": [
                     "text/html"
                 ],
@@ -385,7 +385,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authroize",
+                "summary": "Authorize",
                 "produces": [
                     "application/json"
                 ],
@@ -462,7 +462,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authroize",
+                "summary": "Authorize",
                 "produces": [
                     "text/html"
                 ],
@@ -503,7 +503,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authroize",
+                "summary": "Authorize",
                 "produces": [
                     "text/html"
                 ],
@@ -787,7 +787,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces": {
+        "/stewards/{stewardname}/namespaces": {
             "get": {
                 "x-swagger-router-controller": "Spaces",
                 "operationId": "spacesList",
@@ -936,7 +936,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces/{namespace}": {
+        "/stewards/{stewardname}/namespaces/{namespace}": {
             "get": {
                 "x-swagger-router-controller": "Spaces",
                 "operationId": "spacesGet",
@@ -1170,7 +1170,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces/{namespace}/currencies": {
+        "/stewards/{stewardname}/namespaces/{namespace}/currencies": {
             "get": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesList",
@@ -1327,7 +1327,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}": {
+        "/stewards/{stewardname}/namespaces/{namespace}/currencies/{currency}": {
             "get": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesGet",
@@ -1585,7 +1585,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces/{namespace}/accounts": {
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts": {
             "get": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsList",
@@ -1758,7 +1758,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/space/{namespace}/accounts/{account}": {
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}": {
             "get": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsGet",
@@ -2030,7 +2030,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/space/{namespace}/accounts/discovery": {
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts/discovery": {
             "get": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsDiscovery",
@@ -2119,7 +2119,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals/{currency}": {
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}": {
             "get": {
                 "x-swagger-router-controller": "Journals",
                 "operationId": "journalsList",
