@@ -2814,13 +2814,6 @@
                 },
                 "password": {
                     "type": "string"
-                },
-                "code": {
-                    "type": "string",
-                    "minLength": 39,
-                    "maxLength": 1600,
-                    "pattern": "^[A-Za-z0-9]+$",
-                    "description": "authorization code receieved during /oauth/authorize response"
                 }
             }
         },
