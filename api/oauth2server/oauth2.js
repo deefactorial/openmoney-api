@@ -80,7 +80,6 @@ server.grant(oauth2orize.grant.token(function(client, user, ares, done) {
             });
         });
     });
-
 }));
 
 // Exchange authorization codes for access tokens.  The callback accepts the

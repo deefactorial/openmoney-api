@@ -179,7 +179,7 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   app.get('/V2/stewards/:stewardname/logut', site.logout);
   app.get('/V2/stewards/:stewardname/account', site.account);
   app.get('/V2/stewards/:stewardname/dialog/authorize', oauth2.authorization);
-  app.post('/V2/stewards/:stewardname/dialog/authroize/decision', oauth2.decision);
+  app.post('/V2/stewards/:stewardname/dialog/authorize/decision', oauth2.decision);
 
   // Route validated requests to appropriate controller
   app.use(middleware.swaggerRouter({useStubs: true, controllers: './api/controllers'}));
