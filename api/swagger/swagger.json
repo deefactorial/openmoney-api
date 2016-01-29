@@ -39,7 +39,7 @@
                         "pattern": "^Bearer [A-Za-z0-9/+=.]+$"
                     }
                 ],
-                "description": "Get a listing of known stewards",
+                "summary": "Get a listing of known stewards",
                 "tags": [
                     "stewards"
                 ],
@@ -100,7 +100,7 @@
                         }
                     }
                 ],
-                "description": "Register a steward on the system",
+                "summary": "Register a steward on the system",
                 "tags": [
                     "stewards"
                 ],
@@ -124,7 +124,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "loginGet",
-                "description": "Login Page for the steward",
+                "summary": "Login Page for the steward",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -153,7 +153,7 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "loginPost",
-                "description": "Login steward",
+                "summary": "Login steward",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -193,7 +193,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "logoutPost",
-                "description": "Logout steward",
+                "summary": "Logout steward",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -221,7 +221,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "accountGet",
-                "description": "Get Steward account information",
+                "summary": "Get Steward account information",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -252,7 +252,7 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthApplicationPost",
-                "description": "Existing steward Registers an application with the openmoney network.",
+                "summary": "Create an application for a client_id and client_secret for oauth token authorization.",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -278,6 +278,7 @@
                         }
                     }
                 ],
+                "description": "Existing steward Registers an application with the openmoney network.",
                 "tags": [
                     "auth"
                 ],
@@ -303,7 +304,7 @@
             "get": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthDialogeGet",
-                "description": "Implicit authorization dialog presented to steward to authorize client_id to access API resources on their behalf.",
+                "summary": "Implicit authorization dialog presented to steward to authorize client_id to access API resources on their behalf.",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -346,7 +347,6 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authorize",
                 "produces": [
                     "text/html"
                 ],
@@ -367,7 +367,7 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthDialogePost",
-                "description": "Authorizes a steward on the openmoney network",
+                "description": "Authorization dialoge decision with allowed scopes.",
                 "parameters": [
                     {
                         "name": "stewardname",
@@ -386,10 +386,10 @@
                         }
                     }
                 ],
+                "summary": "Authorizes a steward on the openmoney network",
                 "tags": [
                     "auth"
                 ],
-                "summary": "Authorize",
                 "produces": [
                     "application/json"
                 ],
@@ -410,7 +410,6 @@
             "post": {
                 "x-swagger-router-controller": "Auth",
                 "operationId": "oauthAccessTokenPost",
-                "description": "Exchanges the user or client credentials for an access token used to access resource end points.",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -439,7 +438,7 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "Gets an authorization token",
+                "summary": "Exchanges the user or client credentials for an access token used to access resources.",
                 "security": [
                     {
                         "basicAuthenticationSecurity": []
@@ -484,7 +483,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Get a single steward",
+                "summary": "Get a single steward",
                 "tags": [
                     "stewards"
                 ],
@@ -559,7 +558,7 @@
                         }
                     }
                 ],
-                "description": "Update a steward account",
+                "summary": "Update a steward account",
                 "tags": [
                     "stewards"
                 ],
@@ -625,7 +624,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Delete a steward account",
+                "summary": "Delete a steward account",
                 "tags": [
                     "stewards"
                 ],
@@ -700,7 +699,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Get a Listing of namespaces known by steward.",
+                "summary": "Get a Listing of namespaces known by steward.",
                 "tags": [
                     "namespaces"
                 ],
@@ -774,7 +773,7 @@
                         }
                     }
                 ],
-                "description": "Create a namespace",
+                "summary": "Create a namespace",
                 "tags": [
                     "namespaces"
                 ],
@@ -851,7 +850,7 @@
                         "description": "space name"
                     }
                 ],
-                "description": "Get a namespace by it's name",
+                "summary": "Get a namespace by it's name",
                 "tags": [
                     "namespaces"
                 ],
@@ -901,7 +900,7 @@
             "put": {
                 "x-swagger-router-controller": "Spaces",
                 "operationId": "spacesPut",
-                "description": "Update a namespace",
+                "summary": "Update a namespace",
                 "parameters": [
                     {
                         "name": "Authorization",
@@ -1084,7 +1083,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Get a Listing currencies known by steward.",
+                "summary": "Get a Listing currencies known by steward.",
                 "tags": [
                     "currencies"
                 ],
@@ -1165,7 +1164,7 @@
                         }
                     }
                 ],
-                "description": "Create a currency",
+                "summary": "Create a currency",
                 "tags": [
                     "currencies"
                 ],
@@ -1250,7 +1249,7 @@
                         "description": "Name of a currency"
                     }
                 ],
-                "description": "Get a currency by its name",
+                "summary": "Get a currency by its name",
                 "tags": [
                     "currencies"
                 ],
@@ -1340,7 +1339,7 @@
                         }
                     }
                 ],
-                "description": "Update a Currency",
+                "summary": "Update a Currency",
                 "tags": [
                     "currencies"
                 ],
@@ -1423,7 +1422,7 @@
                         "description": "Currency name"
                     }
                 ],
-                "description": "Delete a currency",
+                "summary": "Delete a currency",
                 "tags": [
                     "currencies"
                 ],
@@ -1515,7 +1514,7 @@
                         "pattern": "^[A-Za-z0-9_.-]*$"
                     }
                 ],
-                "description": "Get a Listing of accounts in a namespace",
+                "summary": "Get a Listing of accounts in a namespace",
                 "tags": [
                     "accounts"
                 ],
@@ -1596,7 +1595,7 @@
                         }
                     }
                 ],
-                "description": "create an account in a namespace",
+                "summary": "create an account in a namespace",
                 "tags": [
                     "accounts"
                 ],
@@ -1696,7 +1695,7 @@
                         "pattern": "^[A-Za-z0-9_.-]*$"
                     }
                 ],
-                "description": "Get an account by account name",
+                "summary": "Get an account by account name",
                 "tags": [
                     "accounts"
                 ],
@@ -1786,7 +1785,7 @@
                         }
                     }
                 ],
-                "description": "Update an account",
+                "summary": "Update an account",
                 "tags": [
                     "accounts"
                 ],
@@ -1868,7 +1867,7 @@
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
                 ],
-                "description": "Delete an account",
+                "summary": "Delete an account",
                 "tags": [
                     "accounts"
                 ],
@@ -1945,7 +1944,7 @@
                         "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
                     }
                 ],
-                "description": "Lookup an account by it's public key",
+                "summary": "Lookup an account by it's public key",
                 "tags": [
                     "accounts"
                 ],
@@ -2060,7 +2059,7 @@
                         "minimum": 5
                     }
                 ],
-                "description": "List Journal Entries for this accountname",
+                "summary": "List Journal Entries for this accountname",
                 "tags": [
                     "journals"
                 ],
@@ -2164,7 +2163,7 @@
                         }
                     }
                 ],
-                "description": "Create a journal entry for this account",
+                "summary": "Create a journal entry for this account",
                 "tags": [
                     "journals"
                 ],
