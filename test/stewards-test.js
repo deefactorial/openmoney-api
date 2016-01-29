@@ -644,7 +644,7 @@ describe('/stewards/{stewardname}/oauth/token', function() {
             request.password = steward.password;
 
             var basic = new Buffer("openmoney-api" + ":" + process.env.OPENMONEY_API_KEY).toString("base64");
-            //console.log(basic);
+            console.log(basic);
             /*eslint-enable*/
             api.post('/V2/stewards/' + steward.stewardname + '/oauth/token')
                 .set('Accept', 'application/json')
@@ -1288,9 +1288,9 @@ describe('/stewards/{stewardname}', function () {
 });
 
 
-describe('/stewards/{stewardname}/spaces', function() {
+describe('/stewards/{stewardname}/namespaces', function() {
     describe('get', function() {
-        it('should respond with 200 List of spaces', function(done) {
+        it('should respond with 200 List of namespaces', function(done) {
             /*eslint-disable*/
             var schema = {
                 "type": "array",
@@ -1346,7 +1346,7 @@ describe('/stewards/{stewardname}/spaces', function() {
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces')
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces')
                 .query({
                     parent_namespace: 'cc'
                 })
@@ -1367,8 +1367,8 @@ describe('/stewards/{stewardname}/spaces', function() {
                 });
         });
 
-        //it('should respond with 200 List of spaces', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces')
+        //it('should respond with 200 List of namespaces', function(done) {
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces')
         //        .query({
         //            parent_namespace: 'DATA GOES HERE'
         //        })
@@ -1406,7 +1406,7 @@ describe('/stewards/{stewardname}/spaces', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces')
         //        .query({
         //            parent_namespace: 'DATA GOES HERE'
         //        })
@@ -1425,7 +1425,7 @@ describe('/stewards/{stewardname}/spaces', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces')
         //        .query({
         //            parent_namespace: 'DATA GOES HERE'
         //        })
@@ -1471,7 +1471,7 @@ describe('/stewards/{stewardname}/spaces', function() {
             };
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1519,7 +1519,7 @@ describe('/stewards/{stewardname}/spaces', function() {
             };
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1533,7 +1533,7 @@ describe('/stewards/{stewardname}/spaces', function() {
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .send({
@@ -1576,7 +1576,7 @@ describe('/stewards/{stewardname}/spaces', function() {
             };
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1617,7 +1617,7 @@ describe('/stewards/{stewardname}/spaces', function() {
             };
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1632,7 +1632,7 @@ describe('/stewards/{stewardname}/spaces', function() {
 
         //
         //it('should respond with default error payload', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .send({
@@ -1652,7 +1652,7 @@ describe('/stewards/{stewardname}/spaces', function() {
 });
 
 
-describe('/stewards/{stewardname}/spaces/{namespace}', function() {
+describe('/stewards/{stewardname}/namespaces/{namespace}', function() {
     describe('get', function() {
         it('should respond with 200 OK', function(done) {
             /*eslint-disable*/
@@ -1709,7 +1709,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + ".cc")
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + ".cc")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(200)
@@ -1728,7 +1728,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -1763,7 +1763,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -1779,7 +1779,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -1816,14 +1816,14 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             var space = {
-                id: "spaces~" + steward.stewardname + "1.cc",
+                id: "namespaces~" + steward.stewardname + "1.cc",
                 namespace: steward.stewardname + "1.cc" ,
                 parent_namespace: "cc",
                 stewards: [ "stewards~" + steward.stewardname ]
             };
 
             /*eslint-enable*/
-            api.put('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + ".cc")
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + ".cc")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1860,7 +1860,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             var space = {
-                id: "spaces~" + steward.stewardname + "1.cc",
+                id: "namespaces~" + steward.stewardname + "1.cc",
                 namespace: steward.stewardname + "1.cc" ,
                 parent_namespace: "cc",
                 stewards: [ "stewards~" + steward.stewardname, "stewards~deefactorial" ]
@@ -1868,7 +1868,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
 
             /*eslint-enable*/
 
-            api.put('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + "1.cc")
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + "1.cc")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1906,7 +1906,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             var space = {
-                id: "spaces~" + steward.stewardname + ".cc",
+                id: "namespaces~" + steward.stewardname + ".cc",
                 namespace: steward.stewardname + ".cc" ,
                 parent_namespace: "cc",
                 stewards: [ "stewards~" + steward.stewardname ]
@@ -1914,7 +1914,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
 
             /*eslint-enable*/
 
-            api.put('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + "1.cc")
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + "1.cc")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1956,14 +1956,14 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             var space = {
-                id: "spaces~" + steward.stewardname + ".cc",
+                id: "namespaces~" + steward.stewardname + ".cc",
                 namespace: steward.stewardname + ".ccc" ,
                 parent_namespace: "ccc",
                 stewards: [ "stewards~" + steward.stewardname ]
             };
 
             /*eslint-enable*/
-            api.put('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + ".cc")
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + ".cc")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(space)
@@ -1977,7 +1977,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         });
 
         //it('should respond with default error payload', function(done) {
-        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2017,7 +2017,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2033,7 +2033,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         //});
         //
         //it('should respond with 200 Delete success', function(done) {
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2070,7 +2070,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
             };
 
             /*eslint-enable*/
-            api.del('/V2/stewards/' + steward.stewardname + '/spaces/' + steward.stewardname + '.cc')
+            api.del('/V2/stewards/' + steward.stewardname + '/namespaces/' + steward.stewardname + '.cc')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(503)
@@ -2088,7 +2088,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
         });
 
         //it('should respond with default error payload', function(done) {
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2105,7 +2105,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}', function() {
     });
 });
 
-describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
+describe('/stewards/{stewardname}/namespaces/{namespace}/currencies', function() {
     describe('get', function() {
         it('should respond with 200 List of currencies', function(done) {
             /*eslint-disable*/
@@ -2159,7 +2159,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces/' + 'cc' + '/currencies')
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/' + 'cc' + '/currencies')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(200)
@@ -2177,7 +2177,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         });
 
         //it('should respond with 200 List of currencies', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .expect(200)
@@ -2209,7 +2209,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2225,7 +2225,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2266,7 +2266,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
             currency.currency_namespace = 'cc';
             currency.stewards = [ "stewards~" + steward.stewardname ];
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces/' + 'cc' + '/currencies')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces/' + 'cc' + '/currencies')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(currency)
@@ -2285,7 +2285,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2323,7 +2323,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2342,7 +2342,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2364,7 +2364,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies', function() {
 
 });
 
-describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', function() {
+describe('/stewards/{stewardname}/namespaces/{namespace}/currencies/{currency}', function() {
     describe('get', function() {
         it('should respond with 200 OK', function(done) {
             /*eslint-disable*/
@@ -2415,7 +2415,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces/cc/currencies/' + steward.stewardname)
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/cc/currencies/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(200)
@@ -2433,7 +2433,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2468,7 +2468,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2484,7 +2484,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2521,7 +2521,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //    };
         //
         //    /*eslint-enable*/
-        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2540,7 +2540,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //});
 
         //it('should respond with 200 OK', function(done) {
-        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2585,7 +2585,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
             currency.stewards = [ "stewards~" + steward.stewardname ];
 
             /*eslint-enable*/
-            api.put('/V2/stewards/' + steward.stewardname + '/spaces/cc/currencies/' + steward.stewardname)
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/cc/currencies/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(currency)
@@ -2599,7 +2599,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         });
         //
         //it('should respond with default error payload', function(done) {
-        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.put('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2639,7 +2639,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //    };
         //
         //    /*eslint-enable*/
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2655,7 +2655,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         //});
 
         //it('should respond with 200 OK', function(done) {
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2692,7 +2692,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
             };
 
             /*eslint-enable*/
-            api.del('/V2/stewards/' + steward.stewardname + '/spaces/cc/currencies/' + steward.stewardname)
+            api.del('/V2/stewards/' + steward.stewardname + '/namespaces/cc/currencies/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(503)
@@ -2705,7 +2705,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
         });
 
         //it('should respond with default error payload', function(done) {
-        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
+        //    api.del('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/currencies/{currency PARAM GOES HERE}')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2725,7 +2725,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/currencies/{currency}', fun
 });
 
 
-describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
+describe('/stewards/{stewardname}/namespaces/{namespace}/accounts', function() {
     describe('get', function() {
         it('should respond with 200 List of accounts', function(done) {
             /*eslint-disable*/
@@ -2797,7 +2797,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces/cc/accounts')
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts')
                 .query({
                     currency: 'cc', currency_namespace: ''
                 })
@@ -2819,7 +2819,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         });
 
         //it('should respond with 200 List of accounts', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .query({
         //            currency: 'DATA GOES HERE',currency_namespace: 'DATA GOES HERE'
         //        })
@@ -2857,7 +2857,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .query({
         //            currency: 'DATA GOES HERE',currency_namespace: 'DATA GOES HERE'
         //        })
@@ -2876,7 +2876,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .query({
         //            currency: 'DATA GOES HERE',currency_namespace: 'DATA GOES HERE'
         //        })
@@ -2923,7 +2923,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
             account.stewards = [ "stewards~" + steward.stewardname ];
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces/cc/accounts')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts')
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(account)
@@ -2943,7 +2943,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -2988,7 +2988,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         //account.stewards = [ "stewards~" + steward.stewardname ];
         //
         //    /*eslint-enable*/
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -3007,7 +3007,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -3030,7 +3030,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts', function() {
 });
 
 
-describe('/stewards/{stewardname}/space/{namespace}/accounts/{account}', function() {
+describe('/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}', function() {
     describe('get', function() {
         it('should respond with 200 OK', function(done) {
             /*eslint-disable*/
@@ -3099,7 +3099,7 @@ describe('/stewards/{stewardname}/space/{namespace}/accounts/{account}', functio
             };
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/space/cc/accounts/' + steward.stewardname)
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname)
                 .query({
                     currency: 'cc', currency_namespace: ''
                 })
@@ -3225,7 +3225,7 @@ describe('/stewards/{stewardname}/space/{namespace}/accounts/{account}', functio
             account_change.stewards = [ "stewards~" + steward.stewardname ];
 
             /*eslint-enable*/
-            api.put('/V2/stewards/' + steward.stewardname + '/space/' + 'cc' + '/accounts/' + steward.stewardname + "2")
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/' + 'cc' + '/accounts/' + steward.stewardname + "2")
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(account_change)
@@ -3293,7 +3293,7 @@ describe('/stewards/{stewardname}/space/{namespace}/accounts/{account}', functio
             account_change.stewards = [ "stewards~" + steward.stewardname, "stewards~test1451600055471" ];
 
             /*eslint-enable*/
-            api.put('/V2/stewards/' + steward.stewardname + '/space/cc/accounts/' + steward.stewardname)
+            api.put('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .send(account_change)
@@ -3410,7 +3410,7 @@ describe('/stewards/{stewardname}/space/{namespace}/accounts/{account}', functio
             };
 
             /*eslint-enable*/
-            api.del('/V2/stewards/' + steward.stewardname + '/space/cc/accounts/' + steward.stewardname)
+            api.del('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
                 .set('Accept', 'application/json')
                 .expect(503)
@@ -3471,10 +3471,7 @@ function decrypt(encrypted, algorithm, password, iv) {
 
 var created = null;
 
-describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals', function() {
-
-
-
+describe('/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals', function() {
     describe('post', function() {
         it('should respond with 200 OK', function(done) {
             /*eslint-disable*/
@@ -3500,7 +3497,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
             journal.amount = 0;
 
             /*eslint-enable*/
-            api.post('/V2/stewards/' + steward.stewardname + '/spaces/cc/accounts/' + steward.stewardname + '/journals/' + 'cc')
+            api.post('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname + '/journals/' + 'cc')
                 .query({
                     currency_namespace: ''
                 })
@@ -3523,7 +3520,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -3561,7 +3558,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         //    };
         //
         //    /*eslint-enable*/
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -3580,7 +3577,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.post('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .set('Authorization', 'Bearer ' + process.env.OPENMONEY_APPLICATION)
         //        .set('Accept', 'application/json')
         //        .set({
@@ -3717,7 +3714,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
 
 
             /*eslint-enable*/
-            api.get('/V2/stewards/' + steward.stewardname + '/spaces/cc/accounts/' + steward.stewardname + '/journals/cc')
+            api.get('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname + '/journals/cc')
                 .query({
                     offset: 0, range: 20
                 })
@@ -3761,7 +3758,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         });
 
         //it('should respond with 200 OK', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .query({
         //            offset: 'DATA GOES HERE',range: 'DATA GOES HERE'
         //        })
@@ -3799,7 +3796,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         //    };
         //
         //    /*eslint-enable*/
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .query({
         //            offset: 'DATA GOES HERE',range: 'DATA GOES HERE'
         //        })
@@ -3818,7 +3815,7 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         //});
         //
         //it('should respond with default error payload', function(done) {
-        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/spaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
+        //    api.get('/V2/stewards/{stewardname PARAM GOES HERE}/namespaces/{namespace PARAM GOES HERE}/accounts/{account PARAM GOES HERE}/journals')
         //        .query({
         //            offset: 'DATA GOES HERE',range: 'DATA GOES HERE'
         //        })
@@ -3835,8 +3832,6 @@ describe('/stewards/{stewardname}/spaces/{namespace}/accounts/{account}/journals
         //            done();
         //        });
         //});
-
     });
-
 });
 
