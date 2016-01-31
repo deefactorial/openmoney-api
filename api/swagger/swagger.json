@@ -2230,7 +2230,8 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "password",
-            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token",
+            "x-token-operation-id": "oauthAccessTokenPost"
         },
         "oauth2ImplicitSecurity": {
             "type": "oauth2",
@@ -2249,7 +2250,8 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "implicit",
-            "authorizationUrl": "http://cloud.openmoney.cc/V2/stewards/{stewardname}/dialog/authorize"
+            "authorizationUrl": "http://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/dialog/authorize",
+            "x-token-operation-id": "oauthAccessTokenPost"
         },
         "oauth2ApplicationSecurity": {
             "type": "oauth2",
@@ -2268,7 +2270,8 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "application",
-            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token",
+            "x-token-operation-id": "oauthAccessTokenPost"
         },
         "oauth2AccessCodeSecurity": {
             "type": "oauth2",
@@ -2287,8 +2290,10 @@
                 "write:journals": "Write access  to journals"
             },
             "flow": "accessCode",
-            "authorizationUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token",
-            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/{stewardname}/oauth/token"
+            "authorizationUrl": "https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token",
+            "x-authroization-operation-id": "oauthDialogeGet",
+            "tokenUrl": "https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token",
+            "x-token-operation-id": "oauthAccessTokenPost"
         },
         "apiKeySecurity": {
             "type": "apiKey",
