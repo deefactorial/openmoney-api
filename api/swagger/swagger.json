@@ -449,10 +449,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Access Token is returned",
-                        "schema": {
-                            "$ref": "#/definitions/access_token_response"
-                        }
+                        "description": "Access Token is returned"
                     },
                     "default": {
                         "description": "Error",
@@ -2994,9 +2991,6 @@
                     "type": "string"
                 }
             }
-        },
-        "access_token_response": {
-            "type": "string"
         },
         "oauth_authorize_request": {
             "type": "object",
