@@ -554,7 +554,7 @@
                         "description": "Steward Document",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/stewards"
+                            "$ref": "#/definitions/stewards_request"
                         }
                     }
                 ],
@@ -769,7 +769,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/namespaces"
+                            "$ref": "#/definitions/namespaces_request"
                         }
                     }
                 ],
@@ -929,7 +929,7 @@
                         "name": "space",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/namespaces"
+                            "$ref": "#/definitions/namespaces_request"
                         }
                     }
                 ],
@@ -1160,7 +1160,7 @@
                         "name": "currency",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/currencies"
+                            "$ref": "#/definitions/currencies_request"
                         }
                     }
                 ],
@@ -1335,7 +1335,7 @@
                         "name": "currencies",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/currencies"
+                            "$ref": "#/definitions/currencies_request"
                         }
                     }
                 ],
@@ -1591,7 +1591,7 @@
                         "name": "account",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/accounts"
+                            "$ref": "#/definitions/accounts_request"
                         }
                     }
                 ],
@@ -1781,7 +1781,7 @@
                         "name": "accounts",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/accounts"
+                            "$ref": "#/definitions/accounts_request"
                         }
                     }
                 ],
@@ -1984,7 +1984,7 @@
                     "200": {
                         "description": "Lookup Results",
                         "schema": {
-                            "$ref": "#/definitions/accounts"
+                            "$ref": "#/definitions/accounts_response"
                         }
                     },
                     "default": {
@@ -2159,7 +2159,7 @@
                         "name": "journal",
                         "in": "body",
                         "schema": {
-                            "$ref": "#/definitions/journals"
+                            "$ref": "#/definitions/journals_request"
                         }
                     }
                 ],
@@ -2346,7 +2346,7 @@
                     "$ref": "#/definitions/get_response"
                 },
                 {
-                    "$ref": "#/definitions/namespaces"
+                    "$ref": "#/definitions/namespaces_response"
                 }
             ]
         },
@@ -2356,7 +2356,7 @@
                     "$ref": "#/definitions/get_response"
                 },
                 {
-                    "$ref": "#/definitions/currencies"
+                    "$ref": "#/definitions/currencies_response"
                 }
             ]
         },
@@ -2366,7 +2366,7 @@
                     "$ref": "#/definitions/get_response"
                 },
                 {
-                    "$ref": "#/definitions/accounts"
+                    "$ref": "#/definitions/accounts_response"
                 }
             ]
         },
@@ -2376,7 +2376,7 @@
                     "$ref": "#/definitions/get_response"
                 },
                 {
-                    "$ref": "#/definitions/stewards"
+                    "$ref": "#/definitions/stewards_response"
                 }
             ]
         },
@@ -2439,7 +2439,43 @@
                 }
             }
         },
-        "stewards": {
+        "stewards_request": {
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 10,
+            "required": [
+                "stewardname",
+                "password"
+            ],
+            "properties": {
+                "stewardname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 1024
+                },
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\\\\s/=+]+-----END PUBLIC KEY-----$"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "pattern": "^([\\w-]+(?:\\.[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                },
+                "email_notifications": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "stewards_response": {
             "type": "object",
             "minProperties": 2,
             "maxProperties": 10,
@@ -2489,7 +2525,55 @@
                 }
             }
         },
-        "accounts": {
+        "accounts_request": {
+            "type": "object",
+            "minProperties": 5,
+            "maxProperties": 10,
+            "required": [
+                "account",
+                "account_namespace",
+                "currency",
+                "currency_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "account": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "account_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "currency": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "currency_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
+                    }
+                },
+                "publicKey": {
+                    "type": "string",
+                    "minLength": 266,
+                    "maxLength": 800,
+                    "pattern": "^[A-Za-z0-9\\\\\\s/=+-]+$"
+                }
+            }
+        },
+        "accounts_response": {
             "type": "object",
             "minProperties": 5,
             "maxProperties": 10,
@@ -2551,7 +2635,37 @@
                 }
             }
         },
-        "currencies": {
+        "currencies_request": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 7,
+            "required": [
+                "currency",
+                "currency_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "currency": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "currency_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
+                    }
+                }
+            }
+        },
+        "currencies_response": {
             "type": "object",
             "minProperties": 3,
             "maxProperties": 7,
@@ -2595,7 +2709,37 @@
                 }
             }
         },
-        "namespaces": {
+        "namespaces_request": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 7,
+            "required": [
+                "namespace",
+                "parent_namespace",
+                "stewards"
+            ],
+            "properties": {
+                "namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "parent_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]*$"
+                },
+                "stewards": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "maxLength": 512,
+                        "pattern": "^stewards~[A-Za-z0-9_.-]+$"
+                    }
+                }
+            }
+        },
+        "namespaces_response": {
             "type": "object",
             "minProperties": 3,
             "maxProperties": 7,
@@ -2674,7 +2818,33 @@
                 }
             }
         },
-        "journals": {
+        "journals_request": {
+            "type": "object",
+            "minProperties": 3,
+            "maxProperties": 9,
+            "required": [
+                "to_account",
+                "to_account_namespace",
+                "amount"
+            ],
+            "properties": {
+                "to_account": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_-]+$"
+                },
+                "to_account_namespace": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "amount": {
+                    "type": "number",
+                    "minimum": 0
+                }
+            }
+        },
+        "journals_response": {
             "type": "object",
             "minProperties": 3,
             "maxProperties": 9,
@@ -2826,46 +2996,7 @@
             }
         },
         "access_token_response": {
-            "type": "object",
-            "minProperties": 5,
-            "maxProperties": 6,
-            "required": [
-                "access_token",
-                "refresh_token",
-                "expires",
-                "scope",
-                "token_type"
-            ],
-            "properties": {
-                "access_token": {
-                    "type": "string",
-                    "minLength": 32,
-                    "pattern": "^[A-Za-z0-9=/+]+$",
-                    "description": "This is the access token used to authenticate successive requests."
-                },
-                "refresh_token": {
-                    "type": "string",
-                    "minLength": 32,
-                    "pattern": "^[A-Za-z0-9=/+]+$",
-                    "description": "This is the refresh token used to refresh access tokens."
-                },
-                "token_type": {
-                    "type": "string",
-                    "pattern": "^Bearer$"
-                },
-                "expires": {
-                    "type": "string",
-                    "description": "time when token expires"
-                },
-                "scope": {
-                    "type": "array",
-                    "items": {
-                        "type": "string",
-                        "minLength": 5,
-                        "maxLength": 32
-                    }
-                }
-            }
+            "type": "string"
         },
         "oauth_authorize_request": {
             "type": "object",
