@@ -152,9 +152,6 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
     }
   });
 
-  // Bug preventing response validation from JSON.parse output.
-  app.post('/V2/stewards/:stewardname/oauth/token', oauth2.token);
-
   // Validate Swagger requests
   app.use(middleware.swaggerValidator({
     validateResponse: true
@@ -173,6 +170,9 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
     }
   });
 
+  // Bug preventing response validation from JSON.parse output.
+  app.post('/V2/stewards/:stewardname/oauth/token', oauth2.token);
+
   //use the security and request/response validation before processing the oauth end points.
   app.get('/V2/stewards/:stewardname/login', site.loginForm);
   app.post('/V2/stewards/:stewardname/login', site.login);
@@ -187,7 +187,10 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   // Serve the Swagger documents and Swagger UI
   //   http://localhost:3000/docs => Swagger UI
   //   http://localhost:3000/api-docs => Swagger document
-  app.use(middleware.swaggerUi());
+  app.use(middleware.swaggerUi({
+    apiDocs: '/api-docs',
+    swaggerUi: '/docs'
+  }));
 
   var port = process.env.PORT || 8080;
   app.listen(port, function() {
