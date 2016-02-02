@@ -352,7 +352,10 @@
                 ],
                 "responses": {
                     "302": {
-                        "description": "redirect to client redirect uri"
+                        "description": "redirect to client redirect uri",
+                        "schema": {
+                            "$ref": "#/definitions/token_response"
+                        }
                     },
                     "default": {
                         "description": "Error",
@@ -2988,6 +2991,21 @@
                     "type": "string"
                 },
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "token_response": {
+            "type": "object",
+            "required": [
+                "access_token",
+                "expires"
+            ],
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "expires": {
                     "type": "string"
                 }
             }
