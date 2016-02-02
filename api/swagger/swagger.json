@@ -352,10 +352,7 @@
                 ],
                 "responses": {
                     "302": {
-                        "description": "redirect to client redirect uri",
-                        "schema": {
-                            "$ref": "#/definitions/token_response"
-                        }
+                        "description": "redirect to client redirect uri"
                     },
                     "default": {
                         "description": "Error",
@@ -452,7 +449,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Access Token is returned"
+                        "description": "Access Token is returned",
+                        "schema": {
+                            "$ref": "#/definitions/token_response"
+                        }
                     },
                     "default": {
                         "description": "Error",
