@@ -2480,19 +2480,13 @@
             "minProperties": 2,
             "maxProperties": 10,
             "required": [
-                "stewardname",
-                "password"
+                "stewardname"
             ],
             "properties": {
                 "stewardname": {
                     "type": "string",
                     "maxLength": 255,
                     "pattern": "^[A-Za-z0-9_.-]+$"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 4,
-                    "maxLength": 1024
                 },
                 "publicKey": {
                     "type": "string",
@@ -2802,7 +2796,6 @@
                     "type": "string"
                 },
                 "encryptedJournal": {
-                    "type": "object",
                     "$ref": "#/definitions/aes_encryption"
                 }
             }
