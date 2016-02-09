@@ -878,7 +878,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                     "stewards": {}
                                 };
 
-                                for(var i = 0; i < stewards.length, i++){
+                                for(var i = 0; i < stewards.length; i++){
                                     delete(stewards[i].password);
                                     delete(stewards[i].privateKey);
                                 }
