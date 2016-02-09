@@ -541,8 +541,8 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         };
         spaces.forEach(function(space){
             if(space.id != 'namespaces~cc' || space.id != 'namespaces~uk' || space.id != 'namespaces~ca') {
-                parallelTasks[space.namespace] = function (callback) {
-                    openmoney_bucket.get("namespaces~" + space.namespace.toLowerCase(), function (err, res) {
+                parallelTasks[space.id] = function (callback) {
+                    openmoney_bucket.get(space.id, function (err, res) {
                         if (err) {
                             // doc doesn't exist insert it.
                             callback(null, false);
