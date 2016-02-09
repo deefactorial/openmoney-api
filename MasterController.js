@@ -540,7 +540,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
             });
         };
         spaces.forEach(function(space){
-            if(space.id != 'namespaces~cc' || space.id != 'namespaces~uk' || space.id != 'namespaces~ca') {
+            if(space.id != 'namespaces~cc' && space.id != 'namespaces~uk' && space.id != 'namespaces~ca') {
                 parallelTasks[space.id] = function (callback) {
                     openmoney_bucket.get(space.id, function (err, res) {
                         if (err) {
@@ -548,7 +548,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                             callback(null, false);
                         } else {
                             // space already exists through error
-                            callback({status: 403, code: 1013, message: "A space exists with the name: " + space.namespace.toLowerCase()}, true);
+                            callback({status: 403, code: 1013, message: "A space exists with the name: " + space.id}, true);
                         }
                     });
                 };
