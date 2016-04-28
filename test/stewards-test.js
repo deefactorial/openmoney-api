@@ -92,8 +92,7 @@ describe('/stewards', function () {
                                     "minProperties": 2,
                                     "maxProperties": 10,
                                     "required": [
-                                        "stewardname",
-                                        "password"
+                                        "stewardname"
                                     ],
                                     "properties": {
                                         "stewardname": {
@@ -405,7 +404,6 @@ describe('/stewards', function () {
                     }
                 }
             };
-
 
             /*eslint-enable*/
             api.post('/V2/stewards')
@@ -1477,7 +1475,9 @@ describe('/stewards/{stewardname}/namespaces', function() {
                 .send(space)
                 .expect(200)
                 .end(function(err, res) {
-                    if (err) return done(err);
+                    if (err) {
+                        return done(err);
+                    }
 
                     var results = validator.validate(res.body, schema);
                     if (!results) {

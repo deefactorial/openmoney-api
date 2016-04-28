@@ -1373,7 +1373,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                             callback(error, null);
                                         }
                                     }
-                                })
+                                });
                             };
                         });
 
@@ -1393,6 +1393,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                     if(err) {
                         spacesPostCallback(err,false);
                     } else {
+                        console.log("All checks pass insert the space.")
                         console.log(results);
                         //insert the space
 
@@ -1426,17 +1427,16 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                              //create a document for this parents namespaces children
                                              var children_reference = {};
                                              children_reference.type = "namespaces_children";
-                                             children_reference.children = [];
-                                             children_reference.id = children_reference.type + "~" + namespace.id;
-                                             parallelInsertTasks.children_reference = function(callback) {
-                                                 openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
-                                                     if(err){
-                                                         callback(err, null);
-                                                     } else {
-                                                         callback(null, ok);
-                                                     }
-                                                 });
-                                             };
+                                             children_reference.children = [ namespace.id ];
+                                             children_reference.id = children_reference.type + "~" + parent;
+                                             openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
+                                                 if(err){
+                                                     callback(err, null);
+                                                 } else {
+                                                     callback(null, ok);
+                                                 }
+                                             });
+
                                          } else {
                                              callback(err, null);
                                          }
@@ -1811,21 +1811,65 @@ exports.spacesPut = function(request, spacesPutCallback) {
                         //look for references then que update tasks
                         parallelTasks.update_references_global = function (callback) {
 
-                            //TODO: replace N1QL with get queries
-                            //Get all childeren namespaces of this parent.
-                            openmoney_bucket.get("namespaces_children~" + olddoc.value.namespace.toLowerCase(), function(err, childrenDoc){
-                                if(err){
-                                    if(err.code == 13){
-                                        callback(null, "No Chilren found.");
+                            //change this namespace document
+
+                            var doc = olddoc.value;
+                            doc.stewards.forEach(function (steward) {
+                                steward_notification_list.push(steward);
+                            });
+                            if (typeof doc.modifications == 'undefined') {
+                                doc.modifications = [];
+                            }
+                            doc.modifications.push(mod);
+                            //if steward change and this is the doc changing
+                            if (steward_change && doc.namespace.toLowerCase() == request.space.namespace.toLowerCase()) {
+                                doc.stewards = request.space.stewards;
+                            }
+                            var olddoc_id = clone(doc.id);
+
+                            if (namespace_change) {
+
+                                //replace the id, and namespaces with the new namespace.
+                                doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                changed_documents.namespaces[olddoc_id] = doc.id; //log the change
+                                doc.namespace = doc.namespace.replace(re, request.space.namespace);
+                                doc.parent_namespace = doc.parent_namespace.replace(re, request.space.namespace);
+                                parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                                    openmoney_bucket.remove(olddoc_id, function (err, result) {
+                                        if (err) {
+                                            cb(err, false);
+                                        } else {
+                                            cb(null, result);
+                                        }
+                                    });
+                                };
+                            }
+
+                            parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                                openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                    if (err) {
+                                        cb(err, false);
+                                    } else {
+                                        cb(null, result);
+                                    }
+                                });
+                            };
+
+
+                            //Get all childeren namespaces of this parent namespace.
+                            openmoney_bucket.get("namespaces_children~" + olddoc.value.namespace.toLowerCase(), function (err, childrenDoc) {
+                                if (err) {
+                                    if (err.code == 13) {
+                                        callback(null, "No Children found.");
                                     } else {
                                         callback(err, null);
                                     }
                                 } else {
                                     //children found
                                     var parallelTasks = {};
-                                    childrenDoc.value.children.forEach(function(child){
-                                        openmoney_bucket.get(child, function(err, namespaceDoc){
-                                            if(err){
+                                    childrenDoc.value.children.forEach(function (child) {
+                                        openmoney_bucket.get(child, function (err, namespaceDoc) {
+                                            if (err) {
                                                 callback(err, null);
                                             } else {
                                                 var doc = namespaceDoc.value;
@@ -1836,10 +1880,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                                     doc.modifications = [];
                                                 }
                                                 doc.modifications.push(mod);
-                                                //if steward change and this is the doc changing
-                                                if (steward_change && doc.namespace.toLowerCase() == request.space.namespace.toLowerCase()) {
-                                                    doc.stewards = request.space.stewards;
-                                                }
+
                                                 var olddoc_id = clone(doc.id);
 
                                                 if (namespace_change) {
@@ -1875,111 +1916,109 @@ exports.spacesPut = function(request, spacesPutCallback) {
 
                                 }
                             });
-                            var N1qlQuery = couchbase.N1qlQuery;
-                            openmoney_bucket.enableN1ql(['http://127.0.0.1:8093/']);
-                            var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'namespaces' AND `namespace` like '%" + olddoc.value.namespace.toLowerCase() + "';";
-                            console.log(queryString);
-                            var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
-                            openmoney_bucket.query(query, function (err, results) {
-                                if (err) {
-                                    callback(err, false);
-                                } else {
-                                    console.log("update_references_global_results: " + JSON.stringify(results));
-                                    var response = [];
-                                    for (i in results) {
-                                        response.push(results[i].openmoney_global);
-                                        var doc = results[i].openmoney_global;
-                                        //notify the stewards of the change
-                                        doc.stewards.forEach(function (steward) {
-                                            steward_notification_list.push(steward);
-                                        });
-                                        if (typeof doc.modifications == 'undefined') {
-                                            doc.modifications = [];
-                                        }
-                                        doc.modifications.push(mod);
-                                        //if steward change and this is the doc changing
-                                        if (steward_change && doc.namespace.toLowerCase() == request.space.namespace.toLowerCase()) {
-                                            doc.stewards = request.space.stewards;
-                                        }
-                                        var olddoc_id = clone(doc.id);
 
-                                        if (namespace_change) {
-
-                                            //replace the id, and namespaces with the new namespace.
-                                            doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
-                                            changed_documents.namespaces[olddoc_id] = doc.id; //log the change
-                                            doc.namespace = doc.namespace.replace(re, request.space.namespace);
-                                            doc.parent_namespace = doc.parent_namespace.replace(re, request.space.namespace);
-                                            parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
-                                                openmoney_bucket.remove(olddoc_id, function (err, result) {
-                                                    if (err) {
-                                                        cb(err, false);
-                                                    } else {
-                                                        cb(null, result);
-                                                    }
-                                                });
-                                            };
-                                        }
-
-                                        parallelUpdateTasks[doc.id + "_global"] = function (cb) {
-                                            openmoney_bucket.upsert(doc.id, doc, function (err, result) {
-                                                if (err) {
-                                                    cb(err, false);
-                                                } else {
-                                                    cb(null, result);
-                                                }
-                                            });
-                                        };
-                                    }
-                                    callback(null, response);
-                                }
-                            });
                         };
 
+                        //parallelTasks.update_references_global2 = function (callback) {
+                        //
+                        //
+                        //    var N1qlQuery = couchbase.N1qlQuery;
+                        //    openmoney_bucket.enableN1ql(['http://127.0.0.1:8093/']);
+                        //    var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'namespaces' AND `namespace` like '%" + olddoc.value.namespace.toLowerCase() + "';";
+                        //    console.log(queryString);
+                        //    var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+                        //    openmoney_bucket.query(query, function (err, results) {
+                        //        if (err) {
+                        //            callback(err, false);
+                        //        } else {
+                        //            console.log("update_references_global_results: " + JSON.stringify(results));
+                        //            var response = [];
+                        //            for (i in results) {
+                        //                response.push(results[i].openmoney_global);
+                        //                var doc = results[i].openmoney_global;
+                        //                //notify the stewards of the change
+                        //                doc.stewards.forEach(function (steward) {
+                        //                    steward_notification_list.push(steward);
+                        //                });
+                        //                if (typeof doc.modifications == 'undefined') {
+                        //                    doc.modifications = [];
+                        //                }
+                        //                doc.modifications.push(mod);
+                        //                //if steward change and this is the doc changing
+                        //                if (steward_change && doc.namespace.toLowerCase() == request.space.namespace.toLowerCase()) {
+                        //                    doc.stewards = request.space.stewards;
+                        //                }
+                        //                var olddoc_id = clone(doc.id);
+                        //
+                        //                if (namespace_change) {
+                        //
+                        //                    //replace the id, and namespaces with the new namespace.
+                        //                    doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                        //                    changed_documents.namespaces[olddoc_id] = doc.id; //log the change
+                        //                    doc.namespace = doc.namespace.replace(re, request.space.namespace);
+                        //                    doc.parent_namespace = doc.parent_namespace.replace(re, request.space.namespace);
+                        //                    parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                        //                        openmoney_bucket.remove(olddoc_id, function (err, result) {
+                        //                            if (err) {
+                        //                                cb(err, false);
+                        //                            } else {
+                        //                                cb(null, result);
+                        //                            }
+                        //                        });
+                        //                    };
+                        //                }
+                        //
+                        //                parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                        //                    openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                        //                        if (err) {
+                        //                            cb(err, false);
+                        //                        } else {
+                        //                            cb(null, result);
+                        //                        }
+                        //                    });
+                        //                };
+                        //            }
+                        //            callback(null, response);
+                        //        }
+                        //    });
+                        //};
 
-                        //look for children references then que update tasks
+
+
+                        //look for references then que update tasks
                         parallelTasks.update_currencies_references_global = function (callback) {
-                            var N1qlQuery = couchbase.N1qlQuery;
-                            var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'currencies' AND `currency_namespace` like '%" + olddoc.value.namespace.toLowerCase() + "';";
-                            console.log(queryString);
-                            var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
-                            openmoney_bucket.query(query, function (err, results) {
-                                if (err) {
-                                    callback(err, false);
-                                } else {
-                                    console.log(results);
-                                    var response = [];
-                                    for (i in results) {
-                                        response.push(results[i].openmoney_global);
-                                        var doc = results[i].openmoney_global;
-                                        //notify the stewards of the change
-                                        doc.stewards.forEach(function (steward) {
-                                            steward_notification_list.push(steward);
-                                        });
 
-                                        if (typeof doc.modifications == 'undefined') {
-                                            doc.modifications = [];
-                                        }
-                                        doc.modifications.push(mod);
+                            //change this currency namespace document
+
+                            openmoney_bucket.get("currencies~" + olddoc.value.namespace.toLowerCase(), function(err, currency_namespaceDoc){
+                                if (err) {
+                                    if (err.code == 13) {
+
+                                    } else {
+                                        callback(err, null);
+                                    }
+                                } else {
+                                    //currency namespace document found
+
+                                    var doc = currency_namespaceDoc.value;
+                                    doc.stewards.forEach(function (steward) {
+                                        steward_notification_list.push(steward);
+                                    });
+                                    if (typeof doc.modifications == 'undefined') {
+                                        doc.modifications = [];
+                                    }
+                                    doc.modifications.push(mod);
+
+                                    var olddoc_id = clone(doc.id);
+
+                                    if (namespace_change) {
+
                                         //replace the id, and namespaces with the new namespace.
-                                        if (namespace_change) {
-
-                                            var olddoc_id = clone(doc.id);
-                                            doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
-                                            changed_documents.currencies[olddoc_id] = doc.id; //log the change
-                                            doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
-                                            parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
-                                                openmoney_bucket.remove(olddoc_id, function (err, result) {
-                                                    if (err) {
-                                                        cb(err, false);
-                                                    } else {
-                                                        cb(null, result);
-                                                    }
-                                                });
-                                            };
-                                        }
-                                        parallelUpdateTasks[doc.id + "_global"] = function (cb) {
-                                            openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                        doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                        changed_documents.currencies[olddoc_id] = doc.id; //log the change
+                                        doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
+                                        parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                                            openmoney_bucket.remove(olddoc_id, function (err, result) {
                                                 if (err) {
                                                     cb(err, false);
                                                 } else {
@@ -1988,59 +2027,173 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                             });
                                         };
                                     }
-                                    callback(null, response);
-                                }
-                            });
-                        };
 
-
-                        //look for children references then que update tasks
-                        parallelTasks.update_accounts_references_global = function (callback) {
-                            var N1qlQuery = couchbase.N1qlQuery;
-                            var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'accounts' AND ( `account_namespace` like '%" + olddoc.value.namespace + "' OR `currency_namespace` like '%" + olddoc.value.namespace + "' );";
-                            console.log(queryString);
-                            var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
-                            openmoney_bucket.query(query, function (err, results) {
-                                if (err) {
-                                    callback(err, false);
-                                } else {
-                                    console.log(results);
-                                    var response = [];
-                                    for (i in results) {
-                                        response.push(results[i].openmoney_global);
-                                        var doc = results[i].openmoney_global;
-                                        //notify the stewards of the change
-                                        doc.stewards.forEach(function (steward) {
-                                            steward_notification_list.push(steward);
+                                    parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                                        openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                            if (err) {
+                                                cb(err, false);
+                                            } else {
+                                                cb(null, result);
+                                            }
                                         });
+                                    };
+                                }
+                            });
 
-                                        if (typeof doc.modifications == 'undefined') {
-                                            doc.modifications = [];
-                                        }
-                                        doc.modifications.push(mod);
 
-                                        if (namespace_change) {
-                                            //replace the id, and namespaces with the new namespace.
 
-                                            var olddoc_id = clone(doc.id);
-                                            doc.account_namespace = doc.account_namespace.replace(re, request.space.namespace);
-                                            doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
-                                            var currency = doc.currency_namespace == "" ? doc.currency : doc.currency + "." + doc.currency_namespace;
-                                            doc.id = "accounts~" + doc.account.toLowerCase() + "." + doc.account_namespace.toLowerCase() +
-                                                "~" + currency;
-                                            changed_documents.accounts[olddoc_id] = doc.id;
-                                            parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
-                                                openmoney_bucket.remove(olddoc_id, function (err, result) {
-                                                    if (err) {
-                                                        cb(err, false);
-                                                    } else {
-                                                        cb(null, result);
-                                                    }
+
+                            //Get all childeren namespaces of this parent namespace.
+                            openmoney_bucket.get("currency_namespaces_children~" + olddoc.value.namespace.toLowerCase(), function (err, childrenDoc) {
+                                if (err) {
+                                    if (err.code == 13) {
+                                        callback(null, "No Currency Children found.");
+                                    } else {
+                                        callback(err, null);
+                                    }
+                                } else {
+                                    //children found
+
+                                    childrenDoc.value.children.forEach(function (child) {
+                                        openmoney_bucket.get(child, function (err, namespaceDoc) {
+                                            if (err) {
+                                                callback(err, null);
+                                            } else {
+                                                var doc = namespaceDoc.value;
+                                                doc.stewards.forEach(function (steward) {
+                                                    steward_notification_list.push(steward);
                                                 });
-                                            };
-                                        }
-                                        parallelUpdateTasks[doc.id + "_global"] = function (cb) {
-                                            openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                                if (typeof doc.modifications == 'undefined') {
+                                                    doc.modifications = [];
+                                                }
+                                                doc.modifications.push(mod);
+
+                                                var olddoc_id = clone(doc.id);
+
+                                                if (namespace_change) {
+
+                                                    //replace the id, and namespaces with the new namespace.
+                                                    doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                                    changed_documents.currencies[olddoc_id] = doc.id; //log the change
+                                                    doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
+                                                    parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                                                        openmoney_bucket.remove(olddoc_id, function (err, result) {
+                                                            if (err) {
+                                                                cb(err, false);
+                                                            } else {
+                                                                cb(null, result);
+                                                            }
+                                                        });
+                                                    };
+                                                }
+
+                                                parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                                                    openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                                        if (err) {
+                                                            cb(err, false);
+                                                        } else {
+                                                            cb(null, result);
+                                                        }
+                                                    });
+                                                };
+                                            }
+                                        })
+                                    });
+                                }
+                            });
+                        };
+
+                        ////TODO: performance improvement update N1QL queries to use only direct read and write.
+                        ////look for children references then que update tasks
+                        //parallelTasks.update_currencies_references_global = function (callback) {
+                        //    var N1qlQuery = couchbase.N1qlQuery;
+                        //    var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'currencies' AND `currency_namespace` like '%" + olddoc.value.namespace.toLowerCase() + "';";
+                        //    console.log(queryString);
+                        //    var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+                        //    openmoney_bucket.query(query, function (err, results) {
+                        //        if (err) {
+                        //            callback(err, false);
+                        //        } else {
+                        //            console.log(results);
+                        //            var response = [];
+                        //            for (i in results) {
+                        //                response.push(results[i].openmoney_global);
+                        //                var doc = results[i].openmoney_global;
+                        //                //notify the stewards of the change
+                        //                doc.stewards.forEach(function (steward) {
+                        //                    steward_notification_list.push(steward);
+                        //                });
+                        //
+                        //                if (typeof doc.modifications == 'undefined') {
+                        //                    doc.modifications = [];
+                        //                }
+                        //                doc.modifications.push(mod);
+                        //                //replace the id, and namespaces with the new namespace.
+                        //                if (namespace_change) {
+                        //
+                        //                    var olddoc_id = clone(doc.id);
+                        //                    doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                        //                    changed_documents.currencies[olddoc_id] = doc.id; //log the change
+                        //                    doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
+                        //                    parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                        //                        openmoney_bucket.remove(olddoc_id, function (err, result) {
+                        //                            if (err) {
+                        //                                cb(err, false);
+                        //                            } else {
+                        //                                cb(null, result);
+                        //                            }
+                        //                        });
+                        //                    };
+                        //                }
+                        //                parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                        //                    openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                        //                        if (err) {
+                        //                            cb(err, false);
+                        //                        } else {
+                        //                            cb(null, result);
+                        //                        }
+                        //                    });
+                        //                };
+                        //            }
+                        //            callback(null, response);
+                        //        }
+                        //    });
+                        //};
+
+                        //look for references then que update tasks
+                        parallelTasks.update_accounts_references_global = function (callback) {
+
+                            //change this currency namespace document
+
+                            openmoney_bucket.get("accounts~" + olddoc.value.namespace.toLowerCase(), function(err, namespaceDoc){
+                                if (err) {
+                                    if (err.code == 13) {
+
+                                    } else {
+                                        callback(err, null);
+                                    }
+                                } else {
+                                    //currency namespace document found
+
+                                    var doc = namespaceDoc.value;
+                                    doc.stewards.forEach(function (steward) {
+                                        steward_notification_list.push(steward);
+                                    });
+                                    if (typeof doc.modifications == 'undefined') {
+                                        doc.modifications = [];
+                                    }
+                                    doc.modifications.push(mod);
+
+                                    var olddoc_id = clone(doc.id);
+
+                                    if (namespace_change) {
+
+                                        //replace the id, and namespaces with the new namespace.
+                                        doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                        changed_documents.accounts[olddoc_id] = doc.id; //log the change
+                                        doc.account_namespace = doc.account_namespace.replace(re, request.space.namespace);
+                                        parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                                            openmoney_bucket.remove(olddoc_id, function (err, result) {
                                                 if (err) {
                                                     cb(err, false);
                                                 } else {
@@ -2049,10 +2202,142 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                             });
                                         };
                                     }
-                                    callback(null, response);
+
+                                    parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                                        openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                            if (err) {
+                                                cb(err, false);
+                                            } else {
+                                                cb(null, result);
+                                            }
+                                        });
+                                    };
+                                }
+                            });
+
+
+
+
+                            //Get all childeren namespaces of this parent namespace.
+                            openmoney_bucket.get("account_namespaces_children~" + olddoc.value.namespace.toLowerCase(), function (err, childrenDoc) {
+                                if (err) {
+                                    if (err.code == 13) {
+                                        callback(null, "No Account Children found.");
+                                    } else {
+                                        callback(err, null);
+                                    }
+                                } else {
+                                    //children found
+
+                                    childrenDoc.value.children.forEach(function (child) {
+                                        openmoney_bucket.get(child, function (err, namespaceDoc) {
+                                            if (err) {
+                                                callback(err, null);
+                                            } else {
+                                                var doc = namespaceDoc.value;
+                                                doc.stewards.forEach(function (steward) {
+                                                    steward_notification_list.push(steward);
+                                                });
+                                                if (typeof doc.modifications == 'undefined') {
+                                                    doc.modifications = [];
+                                                }
+                                                doc.modifications.push(mod);
+
+                                                var olddoc_id = clone(doc.id);
+
+                                                if (namespace_change) {
+
+                                                    //replace the id, and namespaces with the new namespace.
+                                                    doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                                    changed_documents.accounts[olddoc_id] = doc.id; //log the change
+                                                    doc.account_namespace = doc.account_namespace.replace(re, request.space.namespace);
+                                                    parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                                                        openmoney_bucket.remove(olddoc_id, function (err, result) {
+                                                            if (err) {
+                                                                cb(err, false);
+                                                            } else {
+                                                                cb(null, result);
+                                                            }
+                                                        });
+                                                    };
+                                                }
+
+                                                parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                                                    openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                                        if (err) {
+                                                            cb(err, false);
+                                                        } else {
+                                                            cb(null, result);
+                                                        }
+                                                    });
+                                                };
+                                            }
+                                        })
+                                    });
                                 }
                             });
                         };
+
+                        ////TODO: performance update N1QL to use only get and set operations
+                        ////look for children references then que update tasks
+                        //parallelTasks.update_accounts_references_global = function (callback) {
+                        //    var N1qlQuery = couchbase.N1qlQuery;
+                        //    var queryString = "SELECT * FROM openmoney_global WHERE `type` = 'accounts' AND ( `account_namespace` like '%" + olddoc.value.namespace + "' OR `currency_namespace` like '%" + olddoc.value.namespace + "' );";
+                        //    console.log(queryString);
+                        //    var query = N1qlQuery.fromString(queryString).consistency(N1qlQuery.Consistency.REQUEST_PLUS);
+                        //    openmoney_bucket.query(query, function (err, results) {
+                        //        if (err) {
+                        //            callback(err, false);
+                        //        } else {
+                        //            console.log(results);
+                        //            var response = [];
+                        //            for (i in results) {
+                        //                response.push(results[i].openmoney_global);
+                        //                var doc = results[i].openmoney_global;
+                        //                //notify the stewards of the change
+                        //                doc.stewards.forEach(function (steward) {
+                        //                    steward_notification_list.push(steward);
+                        //                });
+                        //
+                        //                if (typeof doc.modifications == 'undefined') {
+                        //                    doc.modifications = [];
+                        //                }
+                        //                doc.modifications.push(mod);
+                        //
+                        //                if (namespace_change) {
+                        //                    //replace the id, and namespaces with the new namespace.
+                        //
+                        //                    var olddoc_id = clone(doc.id);
+                        //                    doc.account_namespace = doc.account_namespace.replace(re, request.space.namespace);
+                        //                    doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
+                        //                    var currency = doc.currency_namespace == "" ? doc.currency : doc.currency + "." + doc.currency_namespace;
+                        //                    doc.id = "accounts~" + doc.account.toLowerCase() + "." + doc.account_namespace.toLowerCase() +
+                        //                        "~" + currency;
+                        //                    changed_documents.accounts[olddoc_id] = doc.id;
+                        //                    parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
+                        //                        openmoney_bucket.remove(olddoc_id, function (err, result) {
+                        //                            if (err) {
+                        //                                cb(err, false);
+                        //                            } else {
+                        //                                cb(null, result);
+                        //                            }
+                        //                        });
+                        //                    };
+                        //                }
+                        //                parallelUpdateTasks[doc.id + "_global"] = function (cb) {
+                        //                    openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                        //                        if (err) {
+                        //                            cb(err, false);
+                        //                        } else {
+                        //                            cb(null, result);
+                        //                        }
+                        //                    });
+                        //                };
+                        //            }
+                        //            callback(null, response);
+                        //        }
+                        //    });
+                        //};
 
 
                         async.parallel(parallelTasks,
@@ -2527,6 +2812,54 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 });
             };
 
+            //find all the parents of this curreny namespace and insert this namespace into their children document.
+            //grandchild.child.parent.grandparent
+            //child.parent.grandparent
+            //parent.grandparent
+            //grandparent
+            var currency_namespace = request.currency.currency + "." + request.currency.currency_namespace;
+            var parents = currency_namespace.toLowerCase().split('.');
+            for(var i = 1; i < parents.length ;i++ ){ // start with second item
+                for(var j = i + 1; j < parents.length; j++){ //concatenate the rest
+                    parents[i] += "." + parents[j];
+                }
+            }
+            parents.shift(); //remove this namespace at the head of the list
+            parents.forEach(function(parent){
+                parallelInsertTasks["parent" + parent] = function(callback){
+                    openmoney_bucket.get("currency_namespaces_children~" + parent, function(err, parentChildrenDoc){
+                        if(err){
+                            if(err.code == 13){
+                                //create a document for this parents namespaces children
+                                var children_reference = {};
+                                children_reference.type = "currency_namespaces_children";
+                                children_reference.children = [ request.currency.id ];
+                                children_reference.id = children_reference.type + "~" + parent;
+                                openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
+                                    if(err){
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, ok);
+                                    }
+                                });
+
+                            } else {
+                                callback(err, null);
+                            }
+                        } else {
+                            parentChildrenDoc.value.children.push( request.currency.id );
+                            openmoney_bucket.replace("currency_namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
+                                if(err){
+                                    callback(err, null);
+                                } else {
+                                    callback(null, ok);
+                                }
+                            });
+                        }
+                    });
+                };
+            });
+
             async.parallel(parallelInsertTasks, function(err, ok) {
                 if(err) {
                     currenciesPostCallback(err, null);
@@ -2986,6 +3319,54 @@ exports.accountsPost = function(request, accountsPostCallback) {
 
                                         }
                                     });
+                                }
+                            });
+                        }
+                    });
+                };
+            });
+
+            //find all the parents of this curreny namespace and insert this namespace into their children document.
+            //grandchild.child.parent.grandparent
+            //child.parent.grandparent
+            //parent.grandparent
+            //grandparent
+            var account_namespace = request.account.account.toLowerCase() + '.' + request.account.account_namespace.toLowerCase();
+            var parents = account_namespace.toLowerCase().split('.');
+            for(var i = 1; i < parents.length ;i++ ){ // start with second item
+                for(var j = i + 1; j < parents.length; j++){ //concatenate the rest
+                    parents[i] += "." + parents[j];
+                }
+            }
+            parents.shift(); //remove this namespace at the head of the list
+            parents.forEach(function(parent){
+                parallelInsertTasks["parent" + parent] = function(callback){
+                    openmoney_bucket.get("account_namespaces_children~" + parent, function(err, parentChildrenDoc){
+                        if(err){
+                            if(err.code == 13){
+                                //create a document for this parents namespaces children
+                                var children_reference = {};
+                                children_reference.type = "account_namespaces_children";
+                                children_reference.children = [ request.account.id ];
+                                children_reference.id = children_reference.type + "~" + parent;
+                                openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
+                                    if(err){
+                                        callback(err, null);
+                                    } else {
+                                        callback(null, ok);
+                                    }
+                                });
+
+                            } else {
+                                callback(err, null);
+                            }
+                        } else {
+                            parentChildrenDoc.value.children.push( request.account.id );
+                            openmoney_bucket.replace("account_namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
+                                if(err){
+                                    callback(err, null);
+                                } else {
+                                    callback(null, ok);
                                 }
                             });
                         }
