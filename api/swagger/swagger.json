@@ -2834,6 +2834,9 @@
                 "amount": {
                     "type": "number",
                     "minimum": 0
+                },
+                "payload": {
+                    "type": "object"
                 }
             }
         },
@@ -2887,6 +2890,9 @@
                 "created_by": {
                     "type": "string",
                     "description": "stewardname of who created entry"
+                },
+                "payload": {
+                    "type": "object"
                 }
             }
         },

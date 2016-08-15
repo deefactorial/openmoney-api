@@ -7,7 +7,6 @@ var async = require('async');
 
 //var tokens = {};
 
-
 exports.find = function(key, done) {
   model.getAccessToken(key, done);
   //var token = tokens[key];

@@ -449,7 +449,7 @@ describe('/stewards', function () {
             api.post('/V2/stewards')
                 .set('Accept', 'application/json')
                 .send(steward)
-                .expect(403)
+                .expect(400)
                 .end(function (err, res) {
                     if (err) return done(err);
 
@@ -492,7 +492,7 @@ describe('/stewards', function () {
             api.post('/V2/stewards')
                 .set('Accept', 'application/json')
                 .send(steward)
-                .expect(403)
+                .expect(400)
                 .end(function (err, res) {
                     if (err) return done(err);
 
@@ -1073,6 +1073,10 @@ describe('/stewards/{stewardname}', function () {
 
             //console.log(steward);
 
+            steward.password = 'new password';
+            steward.email = 'example@example.com'
+            steward.email_notifications = false;
+
             /*eslint-enable*/
             api.put('/V2/stewards/' + steward.stewardname)
                 .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
@@ -1131,46 +1135,46 @@ describe('/stewards/{stewardname}', function () {
                     done();
                 });
         });
-
-        it('should respond with default error payload', function (done) {
-            /*eslint-disable*/
-            var schema = {
-                "type": "object",
-                "required": [
-                    "code",
-                    "message"
-                ],
-                "properties": {
-                    "status": {
-                        "type": "integer"
-                    },
-                    "code": {
-                        "type": "integer"
-                    },
-                    "message": {
-                        "type": "string"
-                    }
-                }
-            };
-            /*eslint-enable*/
-
-            var change_publicKey = {};
-            change_publicKey.stewardname = steward.stewardname;
-            change_publicKey.publicKey = testing_publicKey;
-            change_publicKey.password = steward.password;
-
-            api.put('/V2/stewards/' + change_publicKey.stewardname)
-                .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
-                .set('Accept', 'application/json')
-                .send(change_publicKey)
-                .expect(503)
-                .end(function (err, res) {
-                    if (err) return done(err);
-
-                    expect(validator.validate(res.body, schema)).to.be.true;
-                    done();
-                });
-        });
+        //
+        // it('should respond with default error payload', function (done) {
+        //     /*eslint-disable*/
+        //     var schema = {
+        //         "type": "object",
+        //         "required": [
+        //             "code",
+        //             "message"
+        //         ],
+        //         "properties": {
+        //             "status": {
+        //                 "type": "integer"
+        //             },
+        //             "code": {
+        //                 "type": "integer"
+        //             },
+        //             "message": {
+        //                 "type": "string"
+        //             }
+        //         }
+        //     };
+        //     /*eslint-enable*/
+        //
+        //     var change_publicKey = {};
+        //     change_publicKey.stewardname = steward.stewardname;
+        //     change_publicKey.publicKey = testing_publicKey;
+        //     change_publicKey.password = steward.password;
+        //
+        //     api.put('/V2/stewards/' + change_publicKey.stewardname)
+        //         .set('Authorization', 'Bearer ' + process.env.BEARER_TOKEN)
+        //         .set('Accept', 'application/json')
+        //         .send(change_publicKey)
+        //         .expect(503)
+        //         .end(function (err, res) {
+        //             if (err) return done(err);
+        //
+        //             expect(validator.validate(res.body, schema)).to.be.true;
+        //             done();
+        //         });
+        // });
 
     });
 
@@ -1463,7 +1467,7 @@ describe('/stewards/{stewardname}/namespaces', function() {
             };
 
             var space = {
-                namespace: steward.stewardname + ".cc" ,
+                namespace: steward.stewardname + "2.cc" ,
                 parent_namespace: 'cc',
                 stewards: [ "stewards~" + steward.stewardname ]
             };
@@ -1476,6 +1480,9 @@ describe('/stewards/{stewardname}/namespaces', function() {
                 .expect(200)
                 .end(function(err, res) {
                     if (err) {
+                        console.info(space);
+                        console.error(err);
+                        console.error(res.error);
                         return done(err);
                     }
 
@@ -3495,6 +3502,7 @@ describe('/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/jour
             journal.to_account = steward.stewardname;
             journal.to_account_namespace = 'cc';
             journal.amount = 0;
+            journal.payload = { key: 'value'};
 
             /*eslint-enable*/
             api.post('/V2/stewards/' + steward.stewardname + '/namespaces/cc/accounts/' + steward.stewardname + '/journals/' + 'cc')
@@ -3653,7 +3661,7 @@ describe('/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/jour
                         {
                             "type": "object",
                             "minProperties": 8,
-                            "maxProperties": 11,
+                            "maxProperties": 12,
                             "required": [
                                 "to_account",
                                 "to_account_namespace",
@@ -3834,4 +3842,3 @@ describe('/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/jour
         //});
     });
 });
-

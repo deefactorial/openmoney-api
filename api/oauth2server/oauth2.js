@@ -10,7 +10,7 @@ var oauth2orize = require('oauth2orize')
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
-var ttl = 3600;
+var ttl = 3600 * 24;
 
 // Register serialialization and deserialization functions.
 //
@@ -52,7 +52,7 @@ server.deserializeClient(function(id, done) {
 
 server.grant(oauth2orize.grant.code(function(client, redirectURI, user, ares, done) {
   var code = utils.uid(16);
-  
+
   db.authorizationCodes.save(code, client.id, redirectURI, user.id, function(err) {
     if (err) { return done(err); }
     done(null, code);
@@ -224,22 +224,24 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
     console.log("* Refresh access token client[", client, "] refreshToken[" + refreshToken + "] scope[" + scope + "]");
 
     db.accessTokens.findRefresh(refreshToken, function (err, accessTokenToRefresh) {
+        console.log('find refresh token err[' + err + '] accessToenToRefresh[' + JSON.stringify(accessTokenToRefresh) + ']');
         if (err) { return done(err); }
         if (accessTokenToRefresh === null) { return done(new Error("Refresh token not found."));}
-        if (accessTokenToRefresh.expires < new Date()) {
-            return done(new Error("Refresh Token has expired."));
-        }
+        // if (accessTokenToRefresh.expires < new Date()) {
+        //     return done(new Error("Refresh Token has expired."));
+        // }
 
         console.log("- refresh token valid");
 
         db.accessTokens.find(accessTokenToRefresh.accessToken, function (err, accessTokenDB) {
+            console.log('find accessToken results: err', err, accessTokenDB);
             if (err) { return done(err); }
             if (accessTokenDB == null) {
                 return done(new Error("Access Token not found."));
             }
-            if (accessTokenDB.expires < new Date()) {
-                return done(new Error("Access Token has expired."));
-            }
+            // if (accessTokenDB.expires < new Date()) {
+            //     return done(new Error("Access Token has expired."));
+            // }
 
             console.log("- old access token found");
 
@@ -254,7 +256,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
                     var expires = new Date();
                     expires.setSeconds(expires.getSeconds() + ttl);
 
-                    db.accessTokens.save(token, refreshToken, accessTokenDB.userID, accessTokenDB.clientID, accessTokenDB.scope, expires, function (err) {
+                    db.accessTokens.save(token, refreshToken, accessTokenDB.userId, accessTokenDB.clientId, accessTokenDB.scopes, expires, function (err) {
                         if (err) {
                             return done(err);
                         }
@@ -291,7 +293,7 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
 // the application's responsibility to authenticate the user and render a dialog
 // to obtain their approval (displaying details about the client requesting
 // authorization).  We accomplish that here by routing through `ensureLoggedIn()`
-// first, and rendering the `dialog` view. 
+// first, and rendering the `dialog` view.
 
 exports.authorization = [
   login.ensureLoggedIn(),

@@ -112,7 +112,7 @@ var config = {
     },
     basicAuthenticationSecurity: function(req, def, scopes, callback){
       console.log('in basicAuthenticationSecurity (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
-      passport.authenticate('basic', function (err, user, info) {
+      passport.authenticate(['basic', 'oauth2-client-password'], function (err, user, info) {
         if (err) {
           callback(new Error('Error in passport authenticate'));
         } else if (!user) {
@@ -121,7 +121,6 @@ var config = {
           req.user = user;
           callback();
         }
-
       })(req, null, callback);
     }
   }
