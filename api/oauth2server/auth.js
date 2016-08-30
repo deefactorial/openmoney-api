@@ -66,6 +66,7 @@ passport.use(new BasicStrategy(
 
 passport.use(new ClientPasswordStrategy(
   function(clientId, clientSecret, done) {
+    console.log('in ClientPasswordStrategy( clientId:' + clientId + ', clientSecret:' + clientSecret + ')');
     db.clients.findByClientId(clientId, function(err, client) {
       if (err) { return done(err); }
       if (!client) { return done(null, false); }

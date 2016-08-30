@@ -658,7 +658,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/currencies':
+  '/stewards/{stewardname}/currencies':
     get:
       x-swagger-router-controller: Currencies
       operationId: currenciesList
@@ -674,9 +674,9 @@ paths:
           type: string
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: namespace
-          in: path
+          in: query
           type: string
-          required: true
+          required: false
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
       summary: Get a Listing currencies known by steward.
@@ -702,6 +702,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
+  '/stewards/{stewardname}/namespaces/{namespace}/currencies':
     post:
       x-swagger-router-controller: Currencies
       operationId: currenciesPost
@@ -904,7 +905,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/accounts':
+  '/stewards/{stewardname}/accounts':
     get:
       x-swagger-router-controller: Accounts
       operationId: accountsList
@@ -920,21 +921,21 @@ paths:
           required: true
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: namespace
-          in: path
+          in: query
           type: string
-          required: true
+          required: false
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: currency
           in: query
           type: string
-          required: true
+          required: false
           maxLength: 255
           pattern: '^[A-Za-z0-9_-]+$'
         - name: currency_namespace
           in: query
           type: string
-          required: true
+          required: false
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]*$'
       summary: Get a Listing of accounts in a namespace
@@ -960,6 +961,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
+  '/stewards/{stewardname}/namespaces/{namespace}/accounts':
     post:
       x-swagger-router-controller: Accounts
       operationId: accountsPost
@@ -1221,7 +1223,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}':
+  '/stewards/{stewardname}/journals':
     get:
       x-swagger-router-controller: Journals
       operationId: journalsList
@@ -1237,21 +1239,18 @@ paths:
           type: string
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: namespace
-          in: path
+          in: query
           type: string
-          required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: account
-          in: path
+          in: query
           type: string
-          required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_-]+$'
         - name: currency
-          in: path
+          in: query
           type: string
-          required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_-]+$'
         - name: currency_namespace
@@ -1290,6 +1289,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
+  '/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}':          
     post:
       x-swagger-router-controller: Journals
       operationId: journalsPost
@@ -1550,7 +1550,6 @@ definitions:
   stewards_response:
     type: object
     minProperties: 2
-    maxProperties: 10
     required:
       - stewardname
     properties:
@@ -1674,7 +1673,6 @@ definitions:
   currencies_request:
     type: object
     minProperties: 3
-    maxProperties: 7
     required:
       - currency
       - currency_namespace
@@ -1697,7 +1695,6 @@ definitions:
   currencies_response:
     type: object
     minProperties: 3
-    maxProperties: 7
     required:
       - currency
       - currency_namespace
@@ -1730,7 +1727,6 @@ definitions:
   namespaces_request:
     type: object
     minProperties: 3
-    maxProperties: 7
     required:
       - namespace
       - parent_namespace
@@ -1753,7 +1749,6 @@ definitions:
   namespaces_response:
     type: object
     minProperties: 3
-    maxProperties: 7
     required:
       - namespace
       - parent_namespace

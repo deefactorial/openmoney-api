@@ -1055,7 +1055,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/namespaces/{namespace}/currencies": {
+        "/stewards/{stewardname}/currencies": {
             "get": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesList",
@@ -1076,9 +1076,9 @@
                     },
                     {
                         "name": "namespace",
-                        "in": "path",
+                        "in": "query",
                         "type": "string",
-                        "required": true,
+                        "required": false,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     }
@@ -1129,7 +1129,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/stewards/{stewardname}/namespaces/{namespace}/currencies": {
             "post": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesPost",
@@ -1470,7 +1472,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/namespaces/{namespace}/accounts": {
+        "/stewards/{stewardname}/accounts": {
             "get": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsList",
@@ -1491,9 +1493,9 @@
                     },
                     {
                         "name": "namespace",
-                        "in": "path",
+                        "in": "query",
                         "type": "string",
-                        "required": true,
+                        "required": false,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
@@ -1501,7 +1503,7 @@
                         "name": "currency",
                         "in": "query",
                         "type": "string",
-                        "required": true,
+                        "required": false,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_-]+$"
                     },
@@ -1509,7 +1511,7 @@
                         "name": "currency_namespace",
                         "in": "query",
                         "type": "string",
-                        "required": true,
+                        "required": false,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]*$"
                     }
@@ -1560,7 +1562,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts": {
             "post": {
                 "x-swagger-router-controller": "Accounts",
                 "operationId": "accountsPost",
@@ -1996,7 +2000,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}": {
+        "/stewards/{stewardname}/journals": {
             "get": {
                 "x-swagger-router-controller": "Journals",
                 "operationId": "journalsList",
@@ -2017,25 +2021,22 @@
                     },
                     {
                         "name": "namespace",
-                        "in": "path",
+                        "in": "query",
                         "type": "string",
-                        "required": true,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {
                         "name": "account",
-                        "in": "path",
+                        "in": "query",
                         "type": "string",
-                        "required": true,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_-]+$"
                     },
                     {
                         "name": "currency",
-                        "in": "path",
+                        "in": "query",
                         "type": "string",
-                        "required": true,
                         "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_-]+$"
                     },
@@ -2105,7 +2106,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}": {
             "post": {
                 "x-swagger-router-controller": "Journals",
                 "operationId": "journalsPost",
@@ -2478,7 +2481,6 @@
         "stewards_response": {
             "type": "object",
             "minProperties": 2,
-            "maxProperties": 10,
             "required": [
                 "stewardname"
             ],
@@ -2632,7 +2634,6 @@
         "currencies_request": {
             "type": "object",
             "minProperties": 3,
-            "maxProperties": 7,
             "required": [
                 "currency",
                 "currency_namespace",
@@ -2662,7 +2663,6 @@
         "currencies_response": {
             "type": "object",
             "minProperties": 3,
-            "maxProperties": 7,
             "required": [
                 "currency",
                 "currency_namespace",
@@ -2706,7 +2706,6 @@
         "namespaces_request": {
             "type": "object",
             "minProperties": 3,
-            "maxProperties": 7,
             "required": [
                 "namespace",
                 "parent_namespace",
@@ -2736,7 +2735,6 @@
         "namespaces_response": {
             "type": "object",
             "minProperties": 3,
-            "maxProperties": 7,
             "required": [
                 "namespace",
                 "parent_namespace",
