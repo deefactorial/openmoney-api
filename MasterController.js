@@ -365,6 +365,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     var deefactorial = {};
     deefactorial.stewardname = 'deefactorial';
     deefactorial.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAuoreAzUFyumy3TxoohvkSrukPSX994GUxMg0u1K03m+kI+Uscl+aCJ9y9gtEIxRfZ9fGcDceAZDBA0neZS0aUHu7tH9oI9NzJPhl9A9ORMovdGOrFLqDaSKY6FvDxxQAWT0CbAGfUDGB20Y1793j4bqd1iQHSdo+oVM8bv54THCwFIpjcNW0llbO910t1FE32CWt2Y1kGheMrt0w8du3gFUNIykGoCau2E4q7iDbnID2gl7jNHQQbZbHJX42ywTgFd6a9RuH6c/0vUO2M4u6qXaabOML67uMIpOo77YYEe7VzhL1rqavAvLO4weV0FZ76E8GWMsu9jeKLG4f88OVrFd3QgF55FU8dgbypboeI/e048sNeuEVDRYg4tZUjbzONSSPUk4ZNKbYnhcgYoPWs/DBYFXSssYnQzl5dWgAc8yuYREhqy0Uhr4EzuOBjf/j161UPRrz622jUztN95+idIXwc+sbP76tW4w+8Jm3Z1By+I+2JCRPhcdJYywsH41nDMekKs8xV85mpIkLABompZ5llpKeJkyZboMgF3ynziCMZt7T1zk5dROeHE7GtyhM2Q3BJD+VGteRV1WUmBC1Y9CWTR7/qn4lk6Fa4QNymdx8IfM1uEINFLhAHr+AALwotwHwISjnN2mx8X+mjxXX+w85u3uO1clzPzBLGzrZ/IcCAwEAAQ==-----END PUBLIC KEY-----';
+    //deefactorial.publicKey = '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCPZW00qqHACVN6sLFiv1nYoACG\np1aFBsfMehWCa8YJVnQwgGjI4vAgaocKz68RyDpd43A8NyzrPBOm3DedrQUxnVl/\nTdrFs9dsNCeaiJISPU7u2EdIxpg0IpIU/YPDJtPxGDbJR5zF1EPb40jVhuGM/5/b\nXLn9tsx7zFHWL4d7wQIDAQAB\n-----END PUBLIC KEY-----';
     deefactorial.email = 'deefactorial@gmail.com';
     deefactorial.email_notifications = true;
     deefactorial.type = "stewards";
@@ -375,6 +376,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     var michael = {};
     michael.stewardname = 'mwl';
     michael.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA5JW4L83dOXtWhlQ64F3DAcdckwabV+kYDUIYVSSPxFcPPHAVTDOBwk0NANiEfZQs/uFZgQMfjtz3QGy9LIOp7hVQYhCXtNnL+40iCBFo2uVUrcr5oQpIzQmEuNO1t5d46kRKTMDhg5nWuoPgF5EkLhaUnw0jRuKbM7b4enEijyOFJm9aYWYl/0Czp15bdwhm/q9Et3gvR5ag30GLViTi5dJakV+LI1rTR9SP9Z2wkViy1t3nO7De5dUsIOra67XClUtqCt9x4R8+yEllFMalb02fzgXpSL01lMa6naIIg3LjcP+pmGY1pZcbZj8NBr+Mg9PKOjz4YfHSB66Q73zCvHt+uoeEE0p8+v67pWleZlnckPVSRk0jRY095wNVw4mgso08XtJ4pO/TcmfsI/SgH6LjRPpakyfHVrwm2uBjK+u2HtKSq53UcuxoENP5PJodIt+6a+GqvdHuqE37np77+51lbFC7A4oJT13py/cDng3X0l+glLNJaxm67pVa4CgR9n7aPXaCcHLN/lvHkzctUa5k30uuAoZB2TiWcq1gWyGJYl1FKcxNxniYwpu9WJ05VwwVHoW1FvKVz/hpKEN4febifqOR/+JhpxkyrsDfmaWabXgMZygAlAGW9hCxfi5OagrslMNyuF8OTyrg6VQtNKO6QYcflReHRPDzUz/54UsCAwEAAQ==-----END PUBLIC KEY-----';
+    //michael.publicKey = '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCm6zZlBo5P4pgtxYAFpI7BrwT9\nSWncAmQs6Eiuzm/Db6hEdjat+lThTIW8FRdNabivnHbb5hOYKEXQfAIeWM00dJtk\nZYSEBtyzJ/ygjEjh99fEixlvOmX/ttgYoM9j9sew3BRJ/8OoCra7zPoHmC1UtIjf\n0Y3p03sucWhUv+fCOQIDAQAB\n-----END PUBLIC KEY-----';
     michael.email = 'michael.linton@gmail.com';
     michael.email_notifications = true;
     michael.type = "stewards";
@@ -385,6 +387,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     var les = {};
     les.stewardname = 'les';
     les.publicKey = '-----BEGIN PUBLIC KEY-----MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAss/XIJKfafrpWizysIaxz8yp/92mnu+bP24f+OOXcZfo6LVHFUNnWABCWvui5c4/I68SvKDcjr/WCGlfRVmiRCdoGAt4JT3biaBJUkO3ng4JYi6l17PKnMUDw/d525gnU/uFQJ1HlzovT7GNJ1pUS9vy9attgNgkrGce5n9W03wSU5CAwWD5iZnMKK7TzBrwWO1AEh272vvyomgNO9sKU+g86B0Zj0HuP4feTJQ1RPXNZd5LYFjrtrfqi1lw+/fLPWhB4TfV7nFE/tSvrigA5f8pxPzeunUgh2JZlubtC/3fwOMI2WXNtvkUaGE/bbRGCEFwxdk4U20MQ2G4goEvMsMZZNmD3mygHmXRPTSOQvbT6Iamoxq1qhzzWBXCO7NoJyARw/RpVy+wjXIWXtm1BtrEF2j9JsbDorFQy1jkDijVdAGB6DXi0YhK5mjggIp77RClN1ulpaG8Tdso9Xp3xh490AnoQDSvIsEIG9WuYEhWZEbTGSkESf76ll7qff1d3Hy1sl+9iCPIfCcNu58jGclLw8xjX25Z8SJMJBlAXPPEEj5sBzgpQ+Q6jaVTfkxnopkq6CsSsSzcdhLv2oAijLdjmevDiYy5KsFLSFai3GkkCZk9K3PCdgPv3uf8N2vjkWp+gTmL+PUXM9uZItOPhpZVPEtZjqgzX9166qnybqkCAwEAAQ==-----END PUBLIC KEY-----';
+    //les.publicKey = '-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCDn45uqLb6NUSOiZGffl1H5ToG\ncNJpHjDkJLSV/ra+cHjTZdZHBPAAlF8d47ePPtb00KhXlOsZfdL0TL3hPElDZcJi\nE5QUxLHA6MFSj9jAcGvx42L+GNsm674J8krqK2P/Rl+Z4e5r53IAiCENWrKYT+6w\nS6yk3Cn9Cxl9hSS25QIDAQAB\n-----END PUBLIC KEY-----';
     les.email = 'les.moore@commonresource.net';
     les.email_notificaitons = true;
     les.type = "stewards";
