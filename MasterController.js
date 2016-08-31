@@ -3024,6 +3024,9 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
     if(typeof request.currencies.currency_color != 'undefined'){
       currency.currency_color = request.currencies.currency_color;
     }
+    if(typeof request.currencies.contributionPerPatron != 'undefined'){
+      currency.contributionPerPatron = request.currencies.contributionPerPatron;
+    }
 
     var old_currency = {};
     old_currency.id = "currencies~" + request.currency.toLowerCase() + "." + request.namespace.toLowerCase();
@@ -3118,6 +3121,16 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                 } else if(typeof currency.currency_color != 'undefined'){
                   change = true;
                   oldCurrency.value.currency_color = currency.currency_color;
+                }
+
+                if(typeof currency.contributionPerPatron != 'undefined' && typeof oldCurrency.value.contributionPerPatron != 'undefined'){
+                  if(oldCurrency.value.contributionPerPatron != currency.contributionPerPatron){
+                    change = true;
+                    oldCurrency.value.contributionPerPatron = currency.contributionPerPatron;
+                  }
+                } else if(typeof currency.contributionPerPatron != 'undefined'){
+                  change = true;
+                  oldCurrency.value.contributionPerPatron = currency.contributionPerPatron;
                 }
 
                 // parallelTasks.namespace_check = function(callback) {
