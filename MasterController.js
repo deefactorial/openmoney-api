@@ -2700,6 +2700,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     if(typeof request.currency.currency_color != 'undefined'){
       currency.currency_color = request.currency.currency_color;
     }
+    if(typeof request.currency.contributionPerPatron != 'undefined'){
+      currency.contributionPerPatron = request.currency.contributionPerPatron;
+    }
 
 
     //check namespace exists
