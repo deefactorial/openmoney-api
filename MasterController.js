@@ -2694,6 +2694,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     currency.type = 'currencies';
     currency.id = request.currency.id;
     currency.enabled = true;
+    if(typeof request.currency.enabled != 'undefined'){
+      currency.enabled = request.currency.enabled;
+    }
     if(typeof request.currency.currency_name != 'undefined'){
       currency.currency_name = request.currency.currency_name;
     }
@@ -2702,6 +2705,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     }
     if(typeof request.currency.contributionPerPatron != 'undefined'){
       currency.contributionPerPatron = request.currency.contributionPerPatron;
+    }
+    if(typeof request.currency.default != 'undefined'){
+      currency.default = request.currency.default;
     }
 
 
