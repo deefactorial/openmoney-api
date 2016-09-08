@@ -467,6 +467,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                 steward_space.stewards = [ steward.id ];
                 steward_space.type = "namespaces";
                 steward_space.id = 'namespaces~' + steward_space.namespace + "." + steward_space.parent_namespace;
+                steward_space.private = true;
                 spaces.push( steward_space );
                 steward_bucket.namespaces.push(steward_space.id);
 
@@ -489,6 +490,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
       steward_space.stewards = [ steward.id ];
       steward_space.type = "namespaces";
       steward_space.id = 'namespaces~' + steward_space.namespace;
+      steward_space.private = true;
       spaces.push( steward_space );
       steward_bucket.namespaces.push(steward_space.id);
     }
@@ -1390,7 +1392,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                             var error = {};
                                             error.status = 403;
                                             error.code = 2007;
-                                            error.messages = 'Account exists with that name.';
+                                            error.message = 'Account exists with that name.';
                                             callback(error, null);
                                         }
                                     }
@@ -1559,31 +1561,39 @@ exports.spacesGet = function(request, spacesGetCallback) {
         if (err) {
             spacesGetCallback(err,false);
         } else {
-            console.log( results);
-            stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
-                if (err) {
-                    spacesGetCallback(err);
-                } else {
-                    if(steward_bucket.value.namespaces.indexOf(results.value.id.toLowerCase()) !== -1){
-                      spacesGetCallback(null, results.value);
-                    } else {
-                      steward_bucket.value.namespaces.push(results.value.id.toLowerCase());
-                      //add stewards of currency to users stewards list
-                      results.value.stewards.forEach(function(steward){
-                        if(steward_bucket.value.stewards.indexOf(steward) === -1){
-                          steward_bucket.value.stewards.push(steward);
-                        }
-                      });
-                      stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
-                          if (err) {
-                              spacesGetCallback(err);
-                          } else {
-                              spacesGetCallback(null, results.value);
+            console.log(results);
+            if(results.value.private) {
+              var error = {};
+              error.status = 403;
+              error.code = 2009;
+              error.message = 'Cannot add a private namespace.';
+              spacesGetCallback(error);
+            } else {
+              stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
+                  if (err) {
+                      spacesGetCallback(err);
+                  } else {
+                      if(steward_bucket.value.namespaces.indexOf(results.value.id.toLowerCase()) !== -1){
+                        spacesGetCallback(null, results.value);
+                      } else {
+                        steward_bucket.value.namespaces.push(results.value.id.toLowerCase());
+                        //add stewards of currency to users stewards list
+                        results.value.stewards.forEach(function(steward){
+                          if(steward_bucket.value.stewards.indexOf(steward) === -1){
+                            steward_bucket.value.stewards.push(steward);
                           }
-                      });
-                    }
-                }
-            });
+                        });
+                        stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                            if (err) {
+                                spacesGetCallback(err);
+                            } else {
+                                spacesGetCallback(null, results.value);
+                            }
+                        });
+                      }
+                  }
+              });
+            }
         }
     });
 };
@@ -1709,7 +1719,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                                             var error = {};
                                                             error.status = 403;
                                                             error.code = 2007;
-                                                            error.messages = 'There is an account with that namespace name.';
+                                                            error.message = 'There is an account with that namespace name.';
                                                             callback(error, null);
                                                         }
                                                     }
@@ -2709,6 +2719,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     if(typeof request.currency.default != 'undefined'){
       currency.default = request.currency.default;
     }
+    if(typeof request.currency.private != 'undefined'){
+      currency.private = request.currency.private;
+    }
 
 
     //check namespace exists
@@ -2966,34 +2979,41 @@ exports.currenciesGet = function(request, currenciesGetCallback) {
             currenciesGetCallback(err);
         } else {
             console.log(results);
-            stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
-                if (err) {
-                    currenciesGetCallback(err);
-                } else {
-                    if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) !== -1){
-                      currenciesGetCallback(null, results.value);
-                    } else {
+            if(results.value.private) {
+              var error = {};
+              error.status = 403;
+              error.code = 2009;
+              error.message = 'Cannot add a private currency.';
+              currenciesGetCallback(error);
+            } else {
+              stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
+                  if (err) {
+                      currenciesGetCallback(err);
+                  } else {
+                      if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) !== -1){
+                        currenciesGetCallback(null, results.value);
+                      } else {
 
-                      steward_bucket.value.currencies.push(results.value.id.toLowerCase());
+                        steward_bucket.value.currencies.push(results.value.id.toLowerCase());
 
-                      //add stewards of currency to users stewards list
-                      results.value.stewards.forEach(function(steward){
-                        if(steward_bucket.value.stewards.indexOf(steward) === -1){
-                          steward_bucket.value.stewards.push(steward);
-                        }
-                      });
-
-                      stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
-                          if (err) {
-                              callcurrenciesGetCallbackback(err);
-                          } else {
-                              currenciesGetCallback(null, results.value);
+                        //add stewards of currency to users stewards list
+                        results.value.stewards.forEach(function(steward){
+                          if(steward_bucket.value.stewards.indexOf(steward) === -1){
+                            steward_bucket.value.stewards.push(steward);
                           }
-                      });
-                    }
-                }
-            });
+                        });
 
+                        stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                            if (err) {
+                                callcurrenciesGetCallbackback(err);
+                            } else {
+                                currenciesGetCallback(null, results.value);
+                            }
+                        });
+                      }
+                  }
+              });
+            }
         }
     });
 };
@@ -3035,6 +3055,9 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
     }
     if(typeof request.currencies.contributionPerPatron != 'undefined'){
       currency.contributionPerPatron = request.currencies.contributionPerPatron;
+    }
+    if(typeof request.currencies.private != 'undefined'){
+      currency.private = request.currencies.private;
     }
 
     var old_currency = {};
@@ -3677,7 +3700,6 @@ exports.accountsPost = function(request, accountsPostCallback) {
         };
     }
 
-
     async.parallel(parallelTasks, function(err, results){
         if(err) {
             accountsPostCallback(err, null);
@@ -3775,6 +3797,47 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                 } else {
                                     //console.log("steward bucket" + JSON.stringify(steward_bucket.value));
                                     steward_bucket.value.accounts.push(account.id);
+                                    //add currency if it doesn't exist
+                                    var currency_exists = false;
+                                    if(typeof steward_bucket.value.currencies == 'undefined'){
+                                      steward_bucket.value.currencies = [];
+                                    }
+                                    steward_bucket.value.currencies.forEach(function(currencyID){
+                                      if(currencyID == "currencies~" + currency){
+                                        currency_exists = true;
+                                      }
+                                    });
+                                    if(!currency_exists){
+                                      steward_bucket.value.currencies.push("currencies~" + currency);
+                                    }
+                                    //add namespace if it doesn't exist
+                                    var namespace_exists = false;
+                                    if(typeof steward_bucket.value.namespaces == 'undefined'){
+                                      steward_bucket.value.namespaces = [];
+                                    }
+                                    steward_bucket.value.namespaces.forEach(function(namespaceID){
+                                      if(namespaceID == "namespaces~" + request.account.account_namespace.toLowerCase()){
+                                        namespace_exists = true;
+                                      }
+                                    });
+                                    if(!namespace_exists){
+                                      steward_bucket.value.namespaces.push("namespaces~" + request.account.account_namespace.toLowerCase());
+                                    }
+                                    //add stewards if they don't exist
+                                    if(typeof steward_bucket.value.stewards == 'undefined'){
+                                      steward_bucket.value.stewards = [];
+                                    }
+                                    account.stewards.forEach(function(steward){
+                                      var steward_exists = false;
+                                      steward_bucket.value.stewards.forEach(function(stewardID){
+                                        if(stewardID == steward.toLowerCase()){
+                                          steward_exists = true;
+                                        }
+                                      });
+                                      if(!steward_exists){
+                                        steward_bucket.value.stewards.push(steward.toLowerCase());
+                                      }
+                                    });
                                     stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function(err, ok){
                                         if(err) {
                                             callback(err, null);
@@ -4004,7 +4067,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                                         var error = {};
                                                         error.status = 403;
                                                         error.code = 4008;
-                                                        error.messages = 'You already created this account.';
+                                                        error.message = 'You already created this account.';
                                                         callback(error, null);
                                                     } else {
                                                         callback(null, accountValue.value);
@@ -4013,7 +4076,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                                     var error = {};
                                                     error.status = 403;
                                                     error.code = 4009;
-                                                    error.messages = 'There is another account with that name.';
+                                                    error.message = 'There is another account with that name.';
                                                     callback(error, null);
                                                 }
                                             }
@@ -4939,6 +5002,54 @@ exports.journalsPost = function(request, journalsPostCallback) {
                 }
             }
         })
+    };
+
+    //if the to_account name is the same as the to account parent namespace name only the steward of the to account namespace is allowed to post that account.
+    parallelTasks.account_namespace_check = function(callback){
+      if(request.journal.to_account.toLowerCase() == request.journal.to_account_namespace.toLowerCase().split('.')[0]){
+        openmoney_bucket.get("namespaces~" + request.journal.to_account_namespace.toLowerCase(), function(err, namespace){
+            if(err){
+                if(err.code == 13){
+                    var err = {};
+                    err.status = 404;
+                    err.code = 5011;
+                    err.message = "Their account namespace does not exist.";
+                    callback(err, null);
+                } else {
+                    callback(err, null);
+                }
+            } else {
+                //check that request.journal.to_account_namespace is not disabled
+                if(typeof namespace.value.disabled != 'undefined' && namespace.value.disabled){
+                    var err = {};
+                    err.status = 403;
+                    err.code = 5012;
+                    err.message = "Their account namespace is disabled.";
+                    callback(err, null);
+                } else {
+
+                    var is_steward = false;
+                    namespace.value.stewards.forEach(function(steward){
+                      if(steward == "stewards~" + request.stewardname){
+                        is_steward = true;
+                      }
+                    })
+
+                    if(is_steward){
+                      callback(null, namespace.value);
+                    } else {
+                      var err = {};
+                      err.status = 403;
+                      err.code = 5013;
+                      err.message = "Cannot post to an account name that matches the parent namespace unless you are the steward of the namespace.";
+                      callback(err, null);
+                    }
+                }
+            }
+        })
+      } else {
+        callback(null, {message: 'to_account does not match to_account_namespace parent.'});
+      }
     };
 
     async.parallel(parallelTasks, function(err, results){
