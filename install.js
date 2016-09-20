@@ -40,15 +40,15 @@ tasks.create_index_oauth2Server = function(callback){
         oauth2Server.enableN1ql(['http://' + serverAddress + ':8093/']);
 
         //Create the primary index on the bucket to query the bucket for model.dump
-        var queryString = "CREATE PRIMARY INDEX `#primary` ON `oauth2Server` USING GSI;";
-        var query = N1qlQuery.fromString(queryString);
-        oauth2Server.query(query, function(err, doc){
-            if(err) {
-                callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-            } else {
-                callback(null, "Successfully created index.");
-            }
-        });
+        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `oauth2Server` USING GSI;";
+        // var query = N1qlQuery.fromString(queryString);
+        // oauth2Server.query(query, function(err, doc){
+        //     if(err) {
+        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+        //     } else {
+        //         callback(null, "Successfully created index.");
+        //     }
+        // });
     }, 3000);
 };
 
@@ -72,15 +72,15 @@ tasks.create_index_openmoney_global = function(callback){
         openmoney_global.enableN1ql(['http://' + serverAddress + ':8093/']);
 
         //Create the primary index on the bucket to query the bucket for model.dump
-        var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_global` USING GSI;";
-        var query = N1qlQuery.fromString(queryString);
-        openmoney_global.query(query, function(err, doc){
-            if(err) {
-                callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-            } else {
-                callback(null, "Successfully created index.");
-            }
-        });
+        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_global` USING GSI;";
+        // var query = N1qlQuery.fromString(queryString);
+        // openmoney_global.query(query, function(err, doc){
+        //     if(err) {
+        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+        //     } else {
+        //         callback(null, "Successfully created index.");
+        //     }
+        // });
     }, 3000);
 };
 
@@ -104,15 +104,15 @@ tasks.create_index_openmoney_stewards = function(callback){
         openmoney_stewards.enableN1ql(['http://' + serverAddress + ':8093/']);
 
         //Create the primary index on the bucket to query the bucket for model.dump
-        var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_stewards` USING GSI;";
-        var query = N1qlQuery.fromString(queryString);
-        openmoney_stewards.query(query, function(err, doc){
-            if(err) {
-                callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-            } else {
-                callback(null, "Successfully created index.");
-            }
-        });
+        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_stewards` USING GSI;";
+        // var query = N1qlQuery.fromString(queryString);
+        // openmoney_stewards.query(query, function(err, doc){
+        //     if(err) {
+        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+        //     } else {
+        //         callback(null, "Successfully created index.");
+        //     }
+        // });
     }, 3000);
 };
 

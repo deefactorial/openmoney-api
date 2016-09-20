@@ -1,17 +1,16 @@
 swagger: '2.0'
 info:
-  version: 2.0.0
-  title: Openmoney API
-  description: Openmoney API
-  termsOfService: 'http://openmoney.cc/index.php?page=terms'
+  version: 0.0.1
+  title: Giftcard API
+  description: Giftcard API
   contact:
-    name: Openmoney Development Team
-    url: 'http://openmoney.cc'
+    name: Dominique Legault
+    email: deefactorial@gmail.com
+    url: 'http://prooudleo.com'
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0'
-host: cloud.openmoney.cc
-basePath: /V2
+    name: Copywrite 2016
+host: deefactorial.proudleo.com
+basePath: /V1
 schemes:
   - https
 consumes:
@@ -20,498 +19,212 @@ produces:
   - application/json
   - text/html
 paths:
-  /stewards:
+  /merchants:
     get:
-      x-swagger-router-controller: Stewards
-      operationId: stewardsList
+      x-swagger-router-controller: Merchants
+      operationId: merchantList
       parameters:
         - name: Authorization
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9/+=.]+$'
-      summary: Get a listing of known stewards
+          pattern: '^Basic [A-Za-z0-9/+=]*$'
       tags:
-        - stewards
+        - merchants
       security:
-        - oauth2PasswordSecurity:
-            - 'read:stewards'
-        - oauth2ImplicitSecurity:
-            - 'read:stewards'
-        - oauth2ApplicationSecurity:
-            - 'read:stewards'
-        - oauth2AccessCodeSecurity:
-            - 'read:stewards'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
-          description: List of stewards
+          description: List of merchants
           schema:
-            $ref: '#/definitions/stewards_list'
+            $ref: '#/definitions/merchant_list'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
     post:
-      x-swagger-router-controller: Stewards
-      operationId: stewardsPost
+      x-swagger-router-controller: Merchants
+      operationId: merchantsPost
       parameters:
-        - name: register_request
+        - name: merchant_request
           in: body
           description: Registration Request
           required: true
           schema:
-            $ref: '#/definitions/register_request'
-      summary: Register a steward on the system
+            $ref: '#/definitions/merchants_request'
+      description: Register a steward on the system
       tags:
-        - stewards
+        - merchants
       responses:
         '200':
           description: Registration Success
           schema:
-            $ref: '#/definitions/register_response'
+            $ref: '#/definitions/merchant_response'
         default:
           description: Error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/login':
-    get:
-      x-swagger-router-controller: Auth
-      operationId: loginGet
-      summary: Login Page for the steward
-      parameters:
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      tags:
-        - auth
-      produces:
-        - text/plain
-      responses:
-        '200':
-          description: A login page for the steward
-          schema:
-            type: string
+  /merchants/forgot:
     post:
-      x-swagger-router-controller: Auth
-      operationId: loginPost
-      summary: Login steward
+      x-swagger-router-controller: Merchants
+      operationId: merchantsForgot
       parameters:
-        - name: Authorization
-          in: header
-          type: string
-          pattern: '^Basic [A-Za-z0-9/+=.]+$'
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      tags:
-        - auth
-      consumes:
-        - application/x-www-form-urlencoded
-      produces:
-        - text/plain
-      responses:
-        '302':
-          description: Redirect to account page
-          schema:
-            type: string
-  '/stewards/{stewardname}/logout':
-    get:
-      x-swagger-router-controller: Auth
-      operationId: logoutPost
-      summary: Logout steward
-      parameters:
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      tags:
-        - auth
-      responses:
-        '302':
-          description: Redirect to login page
-          schema:
-            type: string
-  '/stewards/{stewardname}/account':
-    get:
-      x-swagger-router-controller: Auth
-      operationId: accountGet
-      summary: Get Steward account information
-      parameters:
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      tags:
-        - auth
-      produces:
-        - text/html
-      responses:
-        '200':
-          description: An account page
-          schema:
-            type: string
-  '/stewards/{stewardname}/oauth/application':
-    post:
-      x-swagger-router-controller: Auth
-      operationId: oauthApplicationPost
-      summary: >-
-        Create an application for a client_id and client_secret for oauth token
-        authorization.
-      parameters:
-        - name: Authorization
-          in: header
-          type: string
-          pattern: '^Basic [A-Za-z0-9/+=.]+$'
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: application
+        - name: forgot_request
           in: body
-          description: Application Object
+          description: Forgot Request
           required: true
           schema:
-            $ref: '#/definitions/application_request'
-      description: Existing steward Registers an application with the openmoney network.
+            $ref: '#/definitions/forgot_request'
+      description: Forgot Password Request
       tags:
-        - auth
-      produces:
-        - application/json
-      security:
-        - basicAuthenticationSecurity: []
+        - merchants
       responses:
         '200':
-          description: Application Response
+          description: Forgot Success
           schema:
-            $ref: '#/definitions/application_response'
-  '/stewards/{stewardname}/dialog/authorize':
-    get:
-      x-swagger-router-controller: Auth
-      operationId: oauthDialogeGet
-      summary: >-
-        Implicit authorization dialog presented to steward to authorize
-        client_id to access API resources on their behalf.
-      parameters:
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: client_id
-          in: query
-          description: Client ID received during registration
-          required: true
-          type: string
-          minLength: 5
-          maxLength: 800
-          pattern: '^[A-Za-z0-9\\\s/=+-]+$'
-        - name: redirect_uri
-          in: query
-          description: A uri to redirect steward after authorization
-          type: string
-          format: url
-          maxLength: 512
-        - name: scopes
-          in: query
-          description: >-
-            A comma separated list of scopes. If not provided, scope defaults to
-            an empty list of scopes for stewards that don’t have a valid token
-            for the app. For stewards who do already have a valid token for the
-            app, the steward won’t be shown the OAuth authorization page with
-            the list of scopes. Instead, this step of the flow will
-            automatically complete with the same scopes that were used last time
-            the steward completed the flow.
-          type: array
-          items:
-            type: string
-            minLength: 5
-            maxLength: 32
-      tags:
-        - auth
-      produces:
-        - text/html
-      responses:
-        '302':
-          description: redirect to client redirect uri
+            $ref: '#/definitions/forgot_response'
         default:
           description: Error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/dialog/authorize/decision':
+  /merchants/reset:
     post:
-      x-swagger-router-controller: Auth
-      operationId: oauthDialogePost
-      description: Authorization dialoge decision with allowed scopes.
+      x-swagger-router-controller: Merchants
+      operationId: merchantsReset
       parameters:
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: oauth_authorize_request
+        - name: reset_request
           in: body
+          description: Reset Request
           required: true
           schema:
-            $ref: '#/definitions/oauth_authorize_request'
-      summary: Authorizes a steward on the openmoney network
+            $ref: '#/definitions/reset_request'
+      description: Reset Password Request
       tags:
-        - auth
-      produces:
-        - application/json
+        - merchants
       responses:
-        '302':
-          description: redirect to client redirect uri
+        '200':
+          description: Reset Success
+          schema:
+            $ref: '#/definitions/reset_response'
         default:
           description: Error
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/oauth/token':
-    post:
-      x-swagger-router-controller: Auth
-      operationId: oauthAccessTokenPost
+  '/merchants/{merchantname}':
+    get:
+      x-swagger-router-controller: Merchants
+      operationId: merchantsGet
       parameters:
         - name: Authorization
           in: header
           type: string
-          pattern: '^Bearer|Basic [A-Za-z0-9/+=.]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: access_token_request
-          in: body
-          description: Access Token Request Object
-          required: true
-          schema:
-            $ref: '#/definitions/access_token_request'
+      description: Get a single Merchant
       tags:
-        - auth
-      summary: >-
-        Exchanges the user or client credentials for an access token used to
-        access resources.
+        - merchants
       security:
-        - basicAuthenticationSecurity: []
-        - oauth2Refresh: []
+        - password: []
       responses:
         '200':
-          description: Access Token is returned
+          description: Merchant
           schema:
-            $ref: '#/definitions/token_response'
-        default:
-          description: Error
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}':
-    get:
-      x-swagger-router-controller: Stewards
-      operationId: stewardsGet
-      parameters:
-        - name: Authorization
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      summary: Get a single steward
-      tags:
-        - stewards
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:stewards'
-        - oauth2ImplicitSecurity:
-            - 'read:stewards'
-        - oauth2ApplicationSecurity:
-            - 'read:stewards'
-        - oauth2AccessCodeSecurity:
-            - 'read:stewards'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: steward
-          schema:
-            $ref: '#/definitions/stewards_get'
+            $ref: '#/definitions/merchants_response'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
     put:
-      x-swagger-router-controller: Stewards
-      operationId: stewardsPut
+      x-swagger-router-controller: Merchants
+      operationId: merchantsPut
       parameters:
         - name: Authorization
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: steward
+        - name: merchant_request
           required: true
-          description: Steward Document
+          description: Merchant Document
           in: body
           schema:
-            $ref: '#/definitions/stewards_request'
-      summary: Update a steward account
+            $ref: '#/definitions/merchant_update_request'
+      description: Update your merchant account
       tags:
-        - stewards
+        - merchants
       security:
-        - oauth2PasswordSecurity:
-            - 'write:stewards'
-        - oauth2ImplicitSecurity:
-            - 'write:stewards'
-        - oauth2ApplicationSecurity:
-            - 'write:stewards'
-        - oauth2AccessCodeSecurity:
-            - 'write:stewards'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
-          description: steward
+          description: merchants
           schema:
-            $ref: '#/definitions/create_response'
+            $ref: '#/definitions/update_response'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
     delete:
-      x-swagger-router-controller: Stewards
-      operationId: stewardsDelete
+      x-swagger-router-controller: Merchants
+      operationId: merchantsDelete
       parameters:
         - name: Authorization
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           maxLength: 1024
           pattern: '^[A-Za-z0-9_.-]+$'
-      summary: Delete a steward account
+      description: Delete your merchant account
       tags:
-        - stewards
+        - merchants
       security:
-        - oauth2PasswordSecurity:
-            - 'write:stewards'
-        - oauth2ImplicitSecurity:
-            - 'write:stewards'
-        - oauth2ApplicationSecurity:
-            - 'write:stewards'
-        - oauth2AccessCodeSecurity:
-            - 'write:stewards'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
-          description: steward
+          description: merchant
           schema:
             $ref: '#/definitions/delete_response'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces':
-    get:
-      x-swagger-router-controller: Spaces
-      operationId: spacesList
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: parent_namespace
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-      summary: Get a Listing of namespaces known by steward.
-      tags:
-        - namespaces
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:namespaces'
-        - oauth2ImplicitSecurity:
-            - 'read:namespaces'
-        - oauth2ApplicationSecurity:
-            - 'read:namespaces'
-        - oauth2AccessCodeSecurity:
-            - 'read:namespaces'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: List of spaces
-          schema:
-            $ref: '#/definitions/namespaces_list'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/currencies':
     post:
-      x-swagger-router-controller: Spaces
-      operationId: spacesPost
+      x-swagger-router-controller: Merchants
+      operationId: merchantsCurrenciesPost
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: space
+        - name: currency
           in: body
           required: true
           schema:
-            $ref: '#/definitions/namespaces_request'
-      summary: Create a namespace
+            $ref: '#/definitions/currency_request'
+      description: Create New Currency
       tags:
-        - namespaces
+        - merchants
       security:
-        - oauth2PasswordSecurity:
-            - 'write:namespaces'
-        - oauth2ImplicitSecurity:
-            - 'write:namespaces'
-        - oauth2ApplicationSecurity:
-            - 'write:namespaces'
-        - oauth2AccessCodeSecurity:
-            - 'write:namespaces'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
           description: OK
@@ -521,90 +234,145 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}':
+  '/merchants/{merchantname}/employees':
     get:
-      x-swagger-router-controller: Spaces
-      operationId: spacesGet
+      x-swagger-router-controller: Employees
+      operationId: employeeList
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
+        - name: order_by
+          in: query
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: offset
+          in: query
+          type: integer
+          minimum: 0
+        - name: range
+          in: query
+          type: integer
+          minimum: 5
+      description: List of employees
+      tags:
+        - employees
+      security:
+        - password: []
+      responses:
+        '200':
+          description: List of employee
+          schema:
+            $ref: '#/definitions/employees_list'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      x-swagger-router-controller: Employees
+      operationId: employeePost
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: employee
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/employees_request'
+      description: Create New Employee
+      tags:
+        - employees
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/create_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/employees/{employeeID}':
+    get:
+      x-swagger-router-controller: Employees
+      operationId: employeeGet
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: employeeID
           in: path
           type: string
           required: true
           maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
-          description: space name
-      summary: Get a namespace by it's name
+          description: employee id
+      description: Get an employee by employeeID
       tags:
-        - namespaces
+        - employees
       security:
-        - oauth2PasswordSecurity:
-            - 'read:namespaces'
-        - oauth2ImplicitSecurity:
-            - 'read:namespaces'
-        - oauth2ApplicationSecurity:
-            - 'read:namespaces'
-        - oauth2AccessCodeSecurity:
-            - 'read:namespaces'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/namespaces_get'
+            $ref: '#/definitions/employees_response'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
     put:
-      x-swagger-router-controller: Spaces
-      operationId: spacesPut
-      summary: Update a namespace
+      x-swagger-router-controller: Employees
+      operationId: employeePut
+      description: Update Employee
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
+        - name: employeeID
           in: path
           type: string
           required: true
           maxLength: 512
           pattern: '^[A-Za-z0-9_.-]+$'
-          description: space name
-        - name: space
+        - name: employee
           in: body
           schema:
-            $ref: '#/definitions/namespaces_request'
+            $ref: '#/definitions/employees_request'
       tags:
-        - namespaces
+        - employees
       security:
-        - oauth2PasswordSecurity:
-            - 'write:namespaces'
-        - oauth2ImplicitSecurity:
-            - 'write:namespaces'
-        - oauth2ApplicationSecurity:
-            - 'write:namespaces'
-        - oauth2AccessCodeSecurity:
-            - 'write:namespaces'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
           description: OK
@@ -615,40 +383,31 @@ paths:
           schema:
             $ref: '#/definitions/ErrorModel'
     delete:
-      x-swagger-router-controller: Spaces
-      operationId: spacesDelete
+      x-swagger-router-controller: Employees
+      operationId: employeeDelete
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
           type: string
           required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
+        - name: employeeID
           in: path
           type: string
           required: true
           maxLength: 1048
           pattern: '^[A-Za-z0-9_.-]+$'
-          description: namespace name
-      description: Delete a namespace
+          description: employee ID
+      description: Delete a employee
       tags:
-        - namespaces
+        - employees
       security:
-        - oauth2PasswordSecurity:
-            - 'write:namespaces'
-        - oauth2ImplicitSecurity:
-            - 'write:namespaces'
-        - oauth2ApplicationSecurity:
-            - 'write:namespaces'
-        - oauth2AccessCodeSecurity:
-            - 'write:namespaces'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
           description: Delete success
@@ -658,606 +417,25 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/currencies':
+  '/merchants/{merchantname}/cardholders':
     get:
-      x-swagger-router-controller: Currencies
-      operationId: currenciesList
+      x-swagger-router-controller: Cardholders
+      operationId: cardholderList
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
-          required: true
           type: string
+          required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
+        - name: order_by
           in: query
           type: string
-          required: false
-          maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
-      summary: Get a Listing currencies known by steward.
-      tags:
-        - currencies
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:currencies'
-        - oauth2ImplicitSecurity:
-            - 'read:currencies'
-        - oauth2ApplicationSecurity:
-            - 'read:currencies'
-        - oauth2AccessCodeSecurity:
-            - 'read:currencies'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: List of currencies
-          schema:
-            $ref: '#/definitions/currencies_list'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/currencies':
-    post:
-      x-swagger-router-controller: Currencies
-      operationId: currenciesPost
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: body
-          schema:
-            $ref: '#/definitions/currencies_request'
-      summary: Create a currency
-      tags:
-        - currencies
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:currencies'
-        - oauth2ImplicitSecurity:
-            - 'write:currencies'
-        - oauth2ApplicationSecurity:
-            - 'write:currencies'
-        - oauth2AccessCodeSecurity:
-            - 'write:currencies'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/create_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/currencies/{currency}':
-    get:
-      x-swagger-router-controller: Currencies
-      operationId: currenciesGet
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: path
-          type: string
-          required: true
-          maxLength: 512
-          pattern: '^[A-Za-z0-9_.-]+$'
-          description: Name of a currency
-      summary: Get a currency by its name
-      tags:
-        - currencies
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:currencies'
-        - oauth2ImplicitSecurity:
-            - 'read:currencies'
-        - oauth2ApplicationSecurity:
-            - 'read:currencies'
-        - oauth2AccessCodeSecurity:
-            - 'read:currencies'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/currencies_get'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    put:
-      x-swagger-router-controller: Currencies
-      operationId: currenciesPut
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: path
-          type: string
-          required: true
-          maxLength: 512
-          pattern: '^[A-Za-z0-9_.-]+$'
-          description: Name of a currency
-        - name: currencies
-          in: body
-          schema:
-            $ref: '#/definitions/currencies_request'
-      summary: Update a Currency
-      tags:
-        - currencies
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:currencies'
-        - oauth2ImplicitSecurity:
-            - 'write:currencies'
-        - oauth2ApplicationSecurity:
-            - 'write:currencies'
-        - oauth2AccessCodeSecurity:
-            - 'write:currencies'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/create_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    delete:
-      x-swagger-router-controller: Currencies
-      operationId: currenciesDelete
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: path
-          type: string
-          required: true
-          maxLength: 512
-          pattern: '^[A-Za-z0-9_-]+$'
-          description: Currency name
-      summary: Delete a currency
-      tags:
-        - currencies
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:currencies'
-        - oauth2ImplicitSecurity:
-            - 'write:currencies'
-        - oauth2ApplicationSecurity:
-            - 'write:currencies'
-        - oauth2AccessCodeSecurity:
-            - 'write:currencies'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/delete_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/accounts':
-    get:
-      x-swagger-router-controller: Accounts
-      operationId: accountsList
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          type: string
-          required: true
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: query
-          type: string
-          required: false
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: query
-          type: string
-          required: false
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency_namespace
-          in: query
-          type: string
-          required: false
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]*$'
-      summary: Get a Listing of accounts in a namespace
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:accounts'
-        - oauth2ImplicitSecurity:
-            - 'read:accounts'
-        - oauth2ApplicationSecurity:
-            - 'read:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'read:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: List of accounts
-          schema:
-            $ref: '#/definitions/accounts_list'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/accounts':
-    post:
-      x-swagger-router-controller: Accounts
-      operationId: accountsPost
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: body
-          schema:
-            $ref: '#/definitions/accounts_request'
-      summary: create an account in a namespace
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:accounts'
-        - oauth2ImplicitSecurity:
-            - 'write:accounts'
-        - oauth2ApplicationSecurity:
-            - 'write:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'write:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/delete_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}':
-    get:
-      x-swagger-router-controller: Accounts
-      operationId: accountsGet
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency
-          in: query
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency_namespace
-          in: query
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]*$'
-      summary: Get an account by account name
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:accounts'
-        - oauth2ImplicitSecurity:
-            - 'read:accounts'
-        - oauth2ApplicationSecurity:
-            - 'read:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'read:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/accounts_get'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    put:
-      x-swagger-router-controller: Accounts
-      operationId: accountsPut
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: path
-          type: string
-          required: true
-          maxLength: 1024
-          pattern: '^[A-Za-z0-9_.-]+$'
-          description: Account Name
-        - name: accounts
-          in: body
-          schema:
-            $ref: '#/definitions/accounts_request'
-      summary: Update an account
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:accounts'
-        - oauth2ImplicitSecurity:
-            - 'write:accounts'
-        - oauth2ApplicationSecurity:
-            - 'write:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'write:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/create_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-    delete:
-      x-swagger-router-controller: Accounts
-      operationId: accountsDelete
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: path
-          type: string
-          required: true
-          maxLength: 1024
-          pattern: '^[A-Za-z0-9_.-]+$'
-      summary: Delete an account
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'write:accounts'
-        - oauth2ImplicitSecurity:
-            - 'write:accounts'
-        - oauth2ApplicationSecurity:
-            - 'write:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'write:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/delete_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/accounts/lookup':
-    get:
-      x-swagger-router-controller: Accounts
-      operationId: accountsDiscovery
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: publicKey
-          in: query
-          description: Accounts public Key
-          type: string
-          minLength: 1
-          maxLength: 800
-          pattern: '^[A-Za-z0-9\\\s/=+-]+$'
-      summary: Lookup an account by it's public key
-      tags:
-        - accounts
-      security:
-        - oauth2PasswordSecurity:
-            - 'read:stewards'
-            - 'read:accounts'
-        - oauth2ImplicitSecurity:
-            - 'read:stewards'
-            - 'read:accounts'
-        - oauth2ApplicationSecurity:
-            - 'read:stewards'
-            - 'read:accounts'
-        - oauth2AccessCodeSecurity:
-            - 'read:stewards'
-            - 'read:accounts'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
-      responses:
-        '200':
-          description: Lookup Results
-          schema:
-            $ref: '#/definitions/accounts_response'
-        default:
-          description: error payload
-          schema:
-            $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/journals':
-    get:
-      x-swagger-router-controller: Journals
-      operationId: journalsList
-      parameters:
-        - name: Authorization
-          description: Authorization Token
-          in: header
-          type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
-          in: path
-          required: true
-          type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency_namespace
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]*$'
         - name: offset
           in: query
           type: integer
@@ -1266,85 +444,44 @@ paths:
           in: query
           type: integer
           minimum: 5
-      summary: List Journal Entries for this accountname
+      description: List of cardholders
       tags:
-        - journals
+        - cardholders
       security:
-        - oauth2PasswordSecurity:
-            - 'read:journals'
-        - oauth2ImplicitSecurity:
-            - 'read:journals'
-        - oauth2ApplicationSecurity:
-            - 'read:journals'
-        - oauth2AccessCodeSecurity:
-            - 'read:journals'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
-          description: OK
+          description: List of cardholders
           schema:
-            $ref: '#/definitions/journals_list'
+            $ref: '#/definitions/cardholders_list'
         default:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/accounts/{account}/journals/{currency}':          
     post:
-      x-swagger-router-controller: Journals
-      operationId: journalsPost
+      x-swagger-router-controller: Cardholders
+      operationId: cardholderPost
       parameters:
         - name: Authorization
           description: Authorization Token
           in: header
           type: string
-          pattern: '^Bearer [A-Za-z0-9=/+]+$'
-        - name: stewardname
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
           in: path
-          required: true
           type: string
+          required: true
           pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: account
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: currency
-          in: path
-          type: string
-          required: true
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_-]+$'
-        - name: currency_namespace
-          in: query
-          type: string
-          maxLength: 255
-          pattern: '^[A-Za-z0-9_.-]*$'
-        - name: journal
+        - name: cardholder
           in: body
+          required: true
           schema:
-            $ref: '#/definitions/journals_request'
-      summary: Create a journal entry for this account
+            $ref: '#/definitions/cardholders_request'
+      description: Create New Cardholder
       tags:
-        - journals
+        - cardholders
       security:
-        - oauth2PasswordSecurity:
-            - 'write:journals'
-        - oauth2ImplicitSecurity:
-            - 'write:journals'
-        - oauth2ApplicationSecurity:
-            - 'write:journals'
-        - oauth2AccessCodeSecurity:
-            - 'write:journals'
-        - apiKeySecurity: []
-        - basicAuthenticationSecurity: []
+        - password: []
       responses:
         '200':
           description: OK
@@ -1354,154 +491,455 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cardholders/{cardholder_firstname}/{cardholder_lastname}':
+    get:
+      x-swagger-router-controller: Cardholders
+      operationId: cardholderGet
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardholder_firstname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders firstname
+        - name: cardholder_lastname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders lastname
+      description: Get a cardholder by cardholderID
+      tags:
+        - cardholders
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/cardholders_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    put:
+      x-swagger-router-controller: Cardholders
+      operationId: cardholdersPut
+      description: Update Cardholder
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardholder_firstname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders firstname
+        - name: cardholder_lastname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders lastname
+        - name: cardholder
+          in: body
+          schema:
+            $ref: '#/definitions/cardholders_request'
+      tags:
+        - cardholders
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/create_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    delete:
+      x-swagger-router-controller: Cardholders
+      operationId: cardholderDelete
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          type: string
+          required: true
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardholder_firstname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders firstname
+        - name: cardholder_lastname
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+          description: cardholders lastname
+      description: Delete a cardholder
+      tags:
+        - cardholders
+      security:
+        - password: []
+      responses:
+        '200':
+          description: Delete success
+          schema:
+            $ref: '#/definitions/delete_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cards':
+    get:
+      x-swagger-router-controller: Cards
+      operationId: cardsList
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: order_by
+          in: query
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: offset
+          in: query
+          type: integer
+          minimum: 0
+        - name: range
+          in: query
+          type: integer
+          minimum: 5
+      description: List cards
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: List of cards
+          schema:
+            $ref: '#/definitions/cards_list'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+    post:
+      x-swagger-router-controller: Cards
+      operationId: cardPost
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: card
+          in: body
+          schema:
+            $ref: '#/definitions/cards_request'
+      description: Create a card
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/create_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cards/{cardID}':
+    delete:
+      x-swagger-router-controller: Cards
+      operationId: cardsDelete
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardID
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+      description: Delete a card
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/delete_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cards/{cardID}/giftload':
+    post:
+      x-swagger-router-controller: Cards
+      operationId: cardsLoad
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardID
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: giftload
+          in: body
+          schema:
+            $ref: '#/definitions/load_request'
+      description: Load a card with a value
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/load_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cards/{cardID}/giftredeem':
+    post:
+      x-swagger-router-controller: Cards
+      operationId: cardsRedeem
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardID
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: giftredeem
+          in: body
+          schema:
+            $ref: '#/definitions/redeem_request'
+      description: Redeem a card with a value
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/redeem_response'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/cards/{cardID}/balance':
+    get:
+      x-swagger-router-controller: Cards
+      operationId: cardsBalance
+      parameters:
+        # - name: Authorization
+        #   description: Authorization Token
+        #   in: header
+        #   type: string
+        #   pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: cardID
+          in: path
+          type: string
+          required: true
+          maxLength: 255
+          pattern: '^[A-Za-z0-9_.-]+$'
+      description: get the balance remaining on a card
+      tags:
+        - cards
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/card_balance'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
+  '/merchants/{merchantname}/reports':
+    get:
+      x-swagger-router-controller: Reports
+      operationId: reportsList
+      parameters:
+        - name: Authorization
+          description: Authorization Token
+          in: header
+          type: string
+          pattern: '^Basic [A-Za-z0-9=/+]+$'
+        - name: merchantname
+          in: path
+          required: true
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: start_period
+          in: query
+          type: integer
+          description: start period in miliseconds since epoch
+        - name: end_period
+          in: query
+          type: integer
+          description: end period in milliseconds since epoch
+        - name: cardholderID
+          in: query
+          type: string
+        - name: order_by
+          in: query
+          type: string
+          pattern: '^[A-Za-z0-9_.-]+$'
+        - name: offset
+          in: query
+          type: integer
+          minimum: 0
+        - name: range
+          in: query
+          type: integer
+          minimum: 5
+      description: >-
+        Gets a listing of transactions, filter by cardholder or start and end
+        periods.
+      tags:
+        - reports
+      security:
+        - password: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/reports_list'
+        default:
+          description: error payload
+          schema:
+            $ref: '#/definitions/ErrorModel'
 securityDefinitions:
-  oauth2PasswordSecurity:
-    type: oauth2
-    scopes:
-      'read:stewards': Read access to stewards
-      'write:stewards': Write access to stewards
-      'read:accounts': Read access to accounts
-      'write:accounts': Write access to accounts
-      'read:currencies': Read access to currencies
-      'write:currencies': Write access to currencies
-      'manage:currencies': Manage currencies
-      'read:namespaces': Read access to namespaces
-      'write:namespaces': Write access to namespaces
-      'manage:namespaces': Manage namespaces
-      'read:journals': Read access to journals
-      'write:journals': Write access  to journals
-    flow: password
-    tokenUrl: 'https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token'
-    x-token-operation-id: oauthAccessTokenPost
-  oauth2ImplicitSecurity:
-    type: oauth2
-    scopes:
-      'read:stewards': Read access to stewards
-      'write:stewards': Write access to stewards
-      'read:accounts': Read access to accounts
-      'write:accounts': Write access to accounts
-      'read:currencies': Read access to currencies
-      'write:currencies': Write access to currencies
-      'manage:currencies': Manage currencies
-      'read:namespaces': Read access to namespaces
-      'write:namespaces': Write access to namespaces
-      'manage:namespaces': Manage namespaces
-      'read:journals': Read access to journals
-      'write:journals': Write access  to journals
-    flow: implicit
-    authorizationUrl: 'http://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/dialog/authorize'
-    x-token-operation-id: oauthAccessTokenPost
-  oauth2ApplicationSecurity:
-    type: oauth2
-    scopes:
-      'read:stewards': Read access to stewards
-      'write:stewards': Write access to stewards
-      'read:accounts': Read access to accounts
-      'write:accounts': Write access to accounts
-      'read:currencies': Read access to currencies
-      'write:currencies': Write access to currencies
-      'manage:currencies': Manage currencies
-      'read:namespaces': Read access to namespaces
-      'write:namespaces': Write access to namespaces
-      'manage:namespaces': Manage namespaces
-      'read:journals': Read access to journals
-      'write:journals': Write access  to journals
-    flow: application
-    tokenUrl: 'https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token'
-    x-token-operation-id: oauthAccessTokenPost
-  oauth2AccessCodeSecurity:
-    type: oauth2
-    scopes:
-      'read:stewards': Read access to stewards
-      'write:stewards': Write access to stewards
-      'read:accounts': Read access to accounts
-      'write:accounts': Write access to accounts
-      'read:currencies': Read access to currencies
-      'write:currencies': Write access to currencies
-      'manage:currencies': Manage currencies
-      'read:namespaces': Read access to namespaces
-      'write:namespaces': Write access to namespaces
-      'manage:namespaces': Manage namespaces
-      'read:journals': Read access to journals
-      'write:journals': Write access  to journals
-    flow: accessCode
-    authorizationUrl: 'https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token'
-    x-authroization-operation-id: oauthDialogeGet
-    tokenUrl: 'https://cloud.openmoney.cc/V2/stewards/%7Bstewardname%7D/oauth/token'
-    x-token-operation-id: oauthAccessTokenPost
-  apiKeySecurity:
-    type: apiKey
-    in: header
-    name: Authorization
-  oauth2Refresh:
-    type: apiKey
-    in: header
-    name: Authorization
-  basicAuthenticationSecurity:
+  password:
     type: basic
 definitions:
-  stewards_list:
+  merchant_list:
     type: array
     items:
-      $ref: '#/definitions/stewards_get'
-  namespaces_list:
+      $ref: '#/definitions/merchants_response'
+  employees_list:
     type: array
     items:
-      $ref: '#/definitions/namespaces_get'
-  currencies_list:
+      $ref: '#/definitions/employees_response'
+  cardholders_list:
     type: array
     items:
-      $ref: '#/definitions/currencies_get'
-  accounts_list:
+      $ref: '#/definitions/cardholders_response'
+  cards_list:
     type: array
     items:
-      $ref: '#/definitions/accounts_get'
-  journals_list:
+      $ref: '#/definitions/cards_response'
+  reports_list:
     type: array
     items:
-      $ref: '#/definitions/encrypted_journals'
-  namespaces_get:
-    allOf:
-      - $ref: '#/definitions/get_response'
-      - $ref: '#/definitions/namespaces_response'
-  currencies_get:
-    allOf:
-      - $ref: '#/definitions/get_response'
-      - $ref: '#/definitions/currencies_response'
-  accounts_get:
-    allOf:
-      - $ref: '#/definitions/get_response'
-      - $ref: '#/definitions/accounts_response'
-  stewards_get:
-    allOf:
-      - $ref: '#/definitions/get_response'
-      - $ref: '#/definitions/stewards_response'
-  delete_response:
-    type: object
-    required:
-      - id
-      - ok
-    properties:
-      id:
-        type: string
-      ok:
-        type: boolean
-  get_response:
-    type: object
-    required:
-      - id
-    properties:
-      id:
-        type: string
-        pattern: '^[A-Za-z0-9_.~-]+$'
+      $ref: '#/definitions/reports_response'
   create_response:
     type: object
     required:
-      - id
       - ok
     properties:
-      id:
-        type: string
+      ok:
+        type: boolean
+  update_response:
+    type: object
+    required:
+      - ok
+    properties:
+      ok:
+        type: boolean
+  delete_response:
+    type: object
+    required:
+      - ok
+    properties:
       ok:
         type: boolean
   modification:
@@ -1512,58 +950,41 @@ definitions:
         description: timestamp in milliseconds since epoch
       modified_by:
         type: string
-        description: stewardname of steward who made modification
+        description: merchant who made modification
       modification:
         type: string
         description: human readable description of modification
-  stewards_request:
+  merchants_request:
     type: object
     minProperties: 2
-    maxProperties: 10
+    maxProperties: 9
     required:
-      - stewardname
+      - merchantname
       - password
     properties:
-      stewardname:
+      merchantname:
         type: string
         maxLength: 255
         pattern: '^[A-Za-z0-9_.-]+$'
       password:
         type: string
-        minLength: 4
-        maxLength: 1024
-      publicKey:
-        type: string
-        minLength: 266
+        minLength: 3
         maxLength: 800
-        pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
       email:
         type: string
         format: email
         maxLength: 255
         pattern: >-
           ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
-      email_notifications:
-        type: boolean
-  stewards_response:
+  merchants_response:
     type: object
-    minProperties: 2
     required:
-      - stewardname
+      - merchantname
     properties:
-      stewardname:
+      merchantname:
         type: string
         maxLength: 255
         pattern: '^[A-Za-z0-9_.-]+$'
-      publicKey:
-        type: string
-        minLength: 266
-        maxLength: 800
-        pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
       email:
         type: string
         format: email
@@ -1577,496 +998,389 @@ definitions:
         description: timestamp in milliseconds since epoch
       created_by:
         type: string
-        description: stewardname of steward who made change
+        description: merchant of who created object
       modifications:
         type: array
         items:
           $ref: '#/definitions/modification'
-  accounts_request:
+  forgot_request:
     type: object
-    minProperties: 5
-    maxProperties: 10
-    required:
-      - account
-      - account_namespace
-      - currency
-      - currency_namespace
-      - stewards
     properties:
-      account:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      account_namespace:
+      merchantname:
         type: string
         maxLength: 255
         pattern: '^[A-Za-z0-9_.-]+$'
-      currency:
+      email:
         type: string
+        format: email
         maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      currency_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-      publicKey:
-        type: string
-        minLength: 266
-        maxLength: 800
-        pattern: '^[A-Za-z0-9\\\s/=+-]+$'
-  accounts_response:
-    type: object
-    minProperties: 5
-    maxProperties: 10
-    required:
-      - account
-      - account_namespace
-      - currency
-      - currency_namespace
-      - stewards
-    properties:
-      account:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      account_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-      currency:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      currency_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      created:
-        type: integer
-        description: timestamp in milliseconds since epoch
-      created_by:
-        type: string
-        description: stewardname of steward who made change
-      modifications:
-        type: array
-        items:
-          $ref: '#/definitions/modification'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-      publicKey:
-        type: string
-        minLength: 266
-        maxLength: 800
         pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
-  currencies_request:
-    type: object
-    minProperties: 3
-    required:
-      - currency
-      - currency_namespace
-      - stewards
-    properties:
-      currency:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      currency_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-  currencies_response:
-    type: object
-    minProperties: 3
-    required:
-      - currency
-      - currency_namespace
-      - stewards
-    properties:
-      currency:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      currency_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      created:
-        type: integer
-        description: timestamp in milliseconds since epoch
-      created_by:
-        type: string
-        description: stewardname of steward who made change
-      modifications:
-        type: array
-        items:
-          $ref: '#/definitions/modification'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-  namespaces_request:
-    type: object
-    minProperties: 3
-    required:
-      - namespace
-      - parent_namespace
-      - stewards
-    properties:
-      namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-      parent_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-  namespaces_response:
-    type: object
-    minProperties: 3
-    required:
-      - namespace
-      - parent_namespace
-      - stewards
-    properties:
-      namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-      parent_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      created:
-        type: integer
-        description: timestamp in milliseconds since epoch
-      created_by:
-        type: string
-        description: stewardname of who created space
-      modifications:
-        type: array
-        items:
-          $ref: '#/definitions/modification'
-      stewards:
-        type: array
-        items:
-          type: string
-          maxLength: 512
-          pattern: '^stewards~[A-Za-z0-9_.-]+$'
-  encrypted_journals:
+          ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+  forgot_response:
     type: object
     properties:
-      id:
-        type: string
-      type:
-        type: string
-      algorithm:
-        type: string
-      publicKeyEncryptedSymetricKey:
-        type: string
-      initializationVector:
-        type: string
-      encryptedJournal:
-        $ref: '#/definitions/aes_encryption'
-  aes_encryption:
-    type: object
-    properties:
-      content:
-        type: string
-      tag:
+      message:
         type: object
-  journals_request:
+  reset_request:
     type: object
-    minProperties: 3
-    maxProperties: 9
-    required:
-      - to_account
-      - to_account_namespace
-      - amount
     properties:
-      to_account:
+      password:
         type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      to_account_namespace:
+        minLength: 3
+      forgot_token:
+        type: string
+  reset_response:
+    type: object
+    properties:
+      message:
+        type: object
+  currency_request:
+    type: object
+    properties:
+      currency:
         type: string
         maxLength: 255
         pattern: '^[A-Za-z0-9_.-]+$'
+      currency_name:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-\s]+$'
+      currency_color:
+        maxLength: 32
+        pattern: '^[A-Za-z0-9_.-]+$'
+  employees_request:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      code:
+        type: string
+        description: A numerical code that can be used to authenticate employee.
+      is_merchant_owner:
+        type: boolean
+  employees_response:
+    type: object
+    properties:
+      name:
+        type: string
+      code:
+        type: string
+      is_merchant_owner:
+        type: boolean
+      created:
+        type: integer
+        description: timestamp in milliseconds since epoch
+      created_by:
+        type: string
+        description: merchant of who created object
+      modifications:
+        type: array
+        items:
+          $ref: '#/definitions/modification'
+  cards_request:
+    type: object
+    properties:
+      key:
+        type: string
+        maxLength: 800
+        pattern: '^[A-Za-z0-9_-]+$'
+      gift:
+        type: number
+      promo:
+        type: number
+      points:
+        type: number
+      tab:
+        type: number
+      stamp:
+        type: number
+      employeeID:
+        type: string
+      cardholderID:
+        type: string
+  cards_response:
+    type: object
+    properties:
+      key:
+        type: string
+        maxLength: 800
+        pattern: '^[A-Za-z0-9_-]+$'
+      gift:
+        type: number
+      promo:
+        type: number
+      points:
+        type: number
+      tab:
+        type: number
+      stamp:
+        type: number
+      cardholderID:
+        type: string
+      employeeID:
+        type: string
+      created:
+        type: integer
+        description: timestamp in milliseconds since epoch
+      created_by:
+        type: string
+        description: merchant of who created object
+      modifications:
+        type: array
+        items:
+          $ref: '#/definitions/modification'
+      merchantname:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_-]+$'
+  cardholders_request:
+    type: object
+    required:
+      - firstname
+      - lastname
+    properties:
+      firstname:
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]+$'
+      lastname:
+        type: string
+        minLength: 1
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      address1:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      address2:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      phone:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      email:
+        type: string
+        maxLength: 255
+        pattern: >-
+          ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+  cardholders_response:
+    type: object
+    required:
+      - firstname
+      - lastname
+    properties:
+      firstname:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]+$'
+      lastname:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      address1:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      address2:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      phone:
+        type: string
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]*$'
+      email:
+        type: string
+        maxLength: 255
+        pattern: >-
+          ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+      created:
+        type: integer
+        description: timestamp in milliseconds since epoch
+      created_by:
+        type: string
+        description: merchant of who created object
+      modifications:
+        type: array
+        items:
+          $ref: '#/definitions/modification'
+      cards:
+        type: array
+        items:
+          $ref: '#/definitions/cards_response'
+  load_request:
+    type: object
+    properties:
+      gift:
+        type: number
+        minimum: 0
+      promo:
+        type: number
+        minimum: 0
+      points:
+        type: number
+        minimum: 0
+      tab:
+        type: number
+        minimum: 0
+      stamp:
+        type: number
+        minimum: 0
+      employeeID:
+        type: string
+  load_response:
+    type: object
+    properties:
+      gift:
+        type: number
+      promo:
+        type: number
+      points:
+        type: number
+      tab:
+        type: number
+      stamp:
+        type: number
+      created:
+        type: integer
+        description: timestamp in milliseconds since epoch
+      created_by:
+        type: string
+        description: merchant of who created object
+  redeem_request:
+    type: object
+    properties:
+      gift:
+        type: number
+        minimum: 0
+      promo:
+        type: number
+        minimum: 0
+      points:
+        type: number
+        minimum: 0
+      tab:
+        type: number
+        minimum: 0
+      stamp:
+        type: number
+        minimum: 0
+      employeeID:
+        type: string
+  redeem_response:
+    type: object
+    properties:
+      gift:
+        type: number
+      giftVolume:
+        type: number
+      points:
+        type: number
+      pointsVolume:
+        type: number
+      promo:
+        type: number
+      promoVolume:
+        type: number
+      tab:
+        type: number
+      tabVolume:
+        type: number
+      stamp:
+        type: number
+      stampVolume:
+        type: number
+  card_balance:
+    type: object
+    properties:
+      gift:
+        type: number
+      giftVolume:
+        type: number
+      points:
+        type: number
+      pointsVolume:
+        type: number
+      promo:
+        type: number
+      promoVolume:
+        type: number
+      tab:
+        type: number
+      tabVolume:
+        type: number
+      stamp:
+        type: number
+      stampVolume:
+        type: number
+  reports_response:
+    type: object
+    required:
+      - load
+      - redeem
+      - amount
+      - currency
+      - timestamp
+    properties:
+      employeeID:
+        type: string
+      load:
+        type: boolean
+      redeem:
+        type: boolean
       amount:
         type: number
         minimum: 0
-      payload:
-        type: object
-  journals_response:
-    type: object
-    minProperties: 3
-    maxProperties: 9
-    required:
-      - to_account
-      - to_account_namespace
-      - amount
-    properties:
-      to_account:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      to_account_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-      from_account:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      from_account_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
       currency:
         type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_-]+$'
-      currency_namespace:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]*$'
-      amount:
-        type: number
-        minimum: 0
-      created:
+      timestamp:
         type: integer
-      created_by:
-        type: string
-        description: stewardname of who created entry
-      payload:
-        type: object
-  application_request:
+  merchant_update_request:
     type: object
-    minProperties: 3
-    maxProperties: 4
-    required:
-      - application_name
-      - homepage_uri
-      - authorization_callback_uri
-    properties:
-      application_name:
-        type: string
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-        description: Applications Name
-      homepage_uri:
-        type: string
-        maxLength: 512
-        pattern: >-
-          ^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\.-]+)(?::(\d+))?)?([\/\\\w\.()-]*)?(?:([?][^#]*)?(#.*)?)*
-        description: Applications home page
-      application_description:
-        type: string
-        maxLength: 1048
-        description: Application Description
-      authorization_callback_uri:
-        type: string
-        maxLength: 512
-        pattern: >-
-          ^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\.-]+)(?::(\d+))?)?([\/\\\w\.()-]*)?(?:([?][^#]*)?(#.*)?)*
-        description: Callback url after authorization.
-  application_response:
-    type: object
-    minProperties: 2
-    maxProperties: 2
-    required:
-      - application_id
-      - application_secret
-    properties:
-      application_id:
-        type: string
-        minLength: 266
-        maxLength: 800
-        pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
-      application_secret:
-        type: string
-        minLength: 893
-        maxLength: 899
-        pattern: >-
-          ^-----BEGIN PRIVATE KEY-----[A-Za-z0-9/+]{845,848}[=]{0,3}-----END
-          PRIVATE KEY-----$
-  access_token_request:
-    type: object
-    minProperties: 2
+    minProperties: 1
     maxProperties: 3
-    required:
-      - grant_type
     properties:
-      grant_type:
-        type: string
-        maxLength: 20
-        pattern: '^[A-Za-z_]+$'
-        description: 'one of code, password, refresh_token, client_credentials'
-      client_id:
+      password:
         type: string
         minLength: 5
         maxLength: 800
-        pattern: '^[A-Za-z0-9\\\s/=+-]*$'
-        description: Stewards Public Key
-      client_secret:
-        type: string
-        minLength: 32
-        maxLength: 1600
-        pattern: '^[A-Za-z0-9\\\\\\s/=+-]*$'
-        description: Client Secret
-      username:
-        type: string
-        pattern: '^[A-Za-z0-9_.-]+$'
-      password:
-        type: string
-      refresh_token:
-        type: string
-  token_response:
-    type: object
-    required:
-      - access_token
-      - expires
-    properties:
-      access_token:
-        type: string
-      expires:
-        type: string
-  oauth_authorize_request:
-    type: object
-    required:
-      - response_type
-    properties:
-      response_type:
-        type: string
-        maxLength: 20
-        pattern: '^[A-Za-z_]+$'
-        description: 'One of code, password, refresh_token, client_credentials'
-      client_id:
-        type: string
-        minLength: 266
-        maxLength: 800
-        pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
-      redirect_uri:
-        type: string
-        format: url
-        maxLength: 512
-        description: A uri to redirect steward after authorization
-      username:
-        type: string
-        pattern: '^[A-Za-z_]+$'
-        description: stewardname of user
-      scopes:
-        description: >-
-          A comma separated list of scopes. If not provided, scope defaults to
-          an empty list of scopes for stewards that don’t have a valid token for
-          the app. For stewards who do already have a valid token for the app,
-          the steward won’t be shown the OAuth authorization page with the list
-          of scopes. Instead, this step of the flow will automatically complete
-          with the same scopes that were used last time the steward completed
-          the flow.
-        type: array
-        items:
-          type: string
-          minLength: 5
-          maxLength: 32
-  register_response:
-    type: object
-    minProperties: 4
-    maxProperties: 4
-    required:
-      - stewards
-      - accounts
-      - currencies
-      - namespaces
-    properties:
-      stewards:
-        type: array
-        items:
-          $ref: '#/definitions/stewards_get'
-      accounts:
-        type: array
-        items:
-          $ref: '#/definitions/accounts_get'
-      currencies:
-        type: array
-        items:
-          $ref: '#/definitions/currencies_get'
-      namespaces:
-        type: array
-        items:
-          $ref: '#/definitions/namespaces_get'
-  register_request:
-    type: object
-    minProperties: 2
-    maxProperties: 4
-    required:
-      - stewardname
-      - password
-    properties:
-      stewardname:
-        type: string
-        description: Stewards name
-        maxLength: 255
-        pattern: '^[A-Za-z0-9_.-]+$'
-      password:
-        type: string
-        description: Stewards password
-        minLength: 4
-        maxLength: 1024
-      publicKey:
-        type: string
-        minLength: 266
-        maxLength: 800
-        description: >-
-          Stewards 1024bit - 4096bit RSA public key. command: openssl genpkey
-          -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:4096
-          ,openssl rsa -pubout -in private_key.pem -out public_key.pem , you can
-          deterministically generate an RSA key from a passphrase
-          http://crypto.stackexchange.com/questions/24514/deterministically-generate-a-rsa-public-private-key-pair-from-a-passphrase-with
-          you can also use this service to generate a key online:
-          http://travistidwell.com/blog/2013/09/06/an-online-rsa-public-and-private-key-generator/
-        pattern: >-
-          ^-----BEGIN PUBLIC KEY-----[A-Za-z0-9\\\s/=+]+-----END PUBLIC
-          KEY-----$
       email:
         type: string
-        description: Stewards email address
+        description: merchant email address
         format: email
         maxLength: 255
         pattern: >-
           ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
       email_notifications:
         type: boolean
-        description: Does steward wish to receive email notifications
+        description: Does merchant wish to receive email notifications
+  merchant_response:
+    type: object
+    required:
+      - merchantname
+      - email
+      - email_notifications
+    properties:
+      merchantname:
+        type: string
+        description: merchant username
+        maxLength: 255
+        pattern: '^[A-Za-z0-9_.-]+$'
+      email:
+        type: string
+        description: merchant email address
+        format: email
+        maxLength: 255
+        pattern: >-
+          ^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+      email_notifications:
+        type: boolean
+        description: Does merchant wish to receive email notifications
   ErrorModel:
     type: object
     required:
@@ -2074,7 +1388,36 @@ definitions:
       - message
     properties:
       code:
-        type: integer
-        format: int32
+        type: string
       message:
+        type: string
+      failedValidation:
+        type: boolean
+      results:
+        $ref: '#/definitions/ErrorResults'
+      originalResponse:
+        type: string
+  ErrorResults:
+    type: object
+    properties:
+      errors:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorObject'
+      warnings:
+        type: array
+        items:
+          $ref: '#/definitions/ErrorObject'
+  ErrorObject:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      path:
+        type: array
+        items:
+          type: string
+      desccription:
         type: string
