@@ -14,7 +14,7 @@ var couchbase = require('couchbase'),
     serverAddress = '127.0.0.1',
     cluster = new couchbase.Cluster('couchbase://' + serverAddress),
     clusterManager = cluster.manager(process.env.COUCHBASE_ADMIN_USERNAME, process.env.COUCHBASE_ADMIN_PASSWORD),
-    N1qlQuery = couchbase.N1qlQuery,
+    //N1qlQuery = couchbase.N1qlQuery,
     async = require('async'),
     tasks = {},
     openmoney_global = null,
@@ -118,31 +118,34 @@ tasks.create_bucket_openmoney_stewards = function(callback){
 
 tasks.insert_initial_data = function(callback){
 
-    if(openmoney_global == null){
-        openmoney_global = cluster.openBucket('openmoney_global');
-    }
-    var insertTasks = {};
+    //give some time for the buckets to initialize
+    setTimeout(function(){
+      if(openmoney_global == null){
+          openmoney_global = cluster.openBucket('openmoney_global');
+      }
+      var insertTasks = {};
 
-    Object.keys(model).forEach(function (key) {
-        var value = model[key];
-        insertTasks[value.id] = function(cb){
-            openmoney_global.insert(value.id, value, function(err, res) {
-                if(err) {
-                    cb(err, null);
-                } else {
-                    cb(null, res);
-                }
-            });
-        }
-    });
+      Object.keys(model).forEach(function (key) {
+          var value = model[key];
+          insertTasks[value.id] = function(cb){
+              openmoney_global.insert(value.id, value, function(err, res) {
+                  if(err) {
+                      cb(err, null);
+                  } else {
+                      cb(null, res);
+                  }
+              });
+          }
+      });
 
-    async.parallel(insertTasks, function(err, res){
-        if(err){
-            callback(err, null);
-        } else {
-            callback(null, res);
-        }
-    });
+      async.parallel(insertTasks, function(err, res){
+          if(err){
+              callback(err, null);
+          } else {
+              callback(null, res);
+          }
+      });
+    }, 3000);
 };
 
 async.series(tasks, function(err, results){
