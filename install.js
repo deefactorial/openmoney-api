@@ -24,33 +24,33 @@ tasks.create_bucket_oauth2Server = function(callback){
     //Create the bucket
     clusterManager.createBucket('oauth2Server', {}, function(err, results){
         if(err){
-            callback("CREATE oauth2Server BUCKET ERROR: (check that your couchbase admin credentials are set properly.) :" + err, null);
+            callback("CREATE oauth2Server BUCKET ERROR: (does the bucket already exist ?) :" + err, null);
         } else {
             callback(null,"Successfully created oauth2Server bucket.");
         }
     });
 };
 
-tasks.create_index_oauth2Server = function(callback){
-    //give couchbase a couple seconds to initialize the db.
-    setTimeout(function(){
-
-        //Open the bucket
-        var oauth2Server = cluster.openBucket('oauth2Server');
-        oauth2Server.enableN1ql(['http://' + serverAddress + ':8093/']);
-
-        //Create the primary index on the bucket to query the bucket for model.dump
-        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `oauth2Server` USING GSI;";
-        // var query = N1qlQuery.fromString(queryString);
-        // oauth2Server.query(query, function(err, doc){
-        //     if(err) {
-        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-        //     } else {
-        //         callback(null, "Successfully created index.");
-        //     }
-        // });
-    }, 3000);
-};
+// tasks.create_index_oauth2Server = function(callback){
+//     //give couchbase a couple seconds to initialize the db.
+//     setTimeout(function(){
+//
+//         //Open the bucket
+//         var oauth2Server = cluster.openBucket('oauth2Server');
+//         oauth2Server.enableN1ql(['http://' + serverAddress + ':8093/']);
+//
+//         Create the primary index on the bucket to query the bucket for model.dump
+//         var queryString = "CREATE PRIMARY INDEX `#primary` ON `oauth2Server` USING GSI;";
+//         var query = N1qlQuery.fromString(queryString);
+//         oauth2Server.query(query, function(err, doc){
+//             if(err) {
+//                 callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+//             } else {
+//                 callback(null, "Successfully created index.");
+//             }
+//         });
+//     }, 3000);
+// };
 
 tasks.create_bucket_openmoney_global = function(callback){
     //Create the bucket
@@ -63,26 +63,26 @@ tasks.create_bucket_openmoney_global = function(callback){
     });
 };
 
-tasks.create_index_openmoney_global = function(callback){
-    //give couchbase a couple seconds to initialize the db.
-    setTimeout(function(){
-
-        //Open the bucket
-        openmoney_global = cluster.openBucket('openmoney_global');
-        openmoney_global.enableN1ql(['http://' + serverAddress + ':8093/']);
-
-        //Create the primary index on the bucket to query the bucket for model.dump
-        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_global` USING GSI;";
-        // var query = N1qlQuery.fromString(queryString);
-        // openmoney_global.query(query, function(err, doc){
-        //     if(err) {
-        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-        //     } else {
-        //         callback(null, "Successfully created index.");
-        //     }
-        // });
-    }, 3000);
-};
+// tasks.create_index_openmoney_global = function(callback){
+//     //give couchbase a couple seconds to initialize the db.
+//     setTimeout(function(){
+//
+//         //Open the bucket
+//         openmoney_global = cluster.openBucket('openmoney_global');
+//         openmoney_global.enableN1ql(['http://' + serverAddress + ':8093/']);
+//
+//         Create the primary index on the bucket to query the bucket for model.dump
+//         var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_global` USING GSI;";
+//         var query = N1qlQuery.fromString(queryString);
+//         openmoney_global.query(query, function(err, doc){
+//             if(err) {
+//                 callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+//             } else {
+//                 callback(null, "Successfully created index.");
+//             }
+//         });
+//     }, 3000);
+// };
 
 tasks.create_bucket_openmoney_stewards = function(callback){
     //Create the bucket
@@ -95,26 +95,26 @@ tasks.create_bucket_openmoney_stewards = function(callback){
     });
 };
 
-tasks.create_index_openmoney_stewards = function(callback){
-    //give couchbase a couple seconds to initialize the db.
-    setTimeout(function(){
-
-        //Open the bucket
-        var openmoney_stewards = cluster.openBucket('openmoney_stewards');
-        openmoney_stewards.enableN1ql(['http://' + serverAddress + ':8093/']);
-
-        //Create the primary index on the bucket to query the bucket for model.dump
-        // var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_stewards` USING GSI;";
-        // var query = N1qlQuery.fromString(queryString);
-        // openmoney_stewards.query(query, function(err, doc){
-        //     if(err) {
-        //         callback("CREATE PRIMARY INDEX ERROR:" + err, null);
-        //     } else {
-        //         callback(null, "Successfully created index.");
-        //     }
-        // });
-    }, 3000);
-};
+// tasks.create_index_openmoney_stewards = function(callback){
+//     //give couchbase a couple seconds to initialize the db.
+//     setTimeout(function(){
+//
+//         //Open the bucket
+//         var openmoney_stewards = cluster.openBucket('openmoney_stewards');
+//         openmoney_stewards.enableN1ql(['http://' + serverAddress + ':8093/']);
+//
+//         Create the primary index on the bucket to query the bucket for model.dump
+//         var queryString = "CREATE PRIMARY INDEX `#primary` ON `openmoney_stewards` USING GSI;";
+//         var query = N1qlQuery.fromString(queryString);
+//         openmoney_stewards.query(query, function(err, doc){
+//             if(err) {
+//                 callback("CREATE PRIMARY INDEX ERROR:" + err, null);
+//             } else {
+//                 callback(null, "Successfully created index.");
+//             }
+//         });
+//     }, 3000);
+// };
 
 tasks.insert_initial_data = function(callback){
 
