@@ -145,7 +145,7 @@ tasks.insert_initial_data = function(callback){
               callback(null, res);
           }
       });
-    }, 3000);
+    }, 5000);
 };
 
 async.series(tasks, function(err, results){
