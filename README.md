@@ -26,7 +26,9 @@ npm install
 ```sh
 
 npm start
-
+#Control-C to quit
+sudo npm install pm2 -g
+pm2 start app.js --name "openmoney-api"
 ```
 
 #Test

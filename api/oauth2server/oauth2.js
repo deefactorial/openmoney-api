@@ -10,7 +10,7 @@ var oauth2orize = require('oauth2orize')
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
-var ttl = 3600 * 24;
+var ttl = 3600 * 24 * 30; //made their access_token valid for 30 days
 
 // Register serialialization and deserialization functions.
 //
