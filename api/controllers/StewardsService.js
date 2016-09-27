@@ -100,6 +100,8 @@ exports.stewardsGet = function (req, res, next) {
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
     request.publicKey = req.user.publicKey;
+    console.log('req.user', req.user);
+    request.user = req.user;
 
     MasterController.stewardsGet(request, function (err, result) {
         res.setHeader('Content-Type', 'application/json');

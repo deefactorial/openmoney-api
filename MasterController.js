@@ -1012,13 +1012,39 @@ exports.stewardsList = function(request, stewardsGetCallback){
 };
 
 exports.stewardsGet = function(request, stewardsGetCallback){
+
     openmoney_bucket.get('stewards~' + request.stewardname.toLowerCase(), function(err, results) {
         if (err) {
             stewardsGetCallback(err,null);
         } else {
+            //remove password and private key before returning result
+            if(request.stewardname.toLowerCase() != request.user.stewardname.toLowerCase()){
+              delete(results.value.password);
+              delete(results.value.privateKey);
+            }
             //add id to steward_bucket if it doesn't exist yet.
+            stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
+                if (err) {
+                    stewardsGetCallback(err);
+                } else {
+                    if(steward_bucket.value.stewards.indexOf(results.value.id.toLowerCase()) !== -1){
+                      stewardsGetCallback(null, results.value);
+                    } else {
+                      steward_bucket.value.stewards.push(results.value.id.toLowerCase());
+                      //add stewards of currency to users stewards list
+                      stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                          if (err) {
+                              stewardsGetCallback(err);
+                          } else {
+                              stewardsGetCallback(null, results.value);
+                          }
+                      });
+                    }
+                }
+            });
+
             //console.log(results.value);
-            stewardsGetCallback(null, results.value);
+            // stewardsGetCallback(null, results.value);
         }
     });
 };
@@ -1697,15 +1723,17 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                     } else {
                                         //go through each account
                                         //if the account is not this stewards through a 2007 error
-                                        console.log("There are accounts with that namespace name");
+                                        console.log("There are accounts with that namespace name", accountList);
                                         //there are accounts with that name
                                         var parallelAccountTasks = {};
                                         //check who is the steward of the accounts if this is the steward then allow.
                                         accountList.value.list.forEach(function(accountID){
-                                            parallelAccountTasks[accountID] = function(callback) {
+                                            parallelAccountTasks[accountID] = function(cb) {
+                                                console.log('get', accountID);
                                                 openmoney_bucket.get(accountID, function(err, account){
+                                                    console.log('get result of', accountID, err, account);
                                                     if(err) {
-                                                        callback(err, null);
+                                                        cb(err, null);
                                                     } else {
                                                         var is_steward = false;
                                                         account.value.stewards.forEach(function(steward){
@@ -1713,14 +1741,15 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                                                 is_steward = true;
                                                             }
                                                         });
+                                                        console.log('is_steward', is_steward);
                                                         if(is_steward) {
-                                                            callback(null, account);
+                                                            cb(null, account);
                                                         } else {
                                                             var error = {};
                                                             error.status = 403;
                                                             error.code = 2007;
                                                             error.message = 'There is an account with that namespace name.';
-                                                            callback(error, null);
+                                                            cb(error, null);
                                                         }
                                                     }
                                                 })
@@ -1728,6 +1757,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                         });
 
                                         async.parallel(parallelAccountTasks, function(err, ok){
+                                            console.log('parallelAccountTasks', err, ok);
                                             if(err){
                                                 callback(err, null);
                                             } else {
@@ -1787,6 +1817,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                         if (olddoc.value.parent_namespace != request.space.parent_namespace) {
                             //check parent namespace exists
                             parallelTasks.namespace = function (callback) {
+                                console.log('parent namespace check', request.space.parent_namespace);
                                 openmoney_bucket.get("namespaces~" + request.space.parent_namespace, function (err, doc) {
                                     if (err) {
                                         if (err.code == 13) {
@@ -2397,9 +2428,10 @@ exports.spacesPut = function(request, spacesPutCallback) {
                         async.parallel(parallelTasks,
                             function (err, results) {
                                 if (err) {
+                                    console.log('parallelTasks error', err);
                                     spacesPutCallback(err, false);
                                 } else {
-                                    console.log(results);
+                                    console.log('parallelTasks results',results);
                                     //all the checks passed so update all the instances
 
                                     //check if anything changed first
@@ -2873,8 +2905,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 });
             };
 
-            parallelInsertTasks.insert_currency_in_stewards_bucket = function(callback) {
-                request.currency.stewards.forEach(function(steward) {
+
+            request.currency.stewards.forEach(function(steward) {
+                parallelInsertTasks['insert_currency_in_stewards_bucket' + steward] = function(callback) {
                     openmoney_bucket.get(steward.toLowerCase(), function (err, stewardDoc) {
                         if (err) {
                             callback(err, null);
@@ -2895,8 +2928,9 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                             });
                         }
                     });
-                });
-            };
+                };
+            });
+
 
             //find all the parents of this curreny namespace and insert this namespace into their children document.
             //grandchild.child.parent.grandparent
@@ -3702,15 +3736,17 @@ exports.accountsPost = function(request, accountsPostCallback) {
 
     async.parallel(parallelTasks, function(err, results){
         if(err) {
+            console.log('parallelTasks error:', err);
             accountsPostCallback(err, null);
         } else {
-            console.log(results);
+            console.log('parallelTasks results:',results);
             //create the account
 
             var parallelInsertTasks = {};
             parallelInsertTasks.account = function(callback){
                 openmoney_bucket.insert(account.id, account, function(err, ok){
                     if(err){
+                        console.log('account insert error', err)
                         callback(err, null);
                     } else {
                         callback(null, ok);
@@ -3730,12 +3766,14 @@ exports.accountsPost = function(request, accountsPostCallback) {
                             accountsList.list = [ account.id ];
                             openmoney_bucket.insert(accountsList.id, accountsList, function(err, ok){
                                 if(err){
+                                    console.log('insert accountsList error:', accountsList.id, err);
                                     callback(err, null);
                                 } else {
                                     callback(null, ok);
                                 }
                             })
                         } else {
+                            console.log('get ' + "accountsList~" + request.account.account.toLowerCase() + '.' + request.account.account_namespace.toLowerCase() + ' accountsList error', err)
                             callback(err, null);
                         }
                     } else {
@@ -3743,6 +3781,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                         accountsList.value.list.push(account.id);
                         openmoney_bucket.upsert(accountsList.value.id, accountsList.value, {cas: accountsList.cas}, function(err, ok){
                             if(err){
+                                console.log('upsert accountslist error:', accountsList.value.id, err);
                                 callback(err, null);
                             } else {
                                 callback(null, ok);
@@ -3760,6 +3799,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                     publicKeyDoc.account = account.id;
                     openmoney_bucket.insert(publicKeyDoc.id, publicKeyDoc, function(err, ok){
                         if(err){
+                            console.log('insert account public key error', publicKeyDoc.id, err)
                             callback(err, null);
                         } else {
                             callback(null, ok);
@@ -3969,7 +4009,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
     //request.accounts
     //request.publicKey
 
-    var currency = request.accounts.currency_namespace == '' ? request.accounts.currency.toLowerCase() : request.accounts.currency.toLowerCase() + "." + request.account.currency_namespace.toLowerCase();
+    var currency = request.accounts.currency_namespace == '' ? request.accounts.currency.toLowerCase() : request.accounts.currency.toLowerCase() + "." + request.accounts.currency_namespace.toLowerCase();
 
     var account = {};
     account.id = "accounts~" + request.accounts.account.toLowerCase() + '.' + request.accounts.account_namespace.toLowerCase() + '~' + currency;
@@ -4183,6 +4223,26 @@ exports.accountsPut = function(request, accountsPutCallback) {
                 var steward_change = false;
                 if (olddoc.value.stewards.equals(account.stewards) === false) {
                     //check that stewards exist
+                    olddoc.value.stewards.forEach(function (steward) {
+                        console.log("get steward:" + steward);
+                        parallelCheckTasks[steward] = function (callback) {
+                            openmoney_bucket.get(steward, function (err, doc) {
+                                if (err) {
+                                    if (err.code == 13) {
+                                        var error = {};
+                                        error.status = 404;
+                                        error.code = 4007;
+                                        error.message = "Account stewards do not exist.";
+                                        callback(error, false);
+                                    } else {
+                                        callback(err, false);
+                                    }
+                                } else {
+                                    callback(null, doc);
+                                }
+                            })
+                        };
+                    });
                     account.stewards.forEach(function (steward) {
                         console.log("get steward:" + steward);
                         parallelCheckTasks[steward] = function (callback) {
@@ -4379,10 +4439,10 @@ exports.accountsPut = function(request, accountsPutCallback) {
 
                 async.parallel(parallelCheckTasks, function(err, results){
                     if(err) {
-                        console.log(err);
+                        console.log('parallelCheckTasks error:', err);
                         accountsPutCallback(err, null);
                     } else {
-                        console.log(results);
+                        console.log('parallelCheckTasks results:', results);
                         //make the change
 
                         if(typeof account.modifications == 'undefined'){
@@ -4427,11 +4487,15 @@ exports.accountsPut = function(request, accountsPutCallback) {
 
                         account.modifications.push(mod);
 
+                        if(mod.modification)
+                        console.log('modifications', mod.modification);
+
                         var parallelInsertTasks = {};
 
                         parallelInsertTasks.account = function(callback) {
                             openmoney_bucket.upsert(account.id, account, function(err, ok){
                                 if(err){
+                                    console.log('error updating account:', account.id, err)
                                     callback(err, null);
                                 } else {
                                     callback(null, ok);
@@ -4443,6 +4507,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                             parallelInsertTasks.remove_olddoc = function(callback){
                                 openmoney_bucket.remove(olddoc.value.id, function(err, ok){
                                     if(err) {
+                                        console.log('error removing olddoc:', olddoc.value.id, err)
                                         callback(err,null);
                                     } else {
                                         callback(null, ok);
@@ -4454,11 +4519,10 @@ exports.accountsPut = function(request, accountsPutCallback) {
                         parallelInsertTasks.move_value_ref = function(callback){
                             stewards_bucket.get(olddoc.value.id, function(err, oldValRef){
                                 if(err){
-                                    console.log(olddoc.value.id);
-                                    console.log(err);
+                                    console.log('error getting value reference doc:', olddoc.value.id, err);
                                     callback(err, null);
                                 } else {
-
+                                    console.log('oldValRef:', oldValRef);
                                     //update the value reference accounts
                                     if(steward_change){
                                         var removed_stewards = [];
@@ -4477,7 +4541,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                         });
                                         removed_stewards.forEach(function(steward){
                                             var steward_hash = "steward_bucket~" + getHash(results[steward].value.publicKey);
-                                            var index = oldValRef.value.accounts.indexOf(steward_hash);
+                                            var index = oldValRef.value.documents.indexOf(steward_hash);
                                             if (index > -1) {
                                                 oldValRef.value.documents.splice(index, 1);
                                             }
@@ -4539,23 +4603,35 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     });
 
                                     parallelLookupTasks.update_value_reference = function(callback){
+                                        if(oldValRef.value.id != account.id){
+                                          oldValRef.value.id = account.id;
+                                          console.log(oldValRef);
+                                          stewards_bucket.upsert(oldValRef.value.id, oldValRef.value, function(err, ok){
+                                              if(err){
+                                                  callback(err, null);
+                                              } else {
+                                                  console.log(ok);
+                                                  stewards_bucket.remove(olddoc.value.id, function(err, ok){
+                                                      if(err){
+                                                          callback(err, null);
+                                                      } else {
+                                                          callback(null, ok);
+                                                      }
+                                                  })
+                                              }
+                                          })
+                                        } else {
+                                          console.log(oldValRef);
+                                          stewards_bucket.upsert(oldValRef.value.id, oldValRef.value, function(err, ok){
+                                              if(err){
+                                                  callback(err, null);
+                                              } else {
+                                                  console.log(ok);
+                                                  callback(null, ok);
+                                              }
+                                          })
+                                        }
 
-                                        oldValRef.value.id = account.id;
-                                        console.log(oldValRef);
-                                        stewards_bucket.upsert(oldValRef.value.id, oldValRef.value, function(err, ok){
-                                            if(err){
-                                                callback(err, null);
-                                            } else {
-                                                console.log(ok);
-                                                stewards_bucket.remove(olddoc.value.id, function(err, ok){
-                                                    if(err){
-                                                        callback(err, null);
-                                                    } else {
-                                                        callback(null, ok);
-                                                    }
-                                                })
-                                            }
-                                        })
                                     };
 
                                     async.parallel(parallelLookupTasks, function(err, results){
@@ -4574,10 +4650,10 @@ exports.accountsPut = function(request, accountsPutCallback) {
                         async.parallel(parallelInsertTasks, function(err, results){
 
                             if(err){
-                                console.log(results);
+                                console.log('parallelInsertTasks error:', err, results);
                                 accountsPutCallback(err, null);
                             } else {
-                                console.log(results);
+                                console.log('parallelInsertTasks results:', results);
                                 //TODO: notify those affected
 
                                 var response = {};
