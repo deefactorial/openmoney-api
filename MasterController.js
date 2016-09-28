@@ -3561,7 +3561,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
 
     //check that the currency exists
     parallelTasks.currency_check = function(callback) {
-        openmoney_bucket.get("currencies~" + currency, function(err, currency){
+        openmoney_bucket.get("currencies~" + currency, function(err, currencydoc){
             if(err) {
                 //console.log("currency not found");
                 var err = {};
@@ -3570,7 +3570,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                 err.message = "Account currency does not exist."
                 callback(err, null);
             } else {
-                callback(null, currency);
+                callback(null, currencydoc);
             }
         });
     };
@@ -3822,6 +3822,88 @@ exports.accountsPost = function(request, accountsPostCallback) {
                 });
             };
 
+            //insert the account into the known accounts of the currency stewards
+            results.currency_check.value.stewards.forEach(function(steward){
+                //this intentionally has the same name as the next function so that it only does it once per steward.
+                parallelInsertTasks[steward.toLowerCase()] = function(callback){
+                    //console.log("get Steward: " + steward);
+                    openmoney_bucket.get(steward.toLowerCase(), function(err, stewardDoc){
+                        if(err){
+                            callback(err, null);
+                        } else {
+                            //console.log("get Steward bucket: " + "steward_bucket~" + getHash(stewardDoc.value.publicKey));
+                            stewards_bucket.get("steward_bucket~" + getHash(stewardDoc.value.publicKey), function(err, steward_bucket) {
+                                if(err) {
+                                    callback(err, null);
+                                } else {
+                                    //console.log("steward bucket" + JSON.stringify(steward_bucket.value));
+                                    steward_bucket.value.accounts.push(account.id);
+
+                                    //add namespace if it doesn't exist
+                                    var namespace_exists = false;
+                                    if(typeof steward_bucket.value.namespaces == 'undefined'){
+                                      steward_bucket.value.namespaces = [];
+                                    }
+                                    steward_bucket.value.namespaces.forEach(function(namespaceID){
+                                      if(namespaceID == "namespaces~" + request.account.account_namespace.toLowerCase()){
+                                        namespace_exists = true;
+                                      }
+                                    });
+                                    if(!namespace_exists){
+                                      steward_bucket.value.namespaces.push("namespaces~" + request.account.account_namespace.toLowerCase());
+                                    }
+                                    //add stewards if they don't exist
+                                    if(typeof steward_bucket.value.stewards == 'undefined'){
+                                      steward_bucket.value.stewards = [];
+                                    }
+                                    account.stewards.forEach(function(steward){
+                                      var steward_exists = false;
+                                      steward_bucket.value.stewards.forEach(function(stewardID){
+                                        if(stewardID == steward.toLowerCase()){
+                                          steward_exists = true;
+                                        }
+                                      });
+                                      if(!steward_exists){
+                                        steward_bucket.value.stewards.push(steward.toLowerCase());
+                                      }
+                                    });
+                                    stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function(err, ok){
+                                        if(err) {
+                                            callback(err, null);
+                                        } else {
+                                            //console.log("Get account value refrence:" + account.id);
+                                            //get value reference doc and update
+                                            stewards_bucket.get(account.id, function(err, valRefDoc){
+                                                if(err) {
+                                                    callback(err, null);
+                                                } else {
+                                                    //if this reference doesn't exist add it
+                                                    var index = valRefDoc.value.documents.indexOf("steward_bucket~" + getHash(stewardDoc.value.publicKey));
+                                                    if( index === -1){
+                                                        valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
+                                                        stewards_bucket.upsert(account.id, valRefDoc.value, {cas: valRefDoc.cas},function(err, ok){
+                                                            if(err){
+                                                                callback(err, null);
+                                                            } else {
+                                                                callback(null, ok);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        callback(null, ok);
+                                                    }
+                                                }
+                                            });
+
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                };
+            })
+
+            //update the stewards of this account list of known accounts, currencies, namespaces and stewards
             account.stewards.forEach(function(steward){
 
                 parallelInsertTasks[steward.toLowerCase()] = function(callback) {
@@ -4745,6 +4827,37 @@ exports.journalsList = function(request, journalsListCallback) {
                   })
                 }
               });
+              steward_bucket.value.currencies.forEach(function(currencyID){
+                var journalList = "journalsList~" + currencyID.split('~')[1];
+                console.log('journals list lookup', journalList);
+                parallelTasks[journalList] = function(callback){
+                  openmoney_bucket.get(currencyID, function(err, currencyDoc){
+                    if(err){
+                      callback(err);
+                    } else {
+
+                      //only get the currency journals if your the steward of the currency
+                      var isSteward = false;
+                      currencyDoc.value.stewards.forEach(function(steward){
+                        if(steward == 'stewards~' + request.stewardname.toLowerCase()){
+                          isSteward = true;
+                        }
+                      })
+                      if(isSteward){
+                        getJournalList(request, journalList, function(err, journals){
+                          if(err){
+                            callback(err);
+                          } else {
+                            callback(null, journals);
+                          }
+                        })
+                      } else {
+                        callback(null, []);
+                      }
+                    }
+                  });
+                }
+              })
               async.parallel(parallelTasks, function(err, results){
                 if(err){
                   journalsListCallback(err);
@@ -4849,7 +4962,6 @@ function getJournalList(request, journalListDocID, callback){
           async.parallel(parallelTasks, function(err, results){
               if(err) {
                   console.log('could not get journal document', err);
-                  callback(err);
               } else {
                   console.log(results);
                   var response = [];
