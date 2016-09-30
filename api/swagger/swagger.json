@@ -2524,7 +2524,6 @@
         "accounts_request": {
             "type": "object",
             "minProperties": 5,
-            "maxProperties": 10,
             "required": [
                 "account",
                 "account_namespace",
@@ -2572,7 +2571,6 @@
         "accounts_response": {
             "type": "object",
             "minProperties": 5,
-            "maxProperties": 10,
             "required": [
                 "account",
                 "account_namespace",
