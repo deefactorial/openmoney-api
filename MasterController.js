@@ -4978,40 +4978,44 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     callback(err, null);
                 } else {
                     //check that currency namespace exists and is not disabled for all parent namespaces
-                    var namespaces_check = {};
-                    var currency_namespaces = currency.value.currency_namespace.split('.');
-                    var namespaces = [];
-                    for(var i = 0; i < currency_namespaces.length; i++){
-                      namespaces[i] = '';
-                      for(var j = 0; j < currency_namespaces.length; j++){
-                        namespaces[i] += currency_namespaces[j] + '.';
+                    if(currency.value.currency_namespace != ''){
+                      var namespaces_check = {};
+                      var currency_namespaces = currency.value.currency_namespace.split('.');
+                      var namespaces = [];
+                      for(var i = 0; i < currency_namespaces.length; i++){
+                        namespaces[i] = '';
+                        for(var j = 0; j < currency_namespaces.length; j++){
+                          namespaces[i] += currency_namespaces[j] + '.';
+                        }
+                        //remove trailing dot.
+                        namespaces[i] = namespaces[i].substr(0, namespaces[i].length - 1);
                       }
-                      //remove trailing dot.
-                      namespaces[i] = namespaces[i].substr(0, namespaces[i].length - 1);
-                    }
-                    namespaces.forEach(function(namespace){
-                      namespaces_check[namespace] = function(callback){
-                        openmoney_bucket.get('namespaces~' + namespace, function(err, namespaceDoc){
-                          if(err){
-                            callback(err, null);
-                          } else {
-                            if(namespaceDoc.value.disabled === true){
-                              var err = {};
-                              err.status = 403;
-                              err.code = 5015;
-                              err.message = "The currency namespace " + namespaceDoc.value.namespace + " is disabled.";
+                      namespaces.forEach(function(namespace){
+                        namespaces_check[namespace] = function(callback){
+                          openmoney_bucket.get('namespaces~' + namespace, function(err, namespaceDoc){
+                            if(err){
                               callback(err, null);
                             } else {
-                              callback(null, namespaceDoc);
+                              if(namespaceDoc.value.disabled === true){
+                                var err = {};
+                                err.status = 403;
+                                err.code = 5015;
+                                err.message = "The currency namespace " + namespaceDoc.value.namespace + " is disabled.";
+                                callback(err, null);
+                              } else {
+                                callback(null, namespaceDoc);
+                              }
                             }
-                          }
-                        })
-                      }
-                    })
+                          })
+                        }
+                      })
 
-                    async.parallel(namespaces_check, function(err, results){
-                      callback(err, currency.value);
-                    });
+                      async.parallel(namespaces_check, function(err, results){
+                        callback(err, currency.value);
+                      });
+                    } else {
+                      callback(null, currency.value);
+                    }
                 }
             }
         })
