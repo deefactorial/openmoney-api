@@ -3708,6 +3708,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                             //console.log("get Steward bucket: " + "steward_bucket~" + getHash(stewardDoc.value.publicKey));
                             stewards_bucket.get("steward_bucket~" + getHash(stewardDoc.value.publicKey), function(err, steward_bucket) {
                                 if(err) {
+                                    console.log('accountsPost.error getting stewardBucket~' + getHash(stewardDoc.value.publicKey), err)
                                     callback(err, null);
                                 } else {
                                     //console.log("steward bucket" + JSON.stringify(steward_bucket.value));
