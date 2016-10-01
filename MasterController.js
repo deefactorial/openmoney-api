@@ -3256,6 +3256,7 @@ exports.accountsList = function(request, accountsListCallback) {
                 parallelTasks[accountID] = function(callback) {
                     openmoney_bucket.get(accountID,function(err,account){
                         if(err) {
+                            console.log('accountsList.accountID', accountID, err);
                             callback(err, false);
                         } else {
                             callback(null,account.value);
