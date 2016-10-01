@@ -3754,7 +3754,6 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                           steward_exists = true;
                                         }
                                       });
-                                      console.log('steward_exists', steward_exists, steward, steward_bucket.value.stewards);
                                       if(!steward_exists){
                                         steward_bucket.value.stewards.push(steward.toLowerCase());
                                       }
@@ -4475,6 +4474,48 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                                     } else {
                                                         steward_bucket.value.accounts[index] = account.id;
                                                     }
+
+                                                    //add currency if it doesn't exist
+                                                    var currency_exists = false;
+                                                    if(typeof steward_bucket.value.currencies == 'undefined'){
+                                                      steward_bucket.value.currencies = [];
+                                                    }
+                                                    steward_bucket.value.currencies.forEach(function(currencyID){
+                                                      if(currencyID == "currencies~" + currency){
+                                                        currency_exists = true;
+                                                      }
+                                                    });
+                                                    if(!currency_exists){
+                                                      steward_bucket.value.currencies.push("currencies~" + currency);
+                                                    }
+                                                    //add namespace if it doesn't exist
+                                                    var namespace_exists = false;
+                                                    if(typeof steward_bucket.value.namespaces == 'undefined'){
+                                                      steward_bucket.value.namespaces = [];
+                                                    }
+                                                    steward_bucket.value.namespaces.forEach(function(namespaceID){
+                                                      if(namespaceID == "namespaces~" + account.account_namespace){
+                                                        namespace_exists = true;
+                                                      }
+                                                    });
+                                                    if(!namespace_exists){
+                                                      steward_bucket.value.namespaces.push("namespaces~" + account.account_namespace);
+                                                    }
+                                                    //add stewards if they don't exist
+                                                    if(typeof steward_bucket.value.stewards == 'undefined'){
+                                                      steward_bucket.value.stewards = [];
+                                                    }
+                                                    account.stewards.forEach(function(steward){
+                                                      var steward_exists = false;
+                                                      steward_bucket.value.stewards.forEach(function(stewardID){
+                                                        if(stewardID == steward.toLowerCase()){
+                                                          steward_exists = true;
+                                                        }
+                                                      });
+                                                      if(!steward_exists){
+                                                        steward_bucket.value.stewards.push(steward.toLowerCase());
+                                                      }
+                                                    });
 
                                                     stewards_bucket.replace(steward_hash, steward_bucket.value, {cas: steward_bucket.cas},function(err, ok){
                                                         if(err) {
