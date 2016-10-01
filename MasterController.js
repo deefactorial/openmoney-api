@@ -3654,7 +3654,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     account.stewards.forEach(function(steward){
                                       var steward_exists = false;
                                       steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(stewardID == steward.toLowerCase()){
+                                        if(steward == steward.toLowerCase()){
                                           steward_exists = true;
                                         }
                                       });
@@ -3750,7 +3750,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     account.stewards.forEach(function(steward){
                                       var steward_exists = false;
                                       steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(stewardID == steward.toLowerCase()){
+                                        if(steward == steward.toLowerCase()){
                                           steward_exists = true;
                                         }
                                       });
@@ -3846,6 +3846,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                 };
             });
 
+            //parallel causes issues with document updates on the same document.
             async.series(parallelInsertTasks, function(err, ok){
                 if(err) {
                     accountsPostCallback(err, null);
