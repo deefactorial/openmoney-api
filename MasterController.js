@@ -3606,6 +3606,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
             parallelInsertTasks.value_reference = function(callback) {
                 stewards_bucket.insert(value_reference.id, value_reference, function(err, ok){
                     if(err) {
+                        console.log('insert value_reference error', value_reference.id, err)
                         callback(err, null);
                     } else {
                         callback(null, value_reference.id);
@@ -3756,6 +3757,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     });
                                     stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function(err, ok){
                                         if(err) {
+                                            console.log('error replacing steward bucket')
                                             callback(err, null);
                                         } else {
                                             //console.log("Get account value refrence:" + account.id);
@@ -3815,6 +3817,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                 children_reference.id = children_reference.type + "~" + parent;
                                 openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
                                     if(err){
+                                        console.log('error inserting children_reference doc', children_reference.id)
                                         callback(err, null);
                                     } else {
                                         callback(null, ok);
