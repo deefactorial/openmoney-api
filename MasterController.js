@@ -3846,7 +3846,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                 };
             });
 
-            async.parallel(parallelInsertTasks, function(err, ok){
+            async.series(parallelInsertTasks, function(err, ok){
                 if(err) {
                     accountsPostCallback(err, null);
                 } else {
