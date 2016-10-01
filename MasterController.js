@@ -3250,7 +3250,7 @@ exports.accountsList = function(request, accountsListCallback) {
             accountsListCallback(err, false);
         } else {
             var parallelTasks = {};
-            console.log('steward_bucket_doc', steward_bucket);
+            console.log('accountsList.steward_bucket_doc', steward_bucket);
             steward_bucket.value.accounts.forEach(function(accountID){
                 //console.log("accountID:" + accountID);
                 parallelTasks[accountID] = function(callback) {
