@@ -3618,6 +3618,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
             results.currency_check.value.stewards.forEach(function(steward){
                 //this intentionally has the same name as the next function so that it only does it once per steward.
                 parallelInsertTasks[steward.toLowerCase()] = function(callback){
+                    console.log('updating', steward.toLowerCase());
                     //console.log("get Steward: " + steward);
                     openmoney_bucket.get(steward.toLowerCase(), function(err, stewardDoc){
                         if(err){
@@ -3701,6 +3702,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
             account.stewards.forEach(function(steward){
 
                 parallelInsertTasks[steward.toLowerCase()] = function(callback) {
+                    console.log('updating', steward.toLowerCase());
                     //console.log("get Steward: " + steward);
                     openmoney_bucket.get(steward.toLowerCase(), function(err, stewardDoc){
                         if(err){
@@ -3772,6 +3774,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                                         valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
                                                         stewards_bucket.upsert(account.id, valRefDoc.value, {cas: valRefDoc.cas},function(err, ok){
                                                             if(err){
+                                                                console.log('error upserting value ref', account.id, err)
                                                                 callback(err, null);
                                                             } else {
                                                                 callback(null, ok);
