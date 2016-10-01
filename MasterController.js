@@ -3834,6 +3834,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                             parentChildrenDoc.value.children.push( account.id );
                             openmoney_bucket.replace("account_namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
                                 if(err){
+                                    console.log('error replacing account_namespaces_children', "account_namespaces_children~" + parent, err)
                                     callback(err, null);
                                 } else {
                                     callback(null, ok);
