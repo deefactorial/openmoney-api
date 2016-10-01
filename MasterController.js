@@ -3654,7 +3654,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     account.stewards.forEach(function(steward){
                                       var steward_exists = false;
                                       steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(steward == steward.toLowerCase()){
+                                        if(stewardID == steward.toLowerCase()){
                                           steward_exists = true;
                                         }
                                       });
@@ -3750,10 +3750,11 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     account.stewards.forEach(function(steward){
                                       var steward_exists = false;
                                       steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(steward == steward.toLowerCase()){
+                                        if(stewardID == steward.toLowerCase()){
                                           steward_exists = true;
                                         }
                                       });
+                                      console.log('steward_exists', steward_exists, steward, steward_bucket.value.stewards);
                                       if(!steward_exists){
                                         steward_bucket.value.stewards.push(steward.toLowerCase());
                                       }
