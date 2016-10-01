@@ -3678,6 +3678,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                                         valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
                                                         stewards_bucket.upsert(account.id, valRefDoc.value, {cas: valRefDoc.cas},function(err, ok){
                                                             if(err){
+                                                                console.log('error updating value ref', account.id, err)
                                                                 callback(err, null);
                                                             } else {
                                                                 callback(null, ok);
