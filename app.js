@@ -172,6 +172,19 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   // Bug preventing response validation from JSON.parse output.
   app.post('/V2/stewards/:stewardname/oauth/token', oauth2.token);
 
+  app.use(function(err, req, res, next) {
+    console.error("Validation Error Middleware: " + JSON.stringify(err));
+    if(err.code == 'SCHEMA_VALIDATION_FAILED'){
+      var error = {};
+      error.code = 1007;
+      error.status = 403;
+      error.message = err.results.errors[0].message;
+      res.statusCode = 403;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(error));
+    }
+  });
+
   //use the security and request/response validation before processing the oauth end points.
   app.get('/V2/stewards/:stewardname/login', site.loginForm);
   app.post('/V2/stewards/:stewardname/login', site.login);
