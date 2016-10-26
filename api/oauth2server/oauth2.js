@@ -144,11 +144,12 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
                 return done(null, false);
             }
             if (!scrypt.verifyKdfSync(new Buffer(user.password, 'base64'), password)) {
-                console.log('password verification failed.')
+
                 var error = {};
                 error.code = 1006;
                 error.status = 403;
                 error.message = 'Authorization Failed.';
+                console.log('password verification failed.', error);
                 return done(error);
                 //return done(null, false);
                 //return done(new Error('Failed to authenticate'))
