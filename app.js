@@ -173,10 +173,10 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   app.post('/V2/stewards/:stewardname/oauth/token', oauth2.token);
 
   app.use(function(err, req, res, next) {
-    console.error("Validation Error Middleware: " + JSON.stringify(err));
+    console.error("Validation Error Middleware: ", err);
     if(typeof err.originalResponse != "undefined"){
       var error = {};
-      error.code = err.originalResponse.code;
+      error.code = err.originalResponse.error;
       error.status = 403;
       error.message = err.originalResponse.error_description;
       res.statusCode = 403;
