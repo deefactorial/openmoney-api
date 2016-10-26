@@ -176,9 +176,9 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
     console.error("Validation Error Middleware: ", err);
     if(typeof err.originalResponse != "undefined"){
       var error = {};
-      error.code = err.originalResponse.error;
+      error.code = JSON.parse(err.originalResponse).error;
       error.status = 403;
-      error.message = err.originalResponse.error_description;
+      error.message = JSON.pare(err.originalResponse).error_description;
       res.statusCode = 403;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(error));
