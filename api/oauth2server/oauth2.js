@@ -147,7 +147,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
                 return done(null, false);
             }
             //Everything validated, return the token
-
+            console.log('everything validated return token');
             utils.uid(256, function(err, token) {
                 if (err) {
                     return done(err);
