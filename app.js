@@ -174,11 +174,11 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
 
   app.use(function(err, req, res, next) {
     console.error("Validation Error Middleware: " + JSON.stringify(err));
-    if(err.code == 'SCHEMA_VALIDATION_FAILED'){
+    if(typeof err.originalResponse != "undefined"){
       var error = {};
-      error.code = 1007;
+      error.code = err.originalResponse.code;
       error.status = 403;
-      error.message = err.results.errors[0].message;
+      error.message = err.originalResponse.error_description;
       res.statusCode = 403;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(error));
