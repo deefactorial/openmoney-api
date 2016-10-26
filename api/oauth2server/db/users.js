@@ -13,16 +13,14 @@ var model = module.exports,
 exports.findByUsername = function(username, callback) {
   console.info('in findByUsername (username: ' + username + ')');
   openmoney_bucket.get("stewards~" + username.toLowerCase(), function(err, user){
-
+    console.log('getStewards result:', err, user);
     if(err){
-        console.error(err);
       if(err.code == 13){
         callback(null, null);
       } else {
         callback(err, null);
       }
     } else {
-        console.info(user.value);
       callback(null, user.value);
     }
   });
