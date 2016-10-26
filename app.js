@@ -178,7 +178,7 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
       var error = {};
       error.code = JSON.parse(err.originalResponse).error;
       error.status = 403;
-      error.message = JSON.pare(err.originalResponse).error_description;
+      error.message = JSON.parse(err.originalResponse).error_description;
       res.statusCode = 403;
       res.setHeader('Content-Type', 'application/json');
       res.end(JSON.stringify(error));
