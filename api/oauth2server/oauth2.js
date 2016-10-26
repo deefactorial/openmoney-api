@@ -124,10 +124,11 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
 // application issues an access token on behalf of the user who authorized the code.
 
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
-    console.info(" in password exchange (client:" + client + ", username:" + username + ", password:" + password + ", scope:" + scope + ")");
+    console.info(" in password exchange (client:" + JSON.stringify(client) + ", username:" + username + ", password:" + password + ", scope:" + scope + ")");
 
     //Validate the client
     db.clients.findByClientId(client.clientId, function(err, localClient) {
+        console.log('findByClientId:', client.clientId, err, localClient);
         if (err) { return done(err); }
         if(localClient === null) {
             return done(null, false);
@@ -137,6 +138,7 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
         }
         //Validate the user
         db.users.findByUsername(username, function(err, user) {
+            console.log('findByUsername', username, err, user);
             if (err) { return done(err); }
             if(user === null) {
                 return done(null, false);
