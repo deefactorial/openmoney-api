@@ -3940,6 +3940,10 @@ exports.accountsPut = function(request, accountsPutCallback) {
             if(typeof olddoc.value.modifications != 'undefined') {
                 account.modifications = olddoc.value.modifications;
             }
+            if(typeof olddoc.value.balance != 'undefined'){
+              account.balance = olddoc.value.balance;
+              account.volume = olddoc.value.volume;
+            }
 
             if(account.currency != olddoc.value.currency || account.currency_namespace != olddoc.value.currency_namespace) {
                 //currency has changed or currency namespace has changed
