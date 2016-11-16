@@ -3664,7 +3664,14 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     });
                                     stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function(err, ok){
                                         if(err) {
-                                            callback(err, null);
+                                            console.log('error replacing steward bucket', err);
+                                            if(err.code == 12){
+                                              //try again
+                                              parallelInsertTasks[steward.toLowerCase()](callback);
+                                            } else {
+                                              callback(err, null);
+                                            }
+
                                         } else {
                                             //console.log("Get account value refrence:" + account.id);
                                             //get value reference doc and update
@@ -3842,22 +3849,8 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                 if(err){
                                     console.log('error replacing account_namespaces_children', "account_namespaces_children~" + parent, err)
                                     if(err.code == 12){
-                                      //exists with a different cas value try again
-                                      openmoney_bucket.get("account_namespaces_children~" + parent, function(err, parentChildrenDoc){
-                                        if(err){
-                                          callback(err, null);
-                                        } else {
-                                          parentChildrenDoc.value.children.push( account.id );
-                                          openmoney_bucket.replace("account_namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
-                                            if(err){
-                                              console.log('error replacing account_namespaces_children again', "account_namespaces_children~" + parent, err)
-                                              callback(err, null);
-                                            } else {
-                                              callback(null, ok);
-                                            }
-                                          });
-                                        }
-                                      });
+                                      //try again
+                                      parallelInsertTasks["parent" + parent](callback);
                                     } else {
                                       callback(err, null);
                                     }
