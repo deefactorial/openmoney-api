@@ -4429,6 +4429,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     callback(err, null);
                                 } else {
                                     console.log('oldValRef:', oldValRef);
+
+                                    var parallelLookupTasks = {};
                                     //update the value reference accounts
                                     if(steward_change){
                                         var removed_stewards = [];
@@ -4448,7 +4450,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                         removed_stewards.forEach(function(steward){
                                             var steward_hash = "steward_bucket~" + getHash(results[steward].value.publicKey);
                                             var index = oldValRef.value.documents.indexOf(steward_hash);
-                                            if (index > -1) {
+                                            if (index !== -1) {
                                                 oldValRef.value.documents.splice(index, 1);
                                             }
                                             parallelLookupTasks[steward_hash] = function(callback){
@@ -4479,7 +4481,6 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                         })
                                     }
 
-                                    var parallelLookupTasks = {};
                                     oldValRef.value.documents.forEach(function(steward_hash){
                                         parallelLookupTasks[steward_hash] = function(callback){
                                             stewards_bucket.get(steward_hash, function(err, steward_bucket) {
