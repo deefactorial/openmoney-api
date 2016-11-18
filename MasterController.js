@@ -1483,9 +1483,13 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                              children_reference.id = children_reference.type + "~" + parent;
                                              openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
                                                  if(err){
-                                                     callback(err, null);
+                                                    if(err.code == 12){
+                                                      parallelInsertTasks["parent" + parent](callback);
+                                                    } else {
+                                                      callback(err, null);
+                                                    }
                                                  } else {
-                                                     callback(null, ok);
+                                                   callback(null, ok);
                                                  }
                                              });
 
@@ -1493,14 +1497,23 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                              callback(err, null);
                                          }
                                      } else {
+                                       if(parentChildrenDoc.value.children.indexOf(namespace.id) === -1){
                                          parentChildrenDoc.value.children.push( namespace.id );
                                          openmoney_bucket.replace("namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
                                             if(err){
-                                                callback(err, null);
+                                                if(err.code = 12){
+                                                  //try again
+                                                  parallelInsertTasks["parent" + parent](callback);
+                                                } else {
+                                                  callback(err, null);
+                                                }
                                             } else {
                                                 callback(null, ok);
                                             }
                                          });
+                                       } else {
+                                         callback(null, parentChildrenDoc);
+                                       }
                                      }
                                  });
                             };
@@ -1530,35 +1543,47 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                             if(err) {
                                                 callback(err, null);
                                             } else {
-                                                steward_bucket.value.namespaces.push(namespace.id);
-                                                stewards_bucket.upsert("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, { cas: steward_bucket.cas }, function(err, ok){
-                                                    if(err) {
-                                                        callback(err, null);
-                                                    } else {
-                                                        //get value reference doc and update
-                                                        stewards_bucket.get(namespace.id, function(err, valRefDoc){
-                                                            if(err) {
-                                                                callback(err, null);
-                                                            } else {
-                                                                //if this reference doesn't exist add it
-                                                                var index = valRefDoc.value.documents.indexOf("steward_bucket~" + getHash(stewardDoc.value.publicKey));
-                                                                if(index === -1){
-                                                                    valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
-                                                                    stewards_bucket.upsert(namespace.id, valRefDoc.value, { cas: valRefDoc.cas }, function(err, ok){
-                                                                        if(err){
-                                                                            callback(err, null);
-                                                                        } else {
-                                                                            callback(null, ok);
-                                                                        }
-                                                                    });
-                                                                } else {
-                                                                    callback(null, ok);
-                                                                }
-                                                            }
-                                                        });
-
-                                                    }
-                                                });
+                                                if(steward_bucket.value.namespaces.indexOf(namespace.id) !== -1){
+                                                  callback(null, steward_bucket.value);
+                                                } else {
+                                                  steward_bucket.value.namespaces.push(namespace.id);
+                                                  stewards_bucket.upsert("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, { cas: steward_bucket.cas }, function(err, ok){
+                                                      if(err) {
+                                                          if(err.code == 12){
+                                                            //try again
+                                                            parallelInsertTasks[steward](callback);
+                                                          } else {
+                                                            callback(err, null);
+                                                          }
+                                                      } else {
+                                                          //get value reference doc and update
+                                                          stewards_bucket.get(namespace.id, function(err, valRefDoc){
+                                                              if(err) {
+                                                                  callback(err, null);
+                                                              } else {
+                                                                  //if this reference doesn't exist add it
+                                                                  if(valRefDoc.value.documents.indexOf("steward_bucket~" + getHash(stewardDoc.value.publicKey)) === -1){
+                                                                      valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
+                                                                      stewards_bucket.upsert(namespace.id, valRefDoc.value, { cas: valRefDoc.cas }, function(err, ok){
+                                                                          if(err){
+                                                                              if(err.code == 12){
+                                                                                //try again
+                                                                                parallelInsertTasks[steward](callback);
+                                                                              } else {
+                                                                                callback(err, null);
+                                                                              }
+                                                                          } else {
+                                                                              callback(null, ok);
+                                                                          }
+                                                                      });
+                                                                  } else {
+                                                                      callback(null, ok);
+                                                                  }
+                                                              }
+                                                          });
+                                                      }
+                                                  });
+                                                }
                                             }
                                         });
                                     }
@@ -1566,7 +1591,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                             };
                         });
 
-                        async.parallel(parallelInsertTasks,
+                        async.series(parallelInsertTasks,
                             function(err, results) {
                                 if (err) {
                                     spacesPostCallback(err, false);
@@ -2666,7 +2691,6 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 });
             };
 
-
             request.currency.stewards.forEach(function(steward) {
                 parallelInsertTasks['insert_currency_in_stewards_bucket' + steward] = function(callback) {
                     openmoney_bucket.get(steward.toLowerCase(), function (err, stewardDoc) {
@@ -2677,10 +2701,17 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                 if (err) {
                                     callback(err, null);
                                 } else {
-                                    steward_bucket.value.currencies.push(request.currency.id.toLowerCase());
+                                    if(steward_bucket.value.currencies.indexOf(request.currency.id.toLowerCase()) === -1){
+                                      steward_bucket.value.currencies.push(request.currency.id.toLowerCase());
+                                    }
                                     stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
                                         if (err) {
-                                            callback(err, null);
+                                            if(err.code == 12){
+                                              //retry
+                                              parallelInsertTasks['insert_currency_in_stewards_bucket' + steward](callback);
+                                            } else {
+                                              callback(err, null);
+                                            }
                                         } else {
                                             callback(null, ok);
                                         }
@@ -2719,36 +2750,48 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                 children_reference.id = children_reference.id.toLowerCase();
                                 openmoney_bucket.insert(children_reference.id, children_reference, function(err, ok){
                                     if(err){
-                                        callback(err, null);
+                                       if(err.code == 12){
+                                          //try again
+                                          parallelInsertTasks["parent" + parent](callback);
+                                       } else {
+                                         callback(err, null);
+                                       }
                                     } else {
                                         callback(null, ok);
                                     }
                                 });
-
                             } else {
                                 callback(err, null);
                             }
                         } else {
-                            parentChildrenDoc.value.children.push( request.currency.id.toLowerCase() );
-                            openmoney_bucket.replace("currency_namespaces_children~" + parent.toLowerCase(), parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
-                                if(err){
-                                    callback(err, null);
-                                } else {
-                                    callback(null, ok);
-                                }
-                            });
+                            if(parentChildrenDoc.value.children.indexOf(request.currency.id.toLowerCase()) === -1){
+                              parentChildrenDoc.value.children.push( request.currency.id.toLowerCase() );
+                              openmoney_bucket.replace("currency_namespaces_children~" + parent.toLowerCase(), parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
+                                  if(err){
+                                      if(err.code == 12){
+                                        //try again
+                                        parallelInsertTasks["parent" + parent](callback);
+                                      } else {
+                                        callback(err, null);
+                                      }
+                                  } else {
+                                      callback(null, ok);
+                                  }
+                              });
+                            } else {
+                              callback(null, parentChildrenDoc.value);
+                            }
                         }
                     });
                 };
             });
 
-            async.parallel(parallelInsertTasks, function(err, ok) {
+            async.series(parallelInsertTasks, function(err, ok) {
                 if(err) {
                     currenciesPostCallback(err, null);
                 } else {
-
+                    console.log(ok);
                     //TODO: notify the space steward
-
                     var response = {};
                     response.ok = true;
                     response.id = request.currency.id.toLowerCase();
