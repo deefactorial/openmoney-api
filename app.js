@@ -6,33 +6,26 @@ var util            = require('util'),
 var app = express();
 var bodyParser = require('body-parser');
 var passport = require('passport');
-var session = require('express-session');
-var CouchbaseStore = require('connect-couchbase')(session);
-var couchbaseStore = new CouchbaseStore({
-  bucket:"oauth2Server",               //optional
-  host:"127.0.0.1:8091",          //optional
-  connectionTimeout: 2000,        //optional
-  operationTimeout: 2000,         //optional
-  cachefile: '',                  //optional
-  ttl: 86400,                     //optional
-  prefix: 'sess'                  //optional
-});
+// var session = require('express-session');
+// var CouchbaseStore = require('connect-couchbase')(session);
+// var couchbaseStore = new CouchbaseStore({
+//   bucket:"oauth2Server",          //optional
+//   host:"127.0.0.1:8091",          //optional
+//   connectionTimeout: 2000,        //optional
+//   operationTimeout: 2000,         //optional
+//   cachefile: '',                  //optional
+//   ttl: 86400,                     //optional
+//   prefix: 'sess'                  //optional
+// });
 
-/*
- *          cachefile: ''
- *          ttl: 86400,
- *          prefix: 'sess',
- *          operationTimeout:2000,
- connectionTimeout:2000,*/
-
-couchbaseStore.on('connect', function() {
-  console.info("Couchbase Session store is ready for use");
-});
-
-
-couchbaseStore.on('disconnect', function() {
-  console.error("An error occurred connecting to Couchbase Session Storage");
-});
+// couchbaseStore.on('connect', function() {
+//   console.info("Couchbase Session store is ready for use");
+// });
+//
+//
+// couchbaseStore.on('disconnect', function() {
+//   console.error("An error occurred connecting to Couchbase Session Storage");
+// });
 
 function getRandomstring(length){
   var text = "";
@@ -48,11 +41,11 @@ if(typeof process.env.SESSION_SECRET == 'undefined'){
   process.env.SESSION_SECRET = getRandomstring(160);
 }
 
-app.use(session({
-  store: couchbaseStore,
-  secret: process.env.SESSION_SECRET,
-  cookie: {maxAge:24*60*60*1000} //stay open for 1 day of inactivity
-}));
+// app.use(session({
+//   store: couchbaseStore,
+//   secret: process.env.SESSION_SECRET,
+//   cookie: {maxAge:24*60*60*1000} //stay open for 1 day of inactivity
+// }));
 
 app.use(require('morgan')('combined'));
 app.use(bodyParser.urlencoded({ extended: true }));
