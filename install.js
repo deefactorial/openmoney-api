@@ -24,7 +24,7 @@ tasks.create_bucket_oauth2Server = function(callback){
     //Create the bucket
     clusterManager.createBucket('oauth2Server', {}, function(err, results){
         if(err){
-            callback("CREATE oauth2Server BUCKET ERROR: (Check that there is free ram into create a bucket by manually creating a bucket through the admin interface. Does this bucket already exist ?) :" + err, null);
+            callback("CREATE oauth2Server BUCKET ERROR: (Check that there is free ram to create a bucket; By manually creating a bucket through the admin interface. If the bucket exists you may have setup the bucket already, check through the admin interface, if it failed through the installation process you can restart by deleting the buckets and running the command `node install`.) :" + err, null);
         } else {
             callback(null,"Successfully created oauth2Server bucket.");
         }
