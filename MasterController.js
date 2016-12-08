@@ -9,7 +9,7 @@ var crypto = require('crypto');
 var scrypt = require("scrypt");
 var scryptParameters = scrypt.paramsSync(0.5);
 
-
+require('dotenv').load();
 
 function getRandomstring(length) {
     var text = "";
@@ -5012,7 +5012,7 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     var error = {};
                     error.status = 404;
                     error.code = 5008;
-                    error.message = "Their account does not exist.";
+                    error.message = "Their account does not exist in this currency. Be sure the currencies of the accounts match.";
                     callback(error, null);
                 } else {
                     callback(err, null);
