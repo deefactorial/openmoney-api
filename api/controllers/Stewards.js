@@ -25,3 +25,11 @@ module.exports.stewardsPut = function stewardsPut (req, res, next) {
 module.exports.stewardsDelete = function stewardsDelete (req, res, next) {
   Stewards.stewardsDelete(req, res, next);
 };
+
+module.exports.stewardsForgotPost = function stewardsForgotPost (req, res, next) {
+  Stewards.stewardsForgotPost(req.swagger.params, res, next);
+};
+
+module.exports.stewardsResetPost = function stewardsResetPost (req, res, next) {
+  Stewards.stewardsResetPost(req.swagger.params, res, next);
+};

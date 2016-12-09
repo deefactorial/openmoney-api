@@ -195,3 +195,86 @@ exports.stewardsDelete = function (req, res, next) {
     });
 
 };
+
+
+exports.stewardsForgotPost = function (args, res, next) {
+    /**
+     * parameters expected in the args:
+     * registerRequest (Register_request)
+     **/
+
+    var examples = {};
+
+    examples['application/json'] = {
+        "ok": true
+    };
+    //forgotPost
+
+    var MasterController = require('../../MasterController');
+
+    var request = {};
+    if (typeof args.forgot_request.value.stewardname != 'undefined') {
+      request.stewardname = args.forgot_request.value.stewardname;
+    }
+    if (typeof args.forgot_request.value.email != 'undefined') {
+      request.email = args.forgot_request.value.email;
+    }
+
+    MasterController.stewardsForgotPost(request, function (err, result) {
+        if (err) {
+            // throw error
+            var examples = {};
+            examples['application/json'] = err;
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = MasterController.setStatus(err);
+            res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
+        } else {
+            var examples = {};
+            //examples['application/json'] = result;
+
+            res.setHeader('Content-Type', 'application/json');
+            //res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
+            res.end(result);
+        }
+    });
+};
+
+exports.stewardsResetPost = function (args, res, next) {
+    /**
+     * parameters expected in the args:
+     * registerRequest (Register_request)
+     **/
+
+    var examples = {};
+
+    examples['application/json'] = {
+        "ok": true
+    };
+    //forgotPost
+
+    var MasterController = require('../../MasterController');
+
+    var request = {};
+
+    request.stewardname = args.stewardname.value;
+    request.forgot_token = args.reset_request.value.forgot_token;
+    request.password = args.reset_request.value.password;
+
+    MasterController.stewardsResetPost(request, function (err, result) {
+        if (err) {
+            // throw error
+            var examples = {};
+            examples['application/json'] = err;
+            res.setHeader('Content-Type', 'application/json');
+            res.statusCode = MasterController.setStatus(err);
+            res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
+        } else {
+            var examples = {};
+            //examples['application/json'] = result;
+
+            res.setHeader('Content-Type', 'application/json');
+            //res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
+            res.end(result);
+        }
+    });
+};

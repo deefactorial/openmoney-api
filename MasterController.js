@@ -8,8 +8,42 @@ var async = require('async');
 var crypto = require('crypto');
 var scrypt = require("scrypt");
 var scryptParameters = scrypt.paramsSync(0.5);
+var nodemailer = require('nodemailer');
 
 require('dotenv').load();
+
+var smtpConfig = process.env.SMTP_CONFIG;
+
+// create reusable transporter object using the default SMTP transport
+var transporter = nodemailer.createTransport(smtpConfig);
+
+function sendmail(to, subject, messageHTML, callback){
+  var messageText = messageHTML.replace(/<\/?[^>]+(>|$)/g, "");
+  console.log('send email to', to, subject, messageText);
+
+  // setup e-mail data with unicode symbols
+  var mailOptions = {
+      from: '"Openmoney Network" <openmoney.network@gmail.com>', // sender address
+      to: to, // list of receivers
+      subject: subject, // Subject line
+      text: messageText, // plaintext body
+      html: messageHTML // html body
+  };
+
+  if(typeof smtpConfig == 'undefined' || smtpConfig == ''){
+    console.log('smtpConfig is undefined, ignoring sending emails...');
+  } else {
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, function(error, info){
+        callback(error, info);
+        // if(error){
+        //     return console.log(error);
+        // }
+        // console.log('Message sent: ' + info.response);
+    });
+  }
+}
 
 function getRandomstring(length) {
     var text = "";
@@ -323,6 +357,159 @@ exports.authorizePost = function(request, authorizePostCallback) {
     });
 };
 
+exports.stewardsForgotPost = function(forgot_request, forgotPostCallback){
+    console.log("stewardsForgotPost", forgot_request);
+
+    var parallelTasks = {};
+
+    if(typeof forgot_request.email != 'undefined'){
+      //do a lookup on stewards with email address
+      parallelTasks.email_global = function(callback) {
+        openmoney_bucket.get("stewards_emailList~" + forgot_request.email.toLowerCase(), function(err, list){
+          if(err){
+            if(err.code == 13){
+              callback({status:400,code:1098, message: "Steward not found with email: " + forgot_request.email.toLowerCase()})
+            } else {
+              callback(err);
+            }
+          } else {
+
+            var parallelStewardTasks = {};
+            //found the list of stewards
+            list.value.stewards.forEach(function(steward){
+              parallelStewardTasks[steward] = function(callback){
+                openmoney_bucket.get("stewards~" + steward, function (err, res) {
+                    if (err) {
+                      // steward already exists
+                      callback({status:400,code:1099, message: "Steward not found with stewardname: " + steward});
+                    } else {
+                      //found steward generate token and save
+                      res.value.forgot_token = crypto.randomBytes(32).toString('base64');
+                      openmoney_bucket.replace("stewards~" + steward, res.value, {cas: res.cas} , function(err, ok){
+                        if(err){
+                          if(err.code == 12){
+                            //retry
+                            parallelStewardTasks[steward](callback);
+                          } else {
+                            callback(err);
+                          }
+                        } else {
+                          callback(null, res.value.forgot_token);
+                        }
+                      });
+                    }
+                });
+              }
+            })
+
+            async.parallel(parallelStewardTasks, function(err, results){
+              if(err){
+                callback(err);
+              } else {
+
+                //token saved now send email.
+                var to = forgot_request.email.toLowerCase();
+                var subject = 'Forgot Password Request';
+                var messageHTML = '<h3>A forgot password request has been made for your account. </h3>';
+
+                for (var key in results) {
+                  if (results.hasOwnProperty(key)) {
+                    console.log(key + " -> " + results[key]);
+                    messageHTML += '<div>Your stewardname is ' + key + '; Reset Password Link: <a href="https://openmoney.network/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '">https://openmoney.network/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '</a>.</div>';
+                  }
+                }
+
+                messageHTML += '<h5>If you have not made this request you can safely ignore this email.</h5>';
+                sendmail(to, subject, messageHTML, callback);
+              }
+            })
+          }
+        })
+      }
+    } else if (typeof forgot_request.stewardname != 'undefined'){
+      //do a lookup on stewards with stewardname
+
+      parallelTasks.steward_global = function(callback) {
+          openmoney_bucket.get("stewards~" + forgot_request.stewardname.toLowerCase(), function (err, res) {
+              if (err) {
+                // steward already exists
+                callback({status:400,code:1099, message: "Steward not found with stewardname: " + forgot_request.stewardname.toLowerCase()});
+              } else {
+                //found steward generate token and save
+                res.value.forgot_token = crypto.randomBytes(32).toString('base64');
+                openmoney_bucket.replace("stewards~" + forgot_request.stewardname.toLowerCase(), res.value, {cas: res.cas} , function(err, ok){
+                  if(err){
+                    if(err.code == 12){
+                      //retry
+                      parallelTasks.steward_global(callback);
+                    } else {
+                      callback(err);
+                    }
+                  } else {
+                    //token saved now send email.
+                    var to = res.value.email;
+                    var subject = 'Forgot Password Request';
+                    var messageHTML = '<h3>A forgot password request has been made for your account.</h3>';
+                    messageHTML += 'Your stewardname is ' + res.value.stewardname + '; Reset Password Link: <a href="https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '">https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '</a>.';
+                    messageHTML += '<h5>If you have not made this request you can safely ignore this email.</h5>';
+                    sendmail(to, subject, messageHTML, callback);
+                  }
+                });
+              }
+          });
+      };
+    }
+
+    async.parallel(parallelTasks, function(err, results){
+      if(err){
+        forgotPostCallback(err);
+      } else {
+        console.log('parallelTask results:',results);
+        //generate random token
+        //write email
+        //send email
+        forgotPostCallback(null, {ok: true});
+      }
+    })
+};
+
+exports.stewardsResetPost = function(reset_request, resetPostCallback){
+    console.log("stewardsResetPost", reset_request);
+
+
+    var series = {};
+    series.stewardsReset = function(callback){
+      openmoney_bucket.get("stewards~" + reset_request.stewardname.toLowerCase(), function (err, steward) {
+        if(err){
+          callback(err);
+        } else {
+          if(steward.value.forgot_token != reset_request.forgot_token){
+            callback({status:400,code:1097, message: "Forgot token did not match: " + reset_request.forgot_token});
+          } else {
+            steward.value.password = scrypt.kdfSync(reset_request.password, scryptParameters).toString('base64');
+            openmoney_bucket.replace("stewards~" + reset_request.stewardname.toLowerCase(), steward.value, {cas: steward.cas}, function (err, ok) {
+              if(err){
+                if(err.code == 12){
+                  //retry
+                  series.stewardsReset(callback);
+                } else {
+                  callback(err);
+                }
+              } else {
+                callback(null, {ok: true});
+              }
+            });
+          }
+        }
+      });
+    }
+
+    async.series(series, function(err, results){
+      resetPostCallback(err, results.stewardsReset);
+    });
+};
+
+
 
 exports.stewardsPost = function(steward_request, registerPostCallback){
     console.log("stewardsPost");
@@ -589,6 +776,8 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                 }
             });
         };
+
+
         spaces.forEach(function(space){
             if(space.id != 'namespaces~cc' && space.id != 'namespaces~uk' && space.id != 'namespaces~ca') {
                 parallelTasks[space.id] = function (callback) {
@@ -680,6 +869,41 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                 } else {
                     //we are a go to insert the records.
                     var insertTasks = {};
+
+                    insertTasks.stewards_emailList = function(callback){
+                        openmoney_bucket.get("stewards_emailList~" + steward.email.toLowerCase(), function(err, emailList){
+                          if(err){
+                            if(err.code == 13){
+                              //not found create the doc.
+                              var emailList = {};
+                              emailList.type = 'stewards_emailList';
+                              emailList.email = steward.email.toLowerCase();
+                              emailList.stewards = [ steward.stewardname.toLowerCase() ];
+                              emailList.id = emailList.type + '~' + emailList.email.toLowerCase();
+                              openmoney_bucket.insert(emailList.id, emailList, function(err, ok){
+                                callback(err, ok);
+                              })
+                            } else {
+                              callback(err);
+                            }
+                          } else {
+                            //found update the doc.
+                            emailList.value.stewards.push(steward.stewardname.toLowerCase());
+                            openmoney_bucket.replace(emailList.value.id, emailList.value, {cas: emailList.cas}, function(err, ok){
+                              if(err){
+                                if(err.code == 12){
+                                  //retry
+                                  insertTasks.stewards_emailList(callback);
+                                } else {
+                                  callback(err);
+                                }
+                              } else {
+                                callback(null, ok);
+                              }
+                            })
+                          }
+                        })
+                    };
 
                     var value_references = {};
                     value_references.type = "value_reference";
@@ -1501,7 +1725,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                                          parentChildrenDoc.value.children.push( namespace.id );
                                          openmoney_bucket.replace("namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
                                             if(err){
-                                                if(err.code = 12){
+                                                if(err.code == 12){
                                                   //try again
                                                   parallelInsertTasks["parent" + parent](callback);
                                                 } else {

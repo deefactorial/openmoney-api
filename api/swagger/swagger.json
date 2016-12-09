@@ -120,6 +120,84 @@
                 }
             }
         },
+        "/stewards/forgot": {
+            "post": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsForgotPost",
+                "parameters": [
+                    {
+                        "name": "forgot_request",
+                        "in": "body",
+                        "description": "Forgot Password Request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/forgot_request"
+                        }
+                    }
+                ],
+                "summary": "Forgot password or stewardname request",
+                "tags": [
+                    "stewards"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Forgot Password Sent Success",
+                        "schema": {
+                            "$ref": "#/definitions/forgot_response"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
+        "/stewards/{stewardname}/reset": {
+            "post": {
+                "x-swagger-router-controller": "Stewards",
+                "operationId": "stewardsResetPost",
+                "parameters": [
+                    {
+                        "name": "stewardname",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "maxLength": 255,
+                        "pattern": "^[A-Za-z0-9_.-]+$"
+                    },
+                    {
+                        "name": "reset_request",
+                        "in": "body",
+                        "description": "Reset Password Request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/reset_request"
+                        }
+                    }
+                ],
+                "summary": "Reset password request",
+                "tags": [
+                    "stewards"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reset Password Sent Success",
+                        "schema": {
+                            "$ref": "#/definitions/reset_response"
+                        }
+                    },
+                    "default": {
+                        "description": "Error",
+                        "schema": {
+                            "$ref": "#/definitions/ErrorModel"
+                        }
+                    }
+                }
+            }
+        },
         "/stewards/{stewardname}/login": {
             "get": {
                 "x-swagger-router-controller": "Auth",
@@ -2518,6 +2596,51 @@
                     "items": {
                         "$ref": "#/definitions/modification"
                     }
+                }
+            }
+        },
+        "forgot_request": {
+            "type": "object",
+            "properties": {
+                "stewardname": {
+                    "type": "string",
+                    "maxLength": 255,
+                    "pattern": "^[A-Za-z0-9_.-]+$"
+                },
+                "email": {
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 255,
+                    "pattern": "^([\\w-]+(?:\\.[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                }
+            }
+        },
+        "forgot_response": {
+            "type": "object",
+            "properties": {
+                "ok": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "reset_request": {
+            "type": "object",
+            "properties": {
+                "forgot_token": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 1024
+                }
+            }
+        },
+        "reset_response": {
+            "type": "object",
+            "properties": {
+                "ok": {
+                    "type": "boolean"
                 }
             }
         },
