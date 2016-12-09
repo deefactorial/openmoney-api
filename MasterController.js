@@ -5085,7 +5085,8 @@ function getJournalList(request, journalListDocID, callback){
                   parallelTasks[journalID] = function (cb) {
                       stewards_bucket.get(getHash(request.publicKey) + journalID, function (err, journal) {
                           if (err) {
-                              cb(err, false);
+                              console.log('error getting journal:' + journalID, err);
+                              cb(err);
                           } else {
                               cb(null, journal.value);
                           }
@@ -5096,6 +5097,7 @@ function getJournalList(request, journalListDocID, callback){
           async.parallel(parallelTasks, function(err, results){
               if(err) {
                   console.log('could not get journal document', err);
+                  callback(err);
               } else {
                   console.log(results);
                   var response = [];
