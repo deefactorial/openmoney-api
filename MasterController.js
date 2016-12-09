@@ -594,7 +594,9 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         var spaces_array = steward.stewardname.toLowerCase().split('.');
         var numberOfSpaces = spaces_array.length;
 
-        space_root = spaces_array[spaces_array.length];
+        space_root = spaces_array[spaces_array.length - 1];
+        console.info('namespaces array', spaces_array);
+        console.info('numberOfSpaces', numberOfSpaces);
         console.info('space root:' + space_root);
 
         // all root spaces are hard coded to start with.
@@ -649,12 +651,12 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
                 var steward_space = {};
                 //get middle part of steward name .myname.thispart.cc
-                steward_space.namespace = steward.stewardname.toLowerCase().substring(0, indexOf(steward.stewardname, '.')) + '.' + space_parent.toLowerCase();
+                steward_space.namespace = steward.stewardname.toLowerCase();
                 steward_space.parent_namespace = space_parent.toLowerCase();
                 steward_space.created = new Date().getTime();
                 steward_space.stewards = [ steward.id ];
                 steward_space.type = "namespaces";
-                steward_space.id = 'namespaces~' + steward_space.namespace + "." + steward_space.parent_namespace;
+                steward_space.id = 'namespaces~' + steward_space.namespace;
                 steward_space.private = true;
                 steward_space.disabled = false;
                 spaces.push( steward_space );
@@ -709,7 +711,11 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
     //accounts don't store journal entries, journal entries reference accounts.
     var account = {};
-    account.account = steward.stewardname.toLowerCase();
+    if(steward.stewardname.toLowerCase().indexOf('.') !== -1){
+      account.account = steward.stewardname.toLowerCase().substring(0, steward.stewardname.toLowerCase().indexOf('.'));
+    } else {
+      account.account = steward.stewardname.toLowerCase();
+    }
     account.account_namespace = stewards_space;
     account.currency = "cc";
     account.currency_namespace = "";
