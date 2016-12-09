@@ -594,13 +594,13 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         var spaces_array = steward.stewardname.toLowerCase().split('.');
         var numberOfSpaces = spaces_array.length;
 
-        space_root = spaces_array[spaces_array.length - 1];
+        space_root = steward.stewardname.toLowerCase().substring(steward.stewardname.toLowerCase().indexOf('.') + 1, steward.stewardname.toLowerCase().length);
         console.info('namespaces array', spaces_array);
         console.info('numberOfSpaces', numberOfSpaces);
         console.info('space root:' + space_root);
 
         // all root spaces are hard coded to start with.
-        if(space_root == 'ca' || space_root == 'uk' || space_root == 'cc'){
+        if(space_root == 'cv.ca' || space_root == 'nan.ca' || space_root == 'cc'){
             // these are the pre-programmed root spaces that are allowed.
 
             //iterate through the spaces starting with the root.
@@ -621,32 +621,24 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                     //this case is handled below
                 }
 
+                if (space_parent == 'cv.ca') {
+                  steward_bucket.namespaces.push('namespaces~ca');
+                  steward_bucket.namespaces.push('namespaces~cv.ca');
+                }
+
+                if (space_parent == 'nan.ca') {
+                  steward_bucket.namespaces.push('namespaces~ca');
+                  steward_bucket.namespaces.push('namespaces~nan.ca');
+                }
+
                 if (space_parent == 'ca') {
-                    var space = {};
-                    space.namespace = "ca";
-                    space.parent_namespace = "";
-                    space.created = new Date().getTime(); //static
-                    space.stewards = [ deefactorial.id, michael.id ];
-                    space.type = "namespaces";
-                    space.id = 'namespaces~' + space.namespace;
-                    spaces.push( space );
-                    steward_bucket.namespaces.push(space.id);
+                  steward_bucket.namespaces.push('namespaces~ca');
                 }
 
                 if (space_parent == 'uk') {
-                    var space = {};
-                    space.namespace = "uk";
-                    space.parent_namespace = "";
-                    space.created = new Date().getTime(); //static
-                    space.stewards = [ les.id ];
-                    space.type = "namespaces";
-                    space.id = 'namespaces~' + space.namespace;
-                    spaces.push( space );
-                    steward_bucket.namespaces.push(space.id);
-
-                    //push les on the knowns stewards on this stewards bucket
-                    steward_bucket.stewards.push(les.id);
-                    //stewards.push(les);
+                  steward_bucket.namespaces.push('namespaces~uk');
+                  //push les on the knowns stewards on this stewards bucket
+                  steward_bucket.stewards.push(les.id);
                 }
 
                 var steward_space = {};
@@ -670,6 +662,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         } else {
           //TODO: through error
           console.error('should not get here. trying to register for a non registerable space root:' + space_root);
+          return registerPostCallback({status:400,code:1050, message: 'trying to register for a non registerable namespace root:' + space_root});
         }
     } else { // else dot in stewardname
       console.info('does not have dot in stewardname');
@@ -689,13 +682,13 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
     //The root space cc stands for community currency or creative commons. It is the root namespace each steward gets in an account.
     var space = {};
-    space.namespace = "cc";
-    space.parent_namespace = ""; //references the parent space building a tree graph from the root.
-    space.created = new Date().getTime(); //static
-    space.stewards = [ deefactorial.id, michael.id ];
-    space.type = "namespaces";
-    space.id = 'namespaces~' + space.namespace;
-    spaces.push( space );
+    // space.namespace = "cc";
+    // space.parent_namespace = ""; //references the parent space building a tree graph from the root.
+    // space.created = new Date().getTime(); //static
+    // space.stewards = [ deefactorial.id, michael.id ];
+    // space.type = "namespaces";
+    space.id = 'namespaces~cc';
+    //spaces.push( space );
     steward_bucket.namespaces.push(space.id);
 
     //This is the community currency all stewards get an account in this currency when they use the register api.
