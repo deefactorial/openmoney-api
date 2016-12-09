@@ -2082,30 +2082,9 @@ definitions:
           maxLength: 32
   register_response:
     type: object
-    minProperties: 4
-    maxProperties: 4
-    required:
-      - stewards
-      - accounts
-      - currencies
-      - namespaces
     properties:
-      stewards:
-        type: array
-        items:
-          $ref: '#/definitions/stewards_get'
-      accounts:
-        type: array
-        items:
-          $ref: '#/definitions/accounts_get'
-      currencies:
-        type: array
-        items:
-          $ref: '#/definitions/currencies_get'
-      namespaces:
-        type: array
-        items:
-          $ref: '#/definitions/namespaces_get'
+      ok:
+        type: boolean
   register_request:
     type: object
     minProperties: 2
