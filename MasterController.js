@@ -600,7 +600,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         console.info('space root:' + space_root);
 
         // all root spaces are hard coded to start with.
-        if(space_root == 'cc'){
+        if(space_root == 'cc'){ 
             // these are the pre-programmed root spaces that are allowed.
 
             //iterate through the spaces starting with the root.
