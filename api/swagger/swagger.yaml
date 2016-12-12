@@ -2086,7 +2086,9 @@ definitions:
       ok:
         type: boolean
       stewards:
-        type: object
+        type: array
+        items:
+          $ref: '#/definitions/stewards_response'
   register_request:
     type: object
     minProperties: 2
