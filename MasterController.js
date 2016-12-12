@@ -17,18 +17,26 @@ var smtpConfig = process.env.SMTP_CONFIG;
 // create reusable transporter object using the default SMTP transport
 var transporter = nodemailer.createTransport(smtpConfig);
 
-function sendmail(to, subject, messageHTML, callback){
+function sendmail(to, cc, bcc, subject, messageHTML, callback){
   var messageText = messageHTML.replace(/<\/?[^>]+(>|$)/g, "");
-  console.log('send email to', to, subject, messageText);
+  console.log('send email to', to, cc, bcc, subject, messageText);
 
   // setup e-mail data with unicode symbols
   var mailOptions = {
       from: '"Openmoney Network" <openmoney.network@gmail.com>', // sender address
-      to: to, // list of receivers
       subject: subject, // Subject line
       text: messageText, // plaintext body
       html: messageHTML // html body
   };
+  if(to != null){
+    mailOptions.to = to;
+  }
+  if(cc != null){
+    mailOptions.cc = cc;
+  }
+  if(bcc != null){
+    mailOptions.bcc = bcc;
+  }
 
   if(typeof smtpConfig == 'undefined' || smtpConfig == ''){
     console.log('smtpConfig is undefined, ignoring sending emails...');
@@ -420,7 +428,7 @@ exports.stewardsForgotPost = function(forgot_request, forgotPostCallback){
                 }
 
                 messageHTML += '<h5>If you have not made this request you can safely ignore this email.</h5>';
-                sendmail(to, subject, messageHTML, callback);
+                sendmail(to, null, null, subject, messageHTML, callback);
               }
             })
           }
@@ -452,7 +460,7 @@ exports.stewardsForgotPost = function(forgot_request, forgotPostCallback){
                     var messageHTML = '<h3>A forgot password request has been made for your account.</h3>';
                     messageHTML += 'Your stewardname is ' + res.value.stewardname + '; Reset Password Link: <a href="https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '">https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '</a>.';
                     messageHTML += '<h5>If you have not made this request you can safely ignore this email.</h5>';
-                    sendmail(to, subject, messageHTML, callback);
+                    sendmail(to, null, null, subject, messageHTML, callback);
                   }
                 });
               }
@@ -600,7 +608,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
         console.info('space root:' + space_root);
 
         // all root spaces are hard coded to start with.
-        if(space_root == 'cc'){ 
+        if(space_root == 'cc'){
             // these are the pre-programmed root spaces that are allowed.
 
             //iterate through the spaces starting with the root.
@@ -1170,10 +1178,23 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
                                 var response = {
                                   ok: true
+                                };
+                                console.log("response:",response);
+
+
+                                var to = '"' + steward.stewardname + '"<' + steward.email + '>';
+                                if(!steward.email_notifications){
+                                  to = null;
                                 }
-                                console.log("response:");
-                                console.log(response);
-                                registerPostCallback(null, response);
+
+                                var subject = 'Welcome to Openmoney Network: "' + steward.stewardname + '"<' + steward.email + '>';
+                                var messageHTML = '<h3>Welcome to Openmoney Network: "' + steward.stewardname + '"&lt;' + steward.email + '&gt;.</h3>';
+                                messageHTML += '<b>Your stewardname is "' + steward.stewardname + '". You can log in here: <a href="https://openmoney.network#login">https://openmoney.network/#login</a></b> .';
+                                messageHTML += '<h5>If you forgot your password you can reset it here: <a href="https://openmoney.network/#forgot">https://openmoney.network/#forgot</a>.</h5>';
+                                sendmail(to, null, ['"Dominique Legault"<deefactorial+ON@gmail.com>', '"Michael Linton"<michael.lington+ON@gmail.com>'], subject, messageHTML, function(err, ok){
+                                  console.log('sendmail:', err, ok);
+                                  registerPostCallback(null, response);
+                                });
                             }
                         });
                 }
