@@ -546,7 +546,7 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
     }
 
     steward.id = 'stewards~' + steward.stewardname.toLowerCase();
-    //stewards.push(steward);
+    stewards.push(steward);
 
     var steward_bucket = {};
     steward_bucket.stewards = [ steward.id ];
@@ -1156,6 +1156,10 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
                                 //send the response to the steward
 
+                                var response = {
+                                  ok: true
+                                };
+
                                 // var response = {
                                 //     "accounts": {},
                                 //     "currencies": {},
@@ -1163,22 +1167,20 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                 //     "stewards": {}
                                 // };
 
-                                // for(var i = 0; i < stewards.length; i++){
-                                //     delete(stewards[i].password);
-                                //     //need to return the privateKey in order to decrypt journals
-                                //     if(stewards[i].stewardname != steward.stewardname){
-                                //       delete(stewards[i].privateKey);
-                                //     }
-                                // }
+                                for(var i = 0; i < stewards.length; i++){
+                                    delete(stewards[i].password);
+                                    //need to return the privateKey in order to decrypt journals
+                                    if(stewards[i].stewardname != steward.stewardname){
+                                      delete(stewards[i].privateKey);
+                                    }
+                                }
 
-                                // response.stewards = stewards;
+                                response.stewards = stewards;
                                 // response.namespaces = spaces;
                                 // response.currencies = currencies;
                                 // response.accounts = accounts;
 
-                                var response = {
-                                  ok: true
-                                };
+
                                 console.log("response:",response);
 
 
