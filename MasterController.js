@@ -522,7 +522,7 @@ exports.stewardsResetPost = function(reset_request, resetPostCallback){
 exports.stewardsPost = function(steward_request, registerPostCallback){
     console.log("stewardsPost");
 
-    //var stewards = [];
+    var stewards = [];
     var spaces = [];
     var currencies = [];
     var accounts = [];
