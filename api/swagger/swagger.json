@@ -3173,6 +3173,9 @@
             "properties": {
                 "ok": {
                     "type": "boolean"
+                },
+                "stewards": {
+                    "type": "object"
                 }
             }
         },

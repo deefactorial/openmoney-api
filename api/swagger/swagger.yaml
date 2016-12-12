@@ -2085,6 +2085,8 @@ definitions:
     properties:
       ok:
         type: boolean
+      stewards:
+        type: object
   register_request:
     type: object
     minProperties: 2
