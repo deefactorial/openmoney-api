@@ -1157,7 +1157,8 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
                                 //send the response to the steward
 
                                 var response = {
-                                  ok: true
+                                  ok: true,
+                                  stewards: {}
                                 };
 
                                 // var response = {
