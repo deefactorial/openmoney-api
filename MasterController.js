@@ -14,6 +14,10 @@ require('dotenv').load();
 
 var smtpConfig = process.env.SMTP_CONFIG;
 
+if(typeof process.env.API_HOST === 'undefined'){
+  process.env.API_HOST = 'http://localhost';
+}
+
 // create reusable transporter object using the default SMTP transport
 var transporter = nodemailer.createTransport(smtpConfig);
 
@@ -23,7 +27,7 @@ function sendmail(to, cc, bcc, subject, messageHTML, callback){
 
   // setup e-mail data with unicode symbols
   var mailOptions = {
-      from: '"Openmoney Network" <openmoney.network@gmail.com>', // sender address
+      from: process.env.SENDER_ADDRESS, // sender address
       subject: subject, // Subject line
       text: messageText, // plaintext body
       html: messageHTML // html body
@@ -423,7 +427,7 @@ exports.stewardsForgotPost = function(forgot_request, forgotPostCallback){
                 for (var key in results) {
                   if (results.hasOwnProperty(key)) {
                     console.log(key + " -> " + results[key]);
-                    messageHTML += '<div>Your stewardname is ' + key + '; Reset Password Link: <a href="https://openmoney.network/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '">https://openmoney.network/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '</a>.</div>';
+                    messageHTML += '<div>Your stewardname is ' + key + '; Reset Password Link: <a href="' + process.env.API_HOST + '/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '">' + process.env.API_HOST + '/#stewards/' + key + '/reset/' + encodeURIComponent(results[key]) + '</a>.</div>';
                   }
                 }
 
@@ -458,7 +462,7 @@ exports.stewardsForgotPost = function(forgot_request, forgotPostCallback){
                     var to = res.value.email;
                     var subject = 'Forgot Password Request';
                     var messageHTML = '<h3>A forgot password request has been made for your account.</h3>';
-                    messageHTML += 'Your stewardname is ' + res.value.stewardname + '; Reset Password Link: <a href="https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '">https://openmoney.network/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '</a>.';
+                    messageHTML += 'Your stewardname is ' + res.value.stewardname + '; Reset Password Link: <a href="' + process.env.API_HOST + '/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '">' + process.env.API_HOST + '/#stewards/' + res.value.stewardname + '/reset/' + encodeURIComponent(res.value.forgot_token) + '</a>.';
                     messageHTML += '<h5>If you have not made this request you can safely ignore this email.</h5>';
                     sendmail(to, null, null, subject, messageHTML, callback);
                   }
@@ -1186,15 +1190,15 @@ exports.stewardsPost = function(steward_request, registerPostCallback){
 
 
                                 var to = '"' + steward.stewardname + '"<' + steward.email + '>';
-                                if(!steward.email_notifications){
+                                if(typeof steward.email_notifications !== 'undefined' && steward.email_notifications === false){
                                   to = null;
                                 }
 
                                 var subject = 'Welcome to Openmoney Network: "' + steward.stewardname + '"<' + steward.email + '>';
                                 var messageHTML = '<h3>Welcome to Openmoney Network: "' + steward.stewardname + '"&lt;' + steward.email + '&gt;.</h3>';
-                                messageHTML += '<b>Your stewardname is "' + steward.stewardname + '". You can log in here: <a href="https://openmoney.network#login">https://openmoney.network/#login</a></b> .';
-                                messageHTML += '<h5>If you forgot your password you can reset it here: <a href="https://openmoney.network/#forgot">https://openmoney.network/#forgot</a>.</h5>';
-                                sendmail(to, null, ['"Dominique Legault"<deefactorial+ON@gmail.com>', '"Michael Linton"<michael.lington+ON@gmail.com>'], subject, messageHTML, function(err, ok){
+                                messageHTML += '<b>Your stewardname is "' + steward.stewardname + '". You can log in here: <a href="' + process.env.API_HOST + '#login">' + process.env.API_HOST + '/#login</a></b> .';
+                                messageHTML += '<h5>If you forgot your password you can reset it here: <a href="' + process.env.API_HOST + '/#forgot">' + process.env.API_HOST + '/#forgot</a>.</h5>';
+                                sendmail(to, null, process.env.MONITOR_ADDRESSES, subject, messageHTML, function(err, ok){
                                   console.log('sendmail:', err, ok);
                                   registerPostCallback(null, response);
                                 });
