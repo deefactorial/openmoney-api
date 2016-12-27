@@ -44,6 +44,7 @@ function sendmail(to, cc, bcc, subject, messageHTML, callback){
 
   if(typeof smtpConfig == 'undefined' || smtpConfig == ''){
     console.log('smtpConfig is undefined, ignoring sending emails...');
+    callback(null, {ok:true});
   } else {
 
     // send mail with defined transport object
@@ -4233,7 +4234,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
         account.namespace_disabled = request.accounts.namespace_disabled;
     }
 
-    var olddoc_id = "accounts~" + request.account.toLowerCase() + "." + request.namespace.toLowerCase() + "~" + currency;
+    //var olddoc_id = "accounts~" + request.account.toLowerCase() + "." + request.namespace.toLowerCase() + "~" + currency;
+    var olddoc_id = request.accounts.id;
     console.log(olddoc_id);
     //get the old doc
     openmoney_bucket.get(olddoc_id, function(err, olddoc){
@@ -5465,7 +5467,11 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     }
                     account.value.volume += journal.amount + journal.amount;
                     openmoney_bucket.replace(account.value.id, account.value, {cas: account.cas}, function(err, ok){
-                      callback(err, ok);
+                      if(err && err.code == 12){
+                        parallelInsertTasks.fromAccountUpdate(callback);
+                      } else {
+                        callback(err, ok);
+                      }
                     });
                   }
                 });
@@ -5483,7 +5489,11 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     account.value.balance -= journal.amount;
                     account.value.volume += journal.amount;
                     openmoney_bucket.replace(account.value.id, account.value, {cas: account.cas}, function(err, ok){
-                      callback(err, ok);
+                      if(err && err.code == 12){
+                        parallelInsertTasks.fromAccountUpdate(callback);
+                      } else {
+                        callback(err, ok);
+                      }
                     });
                   }
                 });
@@ -5501,7 +5511,11 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     account.value.balance += journal.amount;
                     account.value.volume += journal.amount;
                     openmoney_bucket.replace(account.value.id, account.value, {cas: account.cas}, function(err, ok){
-                      callback(err, ok);
+                      if(err && err.code == 12){
+                        parallelInsertTasks.toAccountUpdate(callback);
+                      } else {
+                        callback(err, ok);
+                      }
                     })
                   }
                 });
@@ -5566,9 +5580,13 @@ exports.journalsPost = function(request, journalsPostCallback) {
                         //update the doc
                         journalsList.value.list.push( journal.id );
 
-                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, function(err, ok){
+                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, {cas: journalsList.cas}, function(err, ok){
                             if(err) {
+                              if(err.code == 12){
+                                parallelInsertTasks.fromJournalList(callback);
+                              } else {
                                 callback(err, null);
+                              }
                             } else {
                                 callback(null, ok);
                             }
@@ -5634,9 +5652,13 @@ exports.journalsPost = function(request, journalsPostCallback) {
                         //update the doc
                         journalsList.value.list.push( journal.id );
 
-                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, function(err, ok){
+                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, {cas: journalsList.cas}, function(err, ok){
                             if(err) {
+                              if(err.code == 12){
+                                parallelInsertTasks.toJournalList(callback);
+                              } else {
                                 callback(err, null);
+                              }
                             } else {
                                 callback(null, ok);
                             }
@@ -5701,10 +5723,13 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     } else {
                         //update the doc
                         journalsList.value.list.push( journal.id );
-
-                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, function(err, ok){
+                        stewards_bucket.upsert(journalsList.value.id, journalsList.value, {cas: journalsList.cas}, function(err, ok){
                             if(err) {
+                              if(err.code == 12){
+                                parallelInsertTasks.currencyjournalList(callback);
+                              } else {
                                 callback(err, null);
+                              }
                             } else {
                                 callback(null, ok);
                             }
@@ -5713,7 +5738,7 @@ exports.journalsPost = function(request, journalsPostCallback) {
                 });
             };
 
-            async.parallel(parallelInsertTasks, function(err, ok){
+            async.series(parallelInsertTasks, function(err, ok){
                 if(err) {
                     console.log(err, ok);
                     journalsPostCallback(err, null);
@@ -5721,7 +5746,6 @@ exports.journalsPost = function(request, journalsPostCallback) {
                     console.log(ok);
 
                     //TODO: notify to stewards, from stewards and currency stewards
-
                     var response = {};
                     response.id = journal.id;
                     response.created = journal.created;
