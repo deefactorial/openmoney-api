@@ -16,9 +16,10 @@ goto: http://localhost:8091 and follow installation instructions. remember to ke
 ```sh
 git clone https://github.com/deefactorial/openmoney-api.git
 cd openmoney-api
+npm install
 export COUCHBASE_ADMIN_USERNAME=Administrator
 export COUCHBASE_ADMIN_PASSWORD=password
-npm install
+node install
 ```
 
 #Run

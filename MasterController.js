@@ -1444,6 +1444,7 @@ exports.spacesList = function(request, spacesGetCallback){
             spacesGetCallback(err, false);
         } else {
             var parallelTasks = {};
+            console.log('namespaces List:', steward_bucket.value.namespaces)
             steward_bucket.value.namespaces.forEach(function(spaceID){
                 //console.log("spaceID:" + spaceID);
                 parallelTasks[spaceID] = function(callback) {
@@ -3079,33 +3080,46 @@ exports.currenciesGet = function(request, currenciesGetCallback) {
               error.message = 'Cannot add a private currency.';
               currenciesGetCallback(error);
             } else {
-              stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
-                  if (err) {
-                      currenciesGetCallback(err);
-                  } else {
-                      if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) !== -1){
-                        currenciesGetCallback(null, results.value);
-                      } else {
+              var task = {};
 
-                        steward_bucket.value.currencies.push(results.value.id.toLowerCase());
+              task.updateBucket = function(callback){
+                stewards_bucket.get("steward_bucket~" + getHash(request.publicKey), function (err, steward_bucket) {
+                    if (err) {
+                        callback(err);
+                    } else {
+                        if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) !== -1){
+                          callback(null, results.value);
+                        } else {
 
-                        //add stewards of currency to users stewards list
-                        results.value.stewards.forEach(function(steward){
-                          if(steward_bucket.value.stewards.indexOf(steward) === -1){
-                            steward_bucket.value.stewards.push(steward);
-                          }
-                        });
+                          steward_bucket.value.currencies.push(results.value.id.toLowerCase());
 
-                        stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
-                            if (err) {
-                                callcurrenciesGetCallbackback(err);
-                            } else {
-                                currenciesGetCallback(null, results.value);
+                          //add stewards of currency to users stewards list
+                          results.value.stewards.forEach(function(steward){
+                            if(steward_bucket.value.stewards.indexOf(steward) === -1){
+                              steward_bucket.value.stewards.push(steward);
                             }
-                        });
-                      }
-                  }
-              });
+                          });
+
+                          stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                              if (err) {
+                                if(err.code == 12){
+                                  task.updateBucket(callback);
+                                } else {
+                                  callback(err);
+                                }
+                              } else {
+                                  callback(null, results.value);
+                              }
+                          });
+                        }
+                    }
+                });
+              };
+
+              async.series(task, function(err, results){
+                currenciesGetCallback(err, results);
+              })
+
             }
         }
     });
@@ -3177,6 +3191,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
               currenciesPutCallback(error, null);
             } else {
               var change = false;
+              var stewards_change = false;
               if(oldCurrency.value.currency != currency.currency){
                 console.log('currency is not the same.', oldCurrency.value.currency, currency.currency);
                 change = true;
@@ -3185,10 +3200,10 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                 console.log('currency_namespace is not the same.', oldCurrency.value.currency_namespace, currency.currency_namespace);
                 change = true;
               }
-              if (oldCurrency.value.stewards.equals(currency.stewards) === false) {
-                console.log('stewards are not the same.', oldCurrency.value.stewards, currency.stewards);
-                change = true;
-              }
+              // if (oldCurrency.value.stewards.equals(currency.stewards) === false) {
+              //   console.log('stewards are not the same.', oldCurrency.value.stewards, currency.stewards);
+              //   change = true;
+              // }
               if(change){
                 //TODO: implement currency name change, currency_namepsace change, and stewards change.
                 var error = {};
@@ -3199,6 +3214,27 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
               } else {
 
                 var parallelTasks = {};
+                if(oldCurrency.value.stewards.equals(currency.stewards) === false){
+
+                  //check stewards exist
+                  currency.stewards.forEach(function(steward){
+                      parallelTasks[steward] = function(callback) {
+                          openmoney_bucket.get(steward.toLowerCase(), function (err, steward) {
+                              if (err) {
+                                  callback(err);
+                              } else {
+                                  callback(null, steward);
+                              }
+                          });
+                      };
+                  });
+
+                  //update oldCurrency stewards
+                  change = true;
+                  stewards_change = true;
+                  oldCurrency.value.stewards = currency.stewards;
+
+                }
 
                 if(typeof request.currencies.disabled != 'undefined'){
                   delete(oldCurrency.value.enabled);
@@ -3433,6 +3469,84 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                             });
                         };
 
+                        if(stewards_change){
+
+                          currency.stewards.forEach(function(steward) {
+                              parallelInsertTasks['insert_currency_in_stewards_bucket' + steward] = function(callback) {
+                                openmoney_bucket.get("currencyAccountList~" + currency.currency.toLowerCase() + '.' + currency.currency_namespace.toLowerCase(), function(err, accountsList){
+                                  if(err && err.code != 13){
+                                    callback(err)
+                                  } else {
+                                    //hack for empty currency accountsList
+                                    if(err && err.code == 13){
+                                      var accountsList = {};
+                                      accountsList.value = {};
+                                      accountsList.value.list = [];
+                                    }
+
+                                    openmoney_bucket.get(steward.toLowerCase(), function (err, stewardDoc) {
+                                        if (err) {
+                                            callback(err, null);
+                                        } else {
+                                            stewards_bucket.get("steward_bucket~" + getHash(stewardDoc.value.publicKey), function (err, steward_bucket) {
+                                                if (err) {
+                                                    callback(err, null);
+                                                } else {
+                                                    accountsList.value.list.forEach(function(accountId){
+                                                      if(steward_bucket.value.accounts.indexOf(accountId) === -1){
+                                                        steward_bucket.value.accounts.push(accountId);
+                                                      }
+                                                      //add all sub namespaces of accounts
+                                                      var namespace = accountId.substring(0,accountId.indexOf('~'));
+                                                      while(namespace.indexOf('.') !== -1){
+                                                        namespace = namespace.substring(namespace.indexOf('.')+1, namespace.length);
+                                                        if(steward_bucket.value.namespaces.indexOf('namespaces~' + namespace) === -1){
+                                                          steward_bucket.value.namespaces.push('namespaces~' + namespace);
+                                                        }
+                                                      }
+                                                    })
+                                                    if(steward_bucket.value.currencies.indexOf(currency.id.toLowerCase()) === -1){
+                                                      steward_bucket.value.currencies.push(currency.id.toLowerCase());
+                                                    }
+                                                    currency.stewards.forEach(function(steward){
+                                                      if(steward_bucket.value.stewards.indexOf(steward) === -1){
+                                                        steward_bucket.value.stewards.push(steward);
+                                                      }
+                                                    });
+                                                    if(steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace.toLowerCase()) === -1){
+                                                      steward_bucket.value.namespaces.push('namespaces~' + currency.currency_namespace.toLowerCase());
+
+                                                      //add all sub namespaces
+                                                      var namespace = currency.currency_namespace.toLowerCase();
+                                                      while(namespace.indexOf('.') !== -1){
+                                                        namespace = namespace.substring(namespace.indexOf('.')+1, namespace.length);
+                                                        if(steward_bucket.value.namespaces.indexOf('namespaces~' + namespace) === -1){
+                                                          steward_bucket.value.namespaces.push('namespaces~' + namespace);
+                                                        }
+                                                      }
+                                                    }
+                                                    stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                                                        if (err) {
+                                                            if(err.code == 12){
+                                                              //retry
+                                                              parallelInsertTasks['insert_currency_in_stewards_bucket' + steward](callback);
+                                                            } else {
+                                                              callback(err, null);
+                                                            }
+                                                        } else {
+                                                            callback(null, ok);
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                  }
+                                });
+                              };
+                          });
+                        }
+
                         //No curency steward change so this is not nessesary
                         // parallelInsertTasks.insert_currency_in_stewards_bucket = function(callback) {
                         //     request.currency.stewards.forEach(function(steward) {
@@ -3508,7 +3622,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                         //     };
                         // });
 
-                        async.parallel(parallelInsertTasks, function(err, ok) {
+                        async.series(parallelInsertTasks, function(err, ok) {
                             if(err) {
                                 currenciesPutCallback(err, null);
                             } else {
@@ -3870,8 +3984,53 @@ exports.accountsPost = function(request, accountsPostCallback) {
                         accountsList.value.list.push(account.id);
                         openmoney_bucket.upsert(accountsList.value.id, accountsList.value, {cas: accountsList.cas}, function(err, ok){
                             if(err){
+                              if(err.code == 12){
+                                parallelInsertTasks.accountList(callback);
+                              } else {
                                 console.log('upsert accountslist error:', accountsList.value.id, err);
                                 callback(err, null);
+                              }
+                            } else {
+                                callback(null, ok);
+                            }
+                        })
+                    }
+                });
+            };
+
+            //add the account to an currency account list
+            parallelInsertTasks.currencyAccountList = function(callback){
+                openmoney_bucket.get("currencyAccountList~" + request.account.currency.toLowerCase() + '.' + request.account.currency_namespace.toLowerCase(), function(err, accountsList){
+                    if(err){
+                        if(err.code==13){
+                            //insert doc
+                            var accountsList = {};
+                            accountsList.id = "currencyAccountList~" + request.account.currency.toLowerCase() + '.' + request.account.currency_namespace.toLowerCase();
+                            accountsList.type = "currencyAccountList";
+                            accountsList.list = [ account.id ];
+                            openmoney_bucket.insert(accountsList.id, accountsList, function(err, ok){
+                                if(err){
+                                    console.log('insert currencyAccountList error:', accountsList.id, err);
+                                    callback(err, null);
+                                } else {
+                                    callback(null, ok);
+                                }
+                            })
+                        } else {
+                            console.log('get ' + "currencyAccountList~" + request.account.currency.toLowerCase() + '.' + request.account.currency_namespace.toLowerCase() + ' currencyAccountList error', err)
+                            callback(err, null);
+                        }
+                    } else {
+                        //update the doc
+                        accountsList.value.list.push(account.id);
+                        openmoney_bucket.upsert(accountsList.value.id, accountsList.value, {cas: accountsList.cas}, function(err, ok){
+                            if(err){
+                              if(err.code == 12){
+                                parallelInsertTasks.currencyAccountList(callback);
+                              } else {
+                                console.log('upsert currencyAccountList error:', accountsList.value.id, err);
+                                callback(err, null);
+                              }
                             } else {
                                 callback(null, ok);
                             }
@@ -4145,11 +4304,12 @@ exports.accountsPost = function(request, accountsPostCallback) {
                             parentChildrenDoc.value.children.push( account.id );
                             openmoney_bucket.replace("account_namespaces_children~" + parent, parentChildrenDoc.value, {cas: parentChildrenDoc.cas}, function(err, ok){
                                 if(err){
-                                    console.log('error replacing account_namespaces_children', "account_namespaces_children~" + parent, err)
+
                                     if(err.code == 12){
                                       //try again
                                       parallelInsertTasks["parent" + parent](callback);
                                     } else {
+                                      console.log('error replacing account_namespaces_children', "account_namespaces_children~" + parent, err)
                                       callback(err, null);
                                     }
                                 } else {
