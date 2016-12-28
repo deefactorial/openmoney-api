@@ -1341,76 +1341,84 @@ exports.stewardsPut = function(request, stewardsPutCallback){
               var error = {};
               error.status = 503;
               error.code = 1016;
-              error.message = "Cannot change your stewardname at this time.";
+              error.message = "Cannot change your stewardname, register for a new account.";
               stewardsPutCallback(error,false);
               //search for all occurances of stewardname and replace them with the new name
           } else {
-            openmoney_bucket.get('stewards~' + request.stewardname.toLowerCase(), function(err, steward){
-              if(err){
-                stewardsPutCallback(err,false);
-              } else {
-
-                //parallel tasks
-                //var parallelTasks = {};
-                var parallelInsertTasks = {};
-
-                if (!scrypt.verifyKdfSync(new Buffer(steward.value.password, 'base64'), request.steward.password )){
-
-                   //encrypt the new password
-                   steward.value.password = scrypt.kdfSync(request.steward.password, scryptParameters).toString('base64');
-
-                  //  parallelInsertTasks.invalidate_session = function(callback) {
-                  //    //check that public key exsits.
-                  //    openmoney_bucket.get(getHash(request.publicKey), function(err,publicKeyDoc){
-                  //        if(err) {
-                  //            callback({status: 401, code: 1005, message: "That public key is not registered."}, false);
-                  //        } else {
-                  //            //remove session
-                  //            delete(publicKeyDoc.value.access_token);
-                  //            delete(publicKeyDoc.value.access_token_expiry);
-                  //            openmoney_bucket.put(getHash(request.publicKey), publicKeyDoc.value, publicKeyDoc.cas, function(err, ok){
-                  //              callback(err, ok);
-                  //            })
-                  //        }//else errs
-                  //    });//get publicKey
-                  //  };
-                }
-                if (request.steward.email != steward.value.email) {
-                   // email update
-                   steward.value.email = request.steward.email;
-                }
-                if (request.steward.email_notifications != steward.value.email_notifications){
-                   steward.value.email_notifications = steward.value.email_notifications;
-                }
 
 
+            //parallel tasks
+            //var parallelTasks = {};
+            var parallelInsertTasks = {};
 
-                   parallelInsertTasks.openmoney_bucket = function(callback) {
-                       openmoney_bucket.replace('stewards~' + request.stewardname.toLowerCase(), steward.value, steward.cas, function(err, results) {
-                           if (err) {
-                               callback(err,false);
-                           } else {
-                               console.log( results);
-                               var response = {};
-                               response = results.value;
-                               callback(null, response);
-                           }
-                       });
-                   };
+            parallelInsertTasks.openmoney_bucket = function(callback) {
 
-                    async.parallel(parallelInsertTasks,
-                        function(err, results) {
-                            if (err) {
-                                stewardsPutCallback(err, false);
-                            } else {
-                                console.log(results);
-                                stewardsPutCallback(null, {id: "stewards~" + request.stewardname.toLowerCase(), ok: true});
-                            }
-                        });
+              openmoney_bucket.get('stewards~' + request.stewardname.toLowerCase(), function(err, steward){
+                if(err){
+                  callback(err);
+                } else {
 
-               }
+                  //change in password
+                  if (typeof request.steward.password != 'undefined' && scrypt.verifyKdfSync(new Buffer(steward.value.password, 'base64'), request.steward.password) !== true){
 
-            });
+                     //encrypt the new password
+                     steward.value.password = scrypt.kdfSync(request.steward.password, scryptParameters).toString('base64');
+
+                    //  parallelInsertTasks.invalidate_session = function(callback) {
+                    //    //check that public key exsits.
+                    //    openmoney_bucket.get(getHash(request.publicKey), function(err,publicKeyDoc){
+                    //        if(err) {
+                    //            callback({status: 401, code: 1005, message: "That public key is not registered."}, false);
+                    //        } else {
+                    //            //remove session
+                    //            delete(publicKeyDoc.value.access_token);
+                    //            delete(publicKeyDoc.value.access_token_expiry);
+                    //            openmoney_bucket.put(getHash(request.publicKey), publicKeyDoc.value, publicKeyDoc.cas, function(err, ok){
+                    //              callback(err, ok);
+                    //            })
+                    //        }//else errs
+                    //    });//get publicKey
+                    //  };
+                  }
+                  if (request.steward.email != steward.value.email) {
+                     // email update
+                     steward.value.email = request.steward.email;
+                  }
+                  if (request.steward.email_notifications != steward.value.email_notifications){
+                     steward.value.email_notifications = request.steward.email_notifications;
+                  }
+                  if (request.steward.theme != steward.value.theme){
+                     steward.value.theme = request.steward.theme;
+                  }
+
+                  openmoney_bucket.replace('stewards~' + request.stewardname.toLowerCase(), steward.value, steward.cas, function(err, results) {
+                     if (err) {
+                       if(err.code == 12){
+                         parallelInsertTasks.openmoney_bucket(callback);
+                       } else {
+                         callback(err);
+                       }
+                     } else {
+                         console.log('replace results',results);
+                         var response = {};
+                         response = results.value;
+                         callback(null, response);
+                     }
+                  });
+                 }
+              });
+            };
+
+            async.parallel(parallelInsertTasks,
+                function(err, results) {
+                    if (err) {
+                        stewardsPutCallback(err, false);
+                    } else {
+                        console.log(results);
+                        stewardsPutCallback(null, {id: "stewards~" + request.stewardname.toLowerCase(), ok: true});
+                    }
+                });
+
           }
 
 

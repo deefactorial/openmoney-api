@@ -2525,8 +2525,7 @@
             "minProperties": 2,
             "maxProperties": 10,
             "required": [
-                "stewardname",
-                "password"
+                "stewardname"
             ],
             "properties": {
                 "stewardname": {

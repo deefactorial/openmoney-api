@@ -1574,7 +1574,6 @@ definitions:
     maxProperties: 10
     required:
       - stewardname
-      - password
     properties:
       stewardname:
         type: string
