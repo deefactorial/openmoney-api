@@ -1399,7 +1399,7 @@ exports.stewardsPut = function(request, stewardsPutCallback){
                          callback(err);
                        }
                      } else {
-                         console.log('replace results',results);
+                         console.log('replace results', results);
                          var response = {};
                          response = results.value;
                          callback(null, response);
@@ -1420,10 +1420,6 @@ exports.stewardsPut = function(request, stewardsPutCallback){
                 });
 
           }
-
-
-
-
         }
     });
 };
@@ -5297,7 +5293,6 @@ function getJournalList(request, journalListDocID, callback){
                   }
               } else {
                   is_displayed = true;
-
               }
               if(is_displayed) {
                   console.log("journalID:" + journalID);
@@ -5305,7 +5300,7 @@ function getJournalList(request, journalListDocID, callback){
                       stewards_bucket.get(getHash(request.publicKey) + journalID, function (err, journal) {
                           if (err) {
                               console.log('error getting journal:' + journalID, err);
-                              cb(err);
+                              cb(null, null);
                           } else {
                               cb(null, journal.value);
                           }
@@ -5322,7 +5317,10 @@ function getJournalList(request, journalListDocID, callback){
                   var response = [];
                   for (var key in results) {
                       if (results.hasOwnProperty(key)) {
+                        if(results[key] != null){
                           response.push(results[key]);
+                        }
+
                       }
                   }
                   callback(null, response);
