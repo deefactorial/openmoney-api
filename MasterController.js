@@ -4791,11 +4791,30 @@ exports.accountsPut = function(request, accountsPutCallback) {
                             }
                         });
                         if (!is_steward) {
-                            var err = {};
-                            err.status = 403;
-                            err.code = 4013;
-                            err.message = "You are not the steward of this account.";
-                            callback(err, null);
+                          //check if you are the steward of the currency
+                          openmoney_bucket.get('currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace, function(err, currency){
+                            if(err){
+                              callback(err);
+                            } else {
+                              var is_currency_steward = false;
+                              currency.value.stewards.forEach(function(steward){
+                                if( steward == "stewards~" + request.stewardname.toLowerCase()) {
+                                  is_currency_steward = true;
+                                }
+                              })
+
+                              if(is_currency_steward){
+                                callback(null, true);
+                              } else {
+                                var err = {};
+                                err.status = 403;
+                                err.code = 4013;
+                                err.message = "You are not the steward of this account, or the steward of this account's currency.";
+                                callback(err, null);
+                              }
+                            }
+                          })
+
                         } else {
                             callback(null, true);
                         }
