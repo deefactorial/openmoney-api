@@ -1595,7 +1595,7 @@ definitions:
         format: email
         maxLength: 255
         pattern: >-
-          ^([\w-]+(?:\.\+[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+          ^([\w-]+(?:[\.\+][\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
       email_notifications:
         type: boolean
   stewards_response:
@@ -2127,7 +2127,7 @@ definitions:
         format: email
         maxLength: 255
         pattern: >-
-          ^([\w-]+(?:\.\+[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
+          ^([\w-]+(?:[\.\+][\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$
       email_notifications:
         type: boolean
         description: Does steward wish to receive email notifications

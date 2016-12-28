@@ -2548,7 +2548,7 @@
                     "type": "string",
                     "format": "email",
                     "maxLength": 255,
-                    "pattern": "^([\\w-]+(?:\\.\\+[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                    "pattern": "^([\\w-]+(?:[\\.\\+][\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
                 },
                 "email_notifications": {
                     "type": "boolean"
@@ -3214,7 +3214,7 @@
                     "description": "Stewards email address",
                     "format": "email",
                     "maxLength": 255,
-                    "pattern": "^([\\w-]+(?:\\.\\+[\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
+                    "pattern": "^([\\w-]+(?:[\\.\\+][\\w-]+)*)@((?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.([a-z]{2,6}(?:\\.[a-z]{2})?)$"
                 },
                 "email_notifications": {
                     "type": "boolean",
