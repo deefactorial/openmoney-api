@@ -3092,7 +3092,7 @@ exports.currenciesGet = function(request, currenciesGetCallback) {
                         callback(err);
                     } else {
 
-                      if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) !== -1){
+                      if(steward_bucket.value.currencies.indexOf(results.value.id.toLowerCase()) === -1){
                         steward_bucket.value.currencies.push(results.value.id.toLowerCase());
                       }
 
@@ -3103,6 +3103,7 @@ exports.currenciesGet = function(request, currenciesGetCallback) {
                         }
                       });
 
+                      console.log('stewards_bucket', steward_bucket.value);
                       stewards_bucket.replace("steward_bucket~" + getHash(request.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
                         console.log('update stewards bucket', err, ok);
                           if (err) {
@@ -3115,7 +3116,6 @@ exports.currenciesGet = function(request, currenciesGetCallback) {
                             callback(null, results.value);
                           }
                       });
-
                     }
                 });
               };
