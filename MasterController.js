@@ -4920,9 +4920,13 @@ exports.accountsPut = function(request, accountsPutCallback) {
                         });
                         if (!is_steward) {
                           //check if you are the steward of the currency
-                          openmoney_bucket.get('currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace, function(err, currency){
+                          var currencyId = 'currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace;
+                          if(olddoc.value.currency_namespace === ''){
+                            currencyId = 'currencies~' + olddoc.value.currency;
+                          }
+                          openmoney_bucket.get(currencyId, function(err, currency){
                             if(err){
-                              console.log('error getting', 'currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace, err);
+                              console.log('error getting', currencyId, err);
                               callback(err);
                             } else {
                               var is_currency_steward = false;
