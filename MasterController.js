@@ -1934,6 +1934,8 @@ exports.spacesPut = function(request, spacesPutCallback) {
             error.message = "Parent namespace is not found.";
             spacesPutCallback(error, false);
         } else {
+
+
             //check what has changed
             openmoney_bucket.get("namespaces~" + request.namespace, function (err, olddoc) {
                 if (err) {
@@ -1959,7 +1961,10 @@ exports.spacesPut = function(request, spacesPutCallback) {
 
                         var namespace_change = false;
                         //namespace change
+                        //namespace change should only be allowed if there are no transactions in the accounts and currencies that are under it.
                         if (olddoc.value.namespace != request.space.namespace) {
+
+
                             namespace_change = true;
                             //check if the namespace exists
                             parallelTasks.namespace = function (callback) {
@@ -1971,8 +1976,8 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                             callback(err, false);
                                         }
                                     } else {
-                                        console.log("namespace exists with that name:");
-                                        console.log(doc);
+                                        console.log("namespace exists with that name:", doc);
+
                                         var error = {};
                                         error.status = 403;
                                         error.code = 2004;
@@ -1991,11 +1996,22 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                             callback(err, false);
                                         }
                                     } else {
-                                        var error = {};
-                                        error.status = 403;
-                                        error.code = 2005;
-                                        error.message = "Currency already exists with the same name.";
-                                        callback(error, false);
+                                        var is_steward = false;
+                                        doc.value.stewards.forEach(function(steward){
+                                          if(steward == 'stewards~' + request.stewardname){
+                                            is_steward = true;
+                                          }
+                                        });
+
+                                        if(is_steward){
+                                          callback(null, true);
+                                        } else {
+                                          var error = {};
+                                          error.status = 403;
+                                          error.code = 2005;
+                                          error.message = "Currency already exists with the same name.";
+                                          callback(error, false);
+                                        }
                                     }
                                 });
                             };
@@ -2182,7 +2198,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                         if (namespace_change) {
 
                             //replace the id, and namespaces with the new namespace.
-                            doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                            doc.id = doc.id.replace(olddoc.value.namespace, request.space.namespace.toLowerCase());
                             changed_documents.namespaces[olddoc_id] = doc.id; //log the change
                             doc.namespace = doc.namespace.replace(re, request.space.namespace);
                             doc.parent_namespace = doc.parent_namespace.replace(re, request.space.namespace);
@@ -2242,10 +2258,10 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                                     if (namespace_change) {
 
                                                         //replace the id, and namespaces with the new namespace.
-                                                        doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                                        doc.id = doc.id.replace(olddoc.value.namespace, request.space.namespace.toLowerCase());
                                                         changed_documents.namespaces[olddoc_id] = doc.id; //log the change
-                                                        doc.namespace = doc.namespace.replace(re, request.space.namespace);
-                                                        doc.parent_namespace = doc.parent_namespace.replace(re, request.space.namespace);
+                                                        doc.namespace = doc.namespace.replace(olddoc.value.namespace, request.space.namespace.toLowerCase());
+                                                        doc.parent_namespace = doc.parent_namespace.replace(olddoc.value.namespace, request.space.namespace.toLowerCase());
                                                         parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
                                                             openmoney_bucket.remove(olddoc_id, function (err, result) {
                                                                 if (err) {
@@ -2258,9 +2274,13 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                                     }
 
                                                     parallelUpdateTasks[doc.id + "_global"] = function (cb) {
-                                                        openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                                        openmoney_bucket.upsert(doc.id, doc, {cas: namespaceDoc.cas} ,function (err, result) {
                                                             if (err) {
-                                                                cb(err, false);
+                                                                if(err.code == 12){
+                                                                  childTasks[child](cb);
+                                                                } else {
+                                                                  cb(err, false);
+                                                                }
                                                             } else {
                                                                 cb(null, result);
                                                             }
@@ -2292,8 +2312,7 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                         callback(err, null);
                                     }
                                 } else {
-                                    //currency namespace document found
-
+                                    //currency with the same namespace found
                                     var doc = currency_namespaceDoc.value;
                                     doc.stewards.forEach(function (steward) {
                                         steward_notification_list.push(steward);
@@ -2307,9 +2326,9 @@ exports.spacesPut = function(request, spacesPutCallback) {
 
                                     if (namespace_change) {
                                         //replace the id, and namespaces with the new namespace.
-                                        doc.id = doc.id.replace(re, request.space.namespace.toLowerCase());
+                                        doc.id = doc.id.replace(olddoc.value.namespace, request.space.namespace.toLowerCase());
                                         changed_documents.currencies[olddoc_id] = doc.id; //log the change
-                                        doc.currency_namespace = doc.currency_namespace.replace(re, request.space.namespace);
+                                        doc.currency_namespace = doc.currency_namespace.replace(olddoc.value.namespace, request.space.namespace);
                                         parallelUpdateTasks[olddoc_id + "_global"] = function (cb) {
                                             openmoney_bucket.remove(olddoc_id, function (err, result) {
                                                 cb(err, result);
@@ -2318,8 +2337,12 @@ exports.spacesPut = function(request, spacesPutCallback) {
                                     }
 
                                     parallelUpdateTasks[doc.id + "_global"] = function (cb) {
-                                        openmoney_bucket.upsert(doc.id, doc, function (err, result) {
+                                        openmoney_bucket.upsert(doc.id, doc, {cas: currency_namespaceDoc.cas}, function (err, result) {
+                                          if(err && err.code == 12){
+                                            parallelTasks.update_currencies_references_global(callback);
+                                          } else {
                                             cb(err, result);
+                                          }
                                         });
                                     };
 
@@ -2507,8 +2530,12 @@ exports.spacesPut = function(request, spacesPutCallback) {
                             });//get
                         };//update_accounts_namespaces_children
 
+
+
+
+
                         console.log('async parallel', parallelTasks);
-                        async.parallel(parallelTasks, function(err, results) {
+                        async.series(parallelTasks, function(err, results) {
                             if (err) {
                                 console.log('parallelTasks error', err);
                                 spacesPutCallback(err, false);
@@ -4508,9 +4535,9 @@ exports.accountsPut = function(request, accountsPutCallback) {
                 err.status = 404;
                 err.code = 4010;
                 err.message = "Account does not exist.";
-                accountsPutCallback(err, null);
+                accountsPutCallback(err);
             } else {
-                accountsPutCallback(err, null);
+                accountsPutCallback(err);
             }
         } else {
             //update the new doc
@@ -4531,7 +4558,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                 err.status = 403;
                 err.code = 4011;
                 err.message = "You cannot change the currency or currency namespace of an account; Create a new account.";
-                accountsPutCallback(err, null);
+                accountsPutCallback(err);
 
             } else {
 
@@ -4550,7 +4577,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                 if(err.code == 13) {
                                     callback(null, true);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 //console.log("There are accounts with that name");
@@ -4561,7 +4588,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     parallelAccountTasks[accountID] = function(callback) {
                                         openmoney_bucket.get(accountID, function(err, accountValue){
                                             if(err) {
-                                                callback(err, null);
+                                                console.log('error getting:', accountID, err);
+                                                callback(err);
                                             } else {
                                                 var is_steward = false;
                                                 accountValue.value.stewards.forEach(function(steward){
@@ -4576,7 +4604,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                                         error.status = 403;
                                                         error.code = 4008;
                                                         error.message = 'You already created this account.';
-                                                        callback(error, null);
+                                                        callback(error);
                                                     } else {
                                                         callback(null, accountValue.value);
                                                     }
@@ -4585,7 +4613,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                                     error.status = 403;
                                                     error.code = 4009;
                                                     error.message = 'There is another account with that name.';
-                                                    callback(error, null);
+                                                    callback(error);
                                                 }
                                             }
                                         })
@@ -4593,11 +4621,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                 });
 
                                 async.parallel(parallelAccountTasks, function(err, ok){
-                                    if(err){
-                                        callback(err, null);
-                                    } else {
-                                        callback(null, ok);
-                                    }
+                                  callback(err, ok);
                                 });
                             }
                         });
@@ -4609,7 +4633,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                 if(err.code == 13){
                                     callback(null, true);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 //currency exists
@@ -4627,7 +4651,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     err.status = 403;
                                     err.code = 4003;
                                     err.message = "Currency exists with that name.";
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             }
                         });
@@ -4639,7 +4663,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                 if(err.code == 13){
                                     callback(null, true);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 //namespace exists
@@ -4657,7 +4681,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     err.status = 403;
                                     err.code = 4002;
                                     err.message = "Namespace exists with that name.";
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             }
                         });
@@ -4677,9 +4701,9 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     err.status = 404;
                                     err.code = 4005;
                                     err.message = "Account namespace does not exist.";
-                                    callback(err, null);
+                                    callback(err);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 callback(null, namespace.value);
@@ -4701,9 +4725,9 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                         error.status = 404;
                                         error.code = 4007;
                                         error.message = "Account stewards do not exist.";
-                                        callback(error, false);
+                                        callback(error);
                                     } else {
-                                        callback(err, false);
+                                        callback(err);
                                     }
                                 } else {
                                     callback(null, doc);
@@ -4721,9 +4745,9 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                         error.status = 404;
                                         error.code = 4007;
                                         error.message = "Account stewards do not exist.";
-                                        callback(error, false);
+                                        callback(error);
                                     } else {
-                                        callback(err, false);
+                                        callback(err);
                                     }
                                 } else {
                                     callback(null, doc);
@@ -4747,14 +4771,14 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     //not found
                                     callback(null, true);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 var err = {};
                                 err.status = 403;
                                 err.code = 4012;
                                 err.message = "The public key of this account is not unique.";
-                                callback(err, null);
+                                callback(err);
                             }
                         })
                     };
@@ -4769,14 +4793,14 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     //not found
                                     callback(null, true);
                                 } else {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             } else {
                                 var err = {};
                                 err.status = 403;
                                 err.code = 4012;
                                 err.message = "The public key of this account is not unique.";
-                                callback(err, null);
+                                callback(err);
                             }
                         })
                     };
@@ -4835,7 +4859,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                     parallelCheckTasks.currency_disabled_check = function(callback) {
                         openmoney_bucket.get("currencies~" + currency, function(err, currency){
                             if(err){
-                                callback(err, null);
+                                callback(err);
                             } else {
                                 var is_steward = false;
                                 currency.value.stewards.forEach(function(steward){
@@ -4850,7 +4874,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     err.status = 403;
                                     err.code = 4014;
                                     err.message = "Only currency stewards can currency disable account.";
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             }
                         })
@@ -4861,7 +4885,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
                     parallelCheckTasks.namespace_disabled_check = function(callback) {
                         openmoney_bucket.get("namespaces~" + account.account_namespace.toLowerCase(), function(err, namespace){
                             if(err){
-                                callback(err, null);
+                              console.log('error getting',"namespaces~" + account.account_namespace.toLowerCase(), err);
+                              callback(err);
                             } else {
                                 var is_steward = false;
                                 namespace.value.stewards.forEach(function(steward){
@@ -4876,7 +4901,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                     err.status = 403;
                                     err.code = 4015;
                                     err.message = "Only namespace stewards can namespace disable account.";
-                                    callback(err, null);
+                                    callback(err);
                                 }
                             }
                         })
@@ -4897,6 +4922,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                           //check if you are the steward of the currency
                           openmoney_bucket.get('currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace, function(err, currency){
                             if(err){
+                              console.log('error getting', 'currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace, err);
                               callback(err);
                             } else {
                               var is_currency_steward = false;
@@ -4913,7 +4939,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                                 err.status = 403;
                                 err.code = 4013;
                                 err.message = "You are not the steward of this account, or the steward of this account's currency.";
-                                callback(err, null);
+                                callback(err);
                               }
                             }
                           })
@@ -4927,7 +4953,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                 async.parallel(parallelCheckTasks, function(err, results){
                     if(err) {
                         console.log('parallelCheckTasks error:', err);
-                        accountsPutCallback(err, null);
+                        accountsPutCallback(err);
                     } else {
                         console.log('parallelCheckTasks results:', results);
                         //make the change
@@ -5181,7 +5207,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
 
                             if(err){
                                 console.log('parallelInsertTasks error:', err, results);
-                                accountsPutCallback(err, null);
+                                accountsPutCallback(err);
                             } else {
                                 console.log('parallelInsertTasks results:', results);
                                 //TODO: notify those affected
