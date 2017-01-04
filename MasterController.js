@@ -3877,7 +3877,7 @@ exports.accountsPost = function(request, accountsPostCallback) {
 
     //check that the account space exists
     var parallelTasks = {};
-    parallelTasks.space_check = function(callback) {
+    parallelTasks.namespace_check = function(callback) {
         openmoney_bucket.get("namespaces~" + request.account.account_namespace.toLowerCase(), function(err, namespace){
             if(err){
                 //console.log("spaces not found");
@@ -4201,100 +4201,28 @@ exports.accountsPost = function(request, accountsPostCallback) {
                 });
             };
 
-            //insert the account into the known accounts of the currency stewards
-            results.currency_check.value.stewards.forEach(function(steward){
-                //this intentionally has the same name as the next function so that it only does it once per steward.
-                parallelInsertTasks[steward.toLowerCase()] = function(callback){
-                    console.log('updating', steward.toLowerCase());
-                    //console.log("get Steward: " + steward);
-                    openmoney_bucket.get(steward.toLowerCase(), function(err, stewardDoc){
-                        if(err){
-                            console.log('error getting steward doc', steward.toLowerCase(), err)
-                            callback(err, null);
-                        } else {
-                            //console.log("get Steward bucket: " + "steward_bucket~" + getHash(stewardDoc.value.publicKey));
-                            stewards_bucket.get("steward_bucket~" + getHash(stewardDoc.value.publicKey), function(err, steward_bucket) {
-                                if(err) {
-                                    console.log('error getting steward_bucket', getHash(stewardDoc.value.publicKey), err)
-                                    callback(err, null);
-                                } else {
-                                    //console.log("steward bucket" + JSON.stringify(steward_bucket.value));
-                                    steward_bucket.value.accounts.push(account.id);
+            var stewardsList = [];
 
-                                    //add namespace if it doesn't exist
-                                    var namespace_exists = false;
-                                    if(typeof steward_bucket.value.namespaces == 'undefined'){
-                                      steward_bucket.value.namespaces = [];
-                                    }
-                                    steward_bucket.value.namespaces.forEach(function(namespaceID){
-                                      if(namespaceID == "namespaces~" + request.account.account_namespace.toLowerCase()){
-                                        namespace_exists = true;
-                                      }
-                                    });
-                                    if(!namespace_exists){
-                                      steward_bucket.value.namespaces.push("namespaces~" + request.account.account_namespace.toLowerCase());
-                                    }
-                                    //add stewards if they don't exist
-                                    if(typeof steward_bucket.value.stewards == 'undefined'){
-                                      steward_bucket.value.stewards = [];
-                                    }
-                                    account.stewards.forEach(function(steward){
-                                      var steward_exists = false;
-                                      steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(stewardID == steward.toLowerCase()){
-                                          steward_exists = true;
-                                        }
-                                      });
-                                      if(!steward_exists){
-                                        steward_bucket.value.stewards.push(steward.toLowerCase());
-                                      }
-                                    });
-                                    stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function(err, ok){
-                                        if(err) {
-                                            console.log('error replacing steward bucket', err);
-                                            if(err.code == 12){
-                                              //try again
-                                              parallelInsertTasks[steward.toLowerCase()](callback);
-                                            } else {
-                                              callback(err, null);
-                                            }
-
-                                        } else {
-                                            //console.log("Get account value refrence:" + account.id);
-                                            //get value reference doc and update
-                                            stewards_bucket.get(account.id, function(err, valRefDoc){
-                                                if(err) {
-                                                    callback(err, null);
-                                                } else {
-                                                    //if this reference doesn't exist add it
-                                                    var index = valRefDoc.value.documents.indexOf("steward_bucket~" + getHash(stewardDoc.value.publicKey));
-                                                    if( index === -1){
-                                                        valRefDoc.value.documents.push("steward_bucket~" + getHash(stewardDoc.value.publicKey));
-                                                        stewards_bucket.upsert(account.id, valRefDoc.value, {cas: valRefDoc.cas},function(err, ok){
-                                                            if(err){
-                                                                console.log('error updating value ref', account.id, err)
-                                                                callback(err, null);
-                                                            } else {
-                                                                callback(null, ok);
-                                                            }
-                                                        });
-                                                    } else {
-                                                        callback(null, ok);
-                                                    }
-                                                }
-                                            });
-
-                                        }
-                                    });
-                                }
-                            });
-                        }
-                    });
-                };
-            })
-
-            //update the stewards of this account list of known accounts, currencies, namespaces and stewards
             account.stewards.forEach(function(steward){
+              if(stewardsList.indexOf(steward) === -1){
+                stewardsList.push(steward);
+              }
+            });
+
+            results.currency_check.value.stewards.forEach(function(steward){
+              if(stewardsList.indexOf(steward) === -1){
+                stewardsList.push(steward);
+              }
+            });
+
+            results.namespace_check.value.stewards.forEach(function(steward){
+              if(stewardsList.indexOf(steward) === -1){
+                stewardsList.push(steward);
+              }
+            });
+
+            //update the account, currency and namespace stewards the list of known accounts, currencies, namespaces and stewards
+            stewardsList.forEach(function(steward){
 
                 parallelInsertTasks[steward.toLowerCase()] = function(callback) {
                     console.log('updating', steward.toLowerCase());
@@ -4310,45 +4238,36 @@ exports.accountsPost = function(request, accountsPostCallback) {
                                     callback(err, null);
                                 } else {
                                     //console.log("steward bucket" + JSON.stringify(steward_bucket.value));
+
+                                    //add the account to the list of known accounts
                                     steward_bucket.value.accounts.push(account.id);
-                                    //add currency if it doesn't exist
-                                    var currency_exists = false;
+                                    //create currency array if it doesn't exist
                                     if(typeof steward_bucket.value.currencies == 'undefined'){
                                       steward_bucket.value.currencies = [];
                                     }
-                                    steward_bucket.value.currencies.forEach(function(currencyID){
-                                      if(currencyID == "currencies~" + currency){
-                                        currency_exists = true;
-                                      }
-                                    });
-                                    if(!currency_exists){
+                                    //add currency if it doesn't exist
+                                    if(steward_bucket.value.currencies.indexOf("currencies~" + currency) === -1){
                                       steward_bucket.value.currencies.push("currencies~" + currency);
                                     }
-                                    //add namespace if it doesn't exist
-                                    var namespace_exists = false;
+
+                                    //create namespace array if it doesn't exist
                                     if(typeof steward_bucket.value.namespaces == 'undefined'){
                                       steward_bucket.value.namespaces = [];
                                     }
-                                    steward_bucket.value.namespaces.forEach(function(namespaceID){
-                                      if(namespaceID == "namespaces~" + request.account.account_namespace.toLowerCase()){
-                                        namespace_exists = true;
-                                      }
-                                    });
-                                    if(!namespace_exists){
+
+                                    //add namespace if it doesn't exist
+                                    if(steward_bucket.value.namespaces.indexOf("namespaces~" + request.account.account_namespace.toLowerCase()) === -1){
                                       steward_bucket.value.namespaces.push("namespaces~" + request.account.account_namespace.toLowerCase());
                                     }
-                                    //add stewards if they don't exist
+
+                                    //create stewards array if it doesn't exist
                                     if(typeof steward_bucket.value.stewards == 'undefined'){
                                       steward_bucket.value.stewards = [];
                                     }
+
+                                    //add stewards if they don't exist
                                     account.stewards.forEach(function(steward){
-                                      var steward_exists = false;
-                                      steward_bucket.value.stewards.forEach(function(stewardID){
-                                        if(stewardID == steward.toLowerCase()){
-                                          steward_exists = true;
-                                        }
-                                      });
-                                      if(!steward_exists){
+                                      if(steward_bucket.value.stewards.indexOf(steward) === -1){
                                         steward_bucket.value.stewards.push(steward.toLowerCase());
                                       }
                                     });
@@ -4919,34 +4838,64 @@ exports.accountsPut = function(request, accountsPutCallback) {
                             }
                         });
                         if (!is_steward) {
-                          //check if you are the steward of the currency
-                          var currencyId = 'currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace;
-                          if(olddoc.value.currency_namespace === ''){
-                            currencyId = 'currencies~' + olddoc.value.currency;
+
+                          var checks = {};
+
+                          checks.currency = function(cb){
+                            //check if you are the steward of the currency or the steward
+                            var currencyId = 'currencies~' + olddoc.value.currency + '.' + olddoc.value.currency_namespace;
+                            if(olddoc.value.currency_namespace === ''){
+                              currencyId = 'currencies~' + olddoc.value.currency;
+                            }
+                            openmoney_bucket.get(currencyId, function(err, currency){
+                              if(err){
+                                console.log('error getting', currencyId, err);
+                                cb(err);
+                              } else {
+
+                                if(currency.value.stewards.indexOf("stewards~" + request.stewardname.toLowerCase()) === -1){
+                                  cb(null, false);
+                                } else {
+                                  cb(null, true);
+                                }
+                              }
+                            })
+                          };
+
+                          checks.namespace = function(cb){
+                            var namespaceId = 'namespaces~' + olddoc.value.account_namespace;
+                            openmoney_bucket.get(namespaceId, function(err, namespace){
+                              if(err){
+                                console.log('error getting', namespaceId, err);
+                                cb(err);
+                              } else {
+
+                                if(namespace.value.stewards.indexOf("stewards~" + request.stewardname.toLowerCase()) === -1){
+                                  cb(null, false);
+                                } else {
+                                  cb(null, true);
+                                }
+
+                              }
+                            })
                           }
-                          openmoney_bucket.get(currencyId, function(err, currency){
+
+                          async.parallel(checks, function(err, results){
                             if(err){
-                              console.log('error getting', currencyId, err);
                               callback(err);
                             } else {
-                              var is_currency_steward = false;
-                              currency.value.stewards.forEach(function(steward){
-                                if( steward == "stewards~" + request.stewardname.toLowerCase()) {
-                                  is_currency_steward = true;
-                                }
-                              })
-
-                              if(is_currency_steward){
-                                callback(null, true);
-                              } else {
+                              if(results.currency === false && results.namespace === false){
                                 var err = {};
                                 err.status = 403;
                                 err.code = 4013;
-                                err.message = "You are not the steward of this account, or the steward of this account's currency.";
+                                err.message = "You are not the steward of this account.";
                                 callback(err);
+                              } else {
+                                callback(null, true);
                               }
                             }
                           })
+
 
                         } else {
                             callback(null, true);
