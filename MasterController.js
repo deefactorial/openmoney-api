@@ -5471,11 +5471,23 @@ exports.journalsPost = function(request, journalsPostCallback) {
                 } else {
                     //check that request.account is not disabled
                     if(typeof from_account.value.disabled != 'undefined' && from_account.value.disabled){
-                        var error = {};
-                        error.status = 403;
-                        error.code = 5004;
-                        error.message = "Your account is disabled.";
-                        callback(error, null);
+                      var error = {};
+                      error.status = 403;
+                      error.code = 5004;
+                      error.message = "Your account is disabled.";
+                      callback(error);
+                    } else if (typeof from_account.value.currency_disabled != 'undefined' && from_account.value.currency_disabled){
+                      var error = {};
+                      error.status = 403;
+                      error.code = 5014;
+                      error.message = "Your account is disabled by the currency stewards. Contact your currency stewards for more information.";
+                      callback(error);
+                    } else if (typeof from_account.value.namespace_disabled != 'undefined' && from_account.value.namespace_disabled){
+                      var error = {};
+                      error.status = 403;
+                      error.code = 5024;
+                      error.message = "Your account is disabled by the namespace stewards. Contact your namespace stewards for more information.";
+                      callback(error);
                     } else {
                         //check that request.account limits will not be exceeded by this journal entry
                         //this requires that we know the balance of the account.
@@ -5542,11 +5554,23 @@ exports.journalsPost = function(request, journalsPostCallback) {
 
                 //check that request.journal.to_account is not disabled
                 if(typeof to_account.value.disabled != 'undefined' && to_account.value.disabled){
-                    var error = {};
-                    error.status = 403;
-                    error.code = 5009;
-                    error.message = "Their account is disabled.";
-                    callback(error, null);
+                  var error = {};
+                  error.status = 403;
+                  error.code = 5009;
+                  error.message = "Their account is disabled.";
+                  callback(error);
+                } else if (typeof to_account.value.currency_disabled != 'undefined' && to_account.value.currency_disabled){
+                  var error = {};
+                  error.status = 403;
+                  error.code = 5019;
+                  error.message = "Their account is disabled by the currency stewards. Contact the currency stewards for more information.";
+                  callback(error);
+                } else if (typeof to_account.value.namespace_disabled != 'undefined' && to_account.value.namespace_disabled){
+                  var error = {};
+                  error.status = 403;
+                  error.code = 5029;
+                  error.message = "Their account is disabled by the namespace stewards. Contact the namespace stewards for more information.";
+                  callback(error);
                 } else {
                     //check that request.journal.to_account limits will not be exceeded by this journal entry
                     //this requires that we know the balance of the account.
