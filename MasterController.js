@@ -2978,7 +2978,15 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 });
             };
 
-            request.currency.stewards.forEach(function(steward) {
+            var stewardsList = currency.stewards;
+
+            results.namespace_check.value.stewards.forEach(function(steward){
+              if(stewardsList.indexOf(steward) === -1){
+                stewardsList.push(steward);
+              }
+            });
+
+            stewardsList.forEach(function(steward) {
                 parallelInsertTasks['insert_currency_in_stewards_bucket' + steward] = function(callback) {
                     openmoney_bucket.get(steward.toLowerCase(), function (err, stewardDoc) {
                         if (err) {
@@ -2988,9 +2996,32 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                 if (err) {
                                     callback(err, null);
                                 } else {
+                                    //add currency namespace to known namespaces
+                                    if(steward_bucket.value.namespaces.indexOf(currency.currency_namespace) === -1){
+                                      steward_bucket.value.namespaces.push(currency.currency_namespace);
+
+                                      //add all sub namespaces
+                                      var namespace = currency.currency_namespace;
+                                      while(namespace.indexOf('.') !== -1){
+                                        namespace = namespace.substring(namespace.indexOf('.')+1, namespace.length);
+                                        if(steward_bucket.value.namespaces.indexOf('namespaces~' + namespace) === -1){
+                                          steward_bucket.value.namespaces.push('namespaces~' + namespace);
+                                        }
+                                      }
+                                    }
+
+                                    //add currency to list of known currencies
                                     if(steward_bucket.value.currencies.indexOf(request.currency.id.toLowerCase()) === -1){
                                       steward_bucket.value.currencies.push(request.currency.id.toLowerCase());
                                     }
+
+                                    //add currency stewards to list of known stewards
+                                    currency.stewards.forEach(function(steward){
+                                      if(steward_bucket.value.stewards.indexOf(steward) === -1){
+                                        steward_bucket.value.stewards.push(steward);
+                                      }
+                                    })
+
                                     stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
                                         if (err) {
                                             if(err.code == 12){
@@ -3206,6 +3237,9 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
     if(typeof request.currencies.disabled != 'undefined'){
       currency.disabled = request.currencies.disabled;
     }
+    if(typeof request.currencies.namespace_disabled != 'undefined'){
+      currency.namespace_disabled = request.currencies.namespace_disabled;
+    }
 
     var old_currency = {};
     old_currency.id = "currencies~" + request.currency.toLowerCase() + "." + request.namespace.toLowerCase();
@@ -3214,19 +3248,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
         if(err) {
             currenciesPutCallback(err);
         } else {
-            var is_steward = false;
-            oldCurrency.value.stewards.forEach(function(steward){
-              if(steward == "stewards~" + request.stewardname.toLowerCase()){
-                is_steward = true;
-              }
-            });
-            if(!is_steward){
-              var error = {};
-              error.status = 403;
-              error.code = 3000;
-              error.message = "You are not the steward of this currency.";
-              currenciesPutCallback(error, null);
-            } else {
+
               var change = false;
               var stewards_change = false;
               if(oldCurrency.value.currency != currency.currency){
@@ -3251,6 +3273,48 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
               } else {
 
                 var parallelTasks = {};
+
+                var isNamespaceSteward = false;
+
+                parallelTasks.isStewardCheck = function(callback){
+                  var is_steward = false;
+                  oldCurrency.value.stewards.forEach(function(steward){
+                    if(steward == "stewards~" + request.stewardname.toLowerCase()){
+                      is_steward = true;
+                    }
+                  });
+                  if(!is_steward){
+
+                    if(oldCurrency.value.currency_namespace != ''){
+                      //get the currency_namespace doc and check if this is one of those stewards, they can update namespace disabled
+                      openmoney_bucket.get('namespaces~' + oldCurrency.value.currency_namespace, function(err, currency_namespace){
+                        if(err){
+                          callback(err)
+                        } else {
+                          if(currency_namespace.value.stewards.indexOf("stewards~" + request.stewardname.toLowerCase()) === -1){
+                            var error = {};
+                            error.status = 403;
+                            error.code = 3000;
+                            error.message = "You are not the steward of this currency.";
+                            callback(error);
+                          } else {
+                            isNamespaceSteward = true;
+                            callback(null, currency_namespace);
+                          }
+                        }
+                      });
+                    } else {
+                      var error = {};
+                      error.status = 403;
+                      error.code = 3000;
+                      error.message = "You are not the steward of this currency.";
+                      callback(error);
+                    }
+                  } else {
+                    callback(null, is_steward)
+                  }
+                }
+
                 if(oldCurrency.value.stewards.equals(currency.stewards) === false){
 
                   //check stewards exist
@@ -3291,6 +3355,29 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                   //leave it undefined
                   oldCurrency.value.disabled = false;
                   delete(oldCurrency.value.enabled);
+                }
+
+                if(typeof request.currencies.namespace_disabled != 'undefined'){
+
+                }
+
+                var namespace_disabled_changed = false;
+                if(typeof currency.namespace_disabled != 'undefined' && typeof oldCurrency.value.namespace_disabled != 'undefined' && currency.namespace_disabled != oldCurrency.value.namespace_disabled){
+                    //account namepsace disabled has changed
+                    namespace_disabled_changed = true;
+                    oldCurrency.value.namespace_disabled = currency.namespace_disabled;
+                }
+                if(typeof currency.namespace_disabled != 'undefined' && typeof oldCurrency.value.namespace_disabled == 'undefined'){
+                    //account namespace disabled is added
+                    namespace_disabled_changed = true;
+                    oldCurrency.value.namespace_disabled = currency.namespace_disabled;
+                }
+                if(typeof currency.namespace_disabled == 'undefined' && typeof oldCurrency.value.namespace_disabled != 'undefined'){
+                    //account namespace disabled is retained.
+                    currency.namespace_disabled = oldCurrency.value.namespace_disabled;
+                }
+                if(namespace_disabled_changed){
+                  change = true;
                 }
 
                 if(typeof request.currencies.private != 'undefined'){
@@ -3359,15 +3446,15 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                   oldCurrency.value.contributionPerPatron = currency.contributionPerPatron;
                 }
 
-                // parallelTasks.namespace_check = function(callback) {
-                //     openmoney_bucket.get("namespaces~" + currency.currency_namespace.toLowerCase(), function(err, namespace){
-                //         if(err) {
-                //             callback(err, null);
-                //         } else {
-                //             callback(null,namespace);
-                //         }
-                //     });
-                // };
+                parallelTasks.namespace_check = function(callback) {
+                    openmoney_bucket.get("namespaces~" + currency.currency_namespace.toLowerCase(), function(err, namespace){
+                        if(err) {
+                            callback(err, null);
+                        } else {
+                            callback(null,namespace);
+                        }
+                    });
+                };
                 //
                 // //check stewards exist
                 // currency.stewards.forEach(function(steward){
@@ -3488,7 +3575,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
 
                 async.parallel(parallelTasks, function(err, results){
                     if(err) {
-                        currenciesPutCallback(err, null);
+                        currenciesPutCallback(err);
                     } else {
                         console.log(results);
 
@@ -3499,7 +3586,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                             console.info(oldCurrency);
                             openmoney_bucket.replace(oldCurrency.value.id, oldCurrency.value, {cas: oldCurrency.cas}, function(err, ok) {
                                 if(err) {
-                                    callback(err, null);
+                                    callback(err);
                                 } else {
                                     callback(null, ok);
                                 }
@@ -3561,6 +3648,50 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                                                     if (err) {
                                                         callback(err);
                                                     } else {
+                                                      //account owners know about currency and currency_namespace already
+
+                                                      //add list of currency stewards to known stewards list
+                                                      currency.stewards.forEach(function(currency_steward) {
+                                                        if(steward_bucket.value.stewards.indexOf(currency_steward) === -1){
+                                                          steward_bucket.value.stewards.push(currency_steward);
+                                                        }
+                                                      });
+                                                      stewards_bucket.replace("steward_bucket~" + getHash(stewardDoc.value.publicKey), steward_bucket.value, {cas: steward_bucket.cas}, function (err, ok) {
+                                                          if (err) {
+                                                              if(err.code == 12){
+                                                                //retry
+                                                                seriesUpdate[steward](callback);
+                                                              } else {
+                                                                callback(err, null);
+                                                              }
+                                                          } else {
+                                                              callback(null, ok);
+                                                          }
+                                                      });
+                                                    }
+                                                });
+                                            }
+                                        });
+                                      };
+                                    });
+
+                                    results.namespace_check.value.stewards.forEach(function(steward){
+                                      seriesUpdate[steward] = function(callback){
+                                        openmoney_bucket.get(steward, function (err, stewardDoc) {
+                                            if (err) {
+                                                callback(err);
+                                            } else {
+                                                stewards_bucket.get("steward_bucket~" + getHash(stewardDoc.value.publicKey), function (err, steward_bucket) {
+                                                    if (err) {
+                                                        callback(err);
+                                                    } else {
+
+                                                      //add currency to the currency stewards list of known currencies
+                                                      if(steward_bucket.value.currencies.indexOf(currency.id.toLowerCase()) === -1){
+                                                        steward_bucket.value.currencies.push(currency.id.toLowerCase());
+                                                      }
+
+                                                      //add list of currency stewards to known stewards list
                                                       currency.stewards.forEach(function(currency_steward) {
                                                         if(steward_bucket.value.stewards.indexOf(currency_steward) === -1){
                                                           steward_bucket.value.stewards.push(currency_steward);
@@ -3587,7 +3718,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
 
                                     //each currency stewards gets the lists of account stewards added to their list of known stewards
                                     currency.stewards.forEach(function(currency_steward) {
-                                        seriesUpdate['update_currency_stewards_bucket' + currency_steward] = function(callback) {
+                                        seriesUpdate[currency_steward] = function(callback) {
 
                                           openmoney_bucket.get(currency_steward.toLowerCase(), function (err, stewardDoc) {
                                               if (err) {
@@ -3650,7 +3781,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                                                               if (err) {
                                                                   if(err.code == 12){
                                                                     //retry
-                                                                    seriesUpdate['update_currency_stewards_bucket' + currency_steward](callback);
+                                                                    seriesUpdate[currency_steward](callback);
                                                                   } else {
                                                                     callback(err, null);
                                                                   }
@@ -3666,7 +3797,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                                         };
                                     });
 
-                                    async.series(seriesUpdate, function(err, ok){
+                                    async.parallel(seriesUpdate, function(err, ok){
                                       callback(err, ok);
                                     })
                                   }
@@ -3767,7 +3898,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                         });//async
                     }//else err
                 });//asnyc
-              }//else core change
+
             }//else steward
         }//oldCreency else
     });//get oldcreency
@@ -4739,8 +4870,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
                     account_disabled_change = true;
                 }
                 if(typeof account.disabled == 'undefined' && typeof olddoc.value.disabled != 'undefined'){
-                    //account disabled is removed
-                    account_disabled_change = true;
+                    //account disabled is retained.
+                    account.disabled = olddoc.value.disabled;
                 }
 
                 var currency_disabled_changed = false;
@@ -4754,7 +4885,7 @@ exports.accountsPut = function(request, accountsPutCallback) {
                 }
                 if(typeof account.currency_disabled == 'undefined' && typeof olddoc.value.currency_disabled != 'undefined'){
                     //account currency_disabled is removed
-                    currency_disabled_changed = true;
+                    account.currency_disabled = olddoc.value.currency_disabled;
                 }
 
                 var namespace_disabled_changed = false;
@@ -4767,8 +4898,8 @@ exports.accountsPut = function(request, accountsPutCallback) {
                     namespace_disabled_changed = true;
                 }
                 if(typeof account.namespace_disabled == 'undefined' && typeof olddoc.value.namespace_disabled != 'undefined'){
-                    //account namespace disabled is removed
-                    namespace_disabled_changed = true;
+                    //account namespace disabled is retained.
+                    account.namespace_disabled = olddoc.value.namespace_disabled;
                 }
 
 
@@ -5635,11 +5766,17 @@ exports.journalsPost = function(request, journalsPostCallback) {
             } else {
                 //check that request.currency is not disabled
                 if(typeof currency.value.disabled != 'undefined' && currency.value.disabled){
-                    var err = {};
-                    err.status = 403;
-                    err.code = 5014;
-                    err.message = "The currency is disabled.";
-                    callback(err, null);
+                  var err = {};
+                  err.status = 403;
+                  err.code = 5014;
+                  err.message = "The currency is disabled.";
+                  callback(err);
+                } else if(typeof currency.value.namespace_disabled != 'undefined' && currency.value.namespace_disabled){
+                  var err = {};
+                  err.status = 403;
+                  err.code = 5024;
+                  err.message = "The currency is namespace disabled.";
+                  callback(err);
                 } else {
                     //check that currency namespace exists and is not disabled for all parent namespaces
                     if(currency.value.currency_namespace != ''){
@@ -5665,7 +5802,7 @@ exports.journalsPost = function(request, journalsPostCallback) {
                                 err.status = 403;
                                 err.code = 5015;
                                 err.message = "The currency namespace " + namespaceDoc.value.namespace + " is disabled.";
-                                callback(err, null);
+                                callback(err);
                               } else {
                                 callback(null, namespaceDoc);
                               }
