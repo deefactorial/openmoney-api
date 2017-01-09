@@ -2884,13 +2884,13 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
       currency.private = request.currency.private;
     }
 
-
+    console.log('request currency', currency);
     //check namespace exists
     var parallelTasks = {};
     parallelTasks.namespace_check = function(callback) {
         openmoney_bucket.get("namespaces~" + request.currency.currency_namespace.toLowerCase(), function(err, namespace){
             if(err) {
-                callback(err, null);
+                callback(err);
             } else {
                 callback(null,namespace);
             }
@@ -2902,7 +2902,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
         parallelTasks[steward] = function(callback) {
             openmoney_bucket.get(steward.toLowerCase(), function (err, steward) {
                 if (err) {
-                    callback(err, null);
+                    callback(err);
                 } else {
                     callback(null, steward);
                 }
@@ -2917,16 +2917,15 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 if(err.code == 13){
                     callback(null,true);
                 } else {
-                    callback(err, null);
+                    callback(err);
                 }
             } else {
                 console.log(currency);
-
                 var error = {};
                 error.status = 403;
                 error.code = 3001;
                 error.message = "Currency Exists.";
-                callback(error, null);
+                callback(error);
             }
         })
     };
@@ -2938,7 +2937,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 if(err.code == 13){
                     callback(null,true);
                 } else {
-                    callback(err, null);
+                    callback(err);
                 }
             } else {
                 //check this space is the steward
@@ -2955,7 +2954,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                     error.status = 403;
                     error.code = 3002;
                     error.message = "Space exists with that currency name.";
-                    callback(error, null);
+                    callback(error);
                 }
             }
         })
@@ -2968,7 +2967,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 if(err.code == 13){
                     callback(null, true);
                 } else {
-                    callback(err, null);
+                    callback(err);
                 }
             } else {
                 var getListTasks = {};
@@ -2979,7 +2978,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                 if(err.code == 13) {
                                     cb(null, true);
                                 } else {
-                                    cb(err, null);
+                                    cb(err);
                                 }
                             } else {
                                 //check this account is the steward
@@ -2996,7 +2995,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                     error.status = 403;
                                     error.code = 3002;
                                     error.message = "Account exists with that currency name.";
-                                    callback(error, null);
+                                    callback(error);
                                 }
                             }
                         })
@@ -3005,7 +3004,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
 
                 async.parallel(getListTasks, function(err, results){
                     if(err) {
-                        callback(err, null);
+                        callback(err);
                     } else {
                         callback(null, results);
                     }
@@ -3034,7 +3033,11 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                 });
             };
 
-            var stewardsList = currency.stewards;
+            var stewardsList = [];
+
+            currency.stewards.forEach(function(steward){
+              stewardsList.push(steward);
+            })
 
             results.namespace_check.value.stewards.forEach(function(steward){
               if(stewardsList.indexOf(steward) === -1){
@@ -3053,8 +3056,8 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                     callback(err, null);
                                 } else {
                                     //add currency namespace to known namespaces
-                                    if(steward_bucket.value.namespaces.indexOf(currency.currency_namespace) === -1){
-                                      steward_bucket.value.namespaces.push(currency.currency_namespace);
+                                    if(steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace) === -1){
+                                      steward_bucket.value.namespaces.push('namespaces~' + currency.currency_namespace);
 
                                       //add all sub namespaces
                                       var namespace = currency.currency_namespace;
