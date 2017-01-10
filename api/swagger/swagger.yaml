@@ -754,7 +754,6 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/currencies':
     post:
       x-swagger-router-controller: Currencies
       operationId: currenciesPost
@@ -768,12 +767,6 @@ paths:
           in: path
           required: true
           type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: currency
           in: body
@@ -802,7 +795,7 @@ paths:
           description: error payload
           schema:
             $ref: '#/definitions/ErrorModel'
-  '/stewards/{stewardname}/namespaces/{namespace}/currencies/{currency}':
+  '/stewards/{stewardname}/currencies/{currency}':
     get:
       x-swagger-router-controller: Currencies
       operationId: currenciesGet
@@ -816,12 +809,6 @@ paths:
           in: path
           required: true
           type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: currency
           in: path
@@ -866,12 +853,6 @@ paths:
           in: path
           required: true
           type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: currency
           in: path
@@ -920,12 +901,6 @@ paths:
           in: path
           required: true
           type: string
-          pattern: '^[A-Za-z0-9_.-]+$'
-        - name: namespace
-          in: path
-          type: string
-          required: true
-          maxLength: 255
           pattern: '^[A-Za-z0-9_.-]+$'
         - name: currency
           in: path

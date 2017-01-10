@@ -1207,9 +1207,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/stewards/{stewardname}/namespaces/{namespace}/currencies": {
+            },
             "post": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesPost",
@@ -1226,14 +1224,6 @@
                         "in": "path",
                         "required": true,
                         "type": "string",
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "namespace",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {
@@ -1292,7 +1282,7 @@
                 }
             }
         },
-        "/stewards/{stewardname}/namespaces/{namespace}/currencies/{currency}": {
+        "/stewards/{stewardname}/currencies/{currency}": {
             "get": {
                 "x-swagger-router-controller": "Currencies",
                 "operationId": "currenciesGet",
@@ -1309,14 +1299,6 @@
                         "in": "path",
                         "required": true,
                         "type": "string",
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "namespace",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {
@@ -1392,14 +1374,6 @@
                         "in": "path",
                         "required": true,
                         "type": "string",
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "namespace",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {
@@ -1482,14 +1456,6 @@
                         "in": "path",
                         "required": true,
                         "type": "string",
-                        "pattern": "^[A-Za-z0-9_.-]+$"
-                    },
-                    {
-                        "name": "namespace",
-                        "in": "path",
-                        "type": "string",
-                        "required": true,
-                        "maxLength": 255,
                         "pattern": "^[A-Za-z0-9_.-]+$"
                     },
                     {

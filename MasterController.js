@@ -1538,21 +1538,29 @@ exports.spacesPost = function(request, spacesPostCallback) {
     var calculatedParent = request.space.namespace.substring(request.space.namespace.indexOf('.')+1, request.space.namespace.length);
     if(request.space.namespace.indexOf('.') === -1 || calculatedParent != request.space.parent_namespace){
       parallelTasks.root_check = function(callback){
-        openmoney_bucket.get('namespaces~cc', function(err, cc){
-          if(err){
-            callback(err);
-          } else {
-            if(cc.value.stewards.indexOf('stewards~' + request.stewardname.toLowerCase()) === -1){
-              var error = {};
-              error.status = 403;
-              error.code = 2002;
-              error.message = "Parent namespace not found.";
-              callback(error);
+        if(request.space.namespace == ''){
+          var error = {};
+          error.status = 403;
+          error.code = 2032;
+          error.message = "Namespace is required.";
+          callback(error);
+        } else {
+          openmoney_bucket.get('namespaces~cc', function(err, cc){
+            if(err){
+              callback(err);
             } else {
-              callback(null, cc);
+              if(cc.value.stewards.indexOf('stewards~' + request.stewardname.toLowerCase()) === -1){
+                var error = {};
+                error.status = 403;
+                error.code = 2002;
+                error.message = "Parent namespace not found.";
+                callback(error);
+              } else {
+                callback(null, cc);
+              }
             }
-          }
-        })
+          })
+        }
       }
     }
 
@@ -2855,7 +2863,11 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     //request.currency
     request.currency.created = new Date().getTime();
     request.currency.created_by = request.stewardname.toLowerCase();
-    request.currency.id = "currencies~" + request.currency.currency.toLowerCase() + "." + request.currency.currency_namespace.toLowerCase();
+    if(request.currency.currency_namespace.toLowerCase() == ''){
+      request.currency.id = "currencies~" + request.currency.currency.toLowerCase()
+    } else {
+      request.currency.id = "currencies~" + request.currency.currency.toLowerCase() + "." + request.currency.currency_namespace.toLowerCase();
+    }
     request.currency.type = "currencies";
 
     var currency = {};
@@ -2894,7 +2906,25 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
     parallelTasks.namespace_check = function(callback) {
         openmoney_bucket.get("namespaces~" + request.currency.currency_namespace.toLowerCase(), function(err, namespace){
             if(err) {
+              if(err.code == 13){
+                openmoney_bucket.get('namespaces~cc', function(err, cc){
+                  if(err){
+                    callback(err);
+                  } else {
+                    if(cc.value.stewards.indexOf('stewards~' + request.stewardname) === -1){
+                      var error = {};
+                      error.status = 403;
+                      error.code = 3021;
+                      error.message = "Currency namespace not found.";
+                      callback(error);
+                    } else {
+                      callback(null, cc)
+                    }
+                  }
+                })
+              } else {
                 callback(err);
+              }
             } else {
                 callback(null,namespace);
             }
@@ -2936,7 +2966,11 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
 
     //check that there isn't another space or account that exists with the same name in the space
     parallelTasks.space_check = function(callback) {
-        openmoney_bucket.get("namespaces~" + request.currency.currency.toLowerCase() + "." + request.currency.currency_namespace.toLowerCase(), function(err, space){
+        var space = request.currency.currency.toLowerCase();
+        if(request.currency.currency_namespace.toLowerCase() != ''){
+          space += "." + request.currency.currency_namespace.toLowerCase();
+        }
+        openmoney_bucket.get("namespaces~" + space, function(err, space){
             if(err){
                 if(err.code == 13){
                     callback(null,true);
@@ -2966,7 +3000,11 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
 
     //check that there isn't another space or account that exists with the same name in the space
     parallelTasks.accounts_check = function(callback) {
-        openmoney_bucket.get("accountsList~" + request.currency.currency.toLowerCase() + "." + request.currency.currency_namespace.toLowerCase(), function(err, accountsList){
+        var account = request.currency.currency.toLowerCase();
+        if(request.currency.currency_namespace.toLowerCase() != ''){
+          account += "." + request.currency.currency_namespace.toLowerCase();
+        }
+        openmoney_bucket.get("accountsList~" + account, function(err, accountsList){
             if(err){
                 if(err.code == 13){
                     callback(null, true);
@@ -3060,7 +3098,7 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
                                     callback(err, null);
                                 } else {
                                     //add currency namespace to known namespaces
-                                    if(steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace) === -1){
+                                    if(currency.currency_namespace != '' && steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace) === -1){
                                       steward_bucket.value.namespaces.push('namespaces~' + currency.currency_namespace);
 
                                       //add all sub namespaces
@@ -3110,7 +3148,10 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
             //child.parent.grandparent
             //parent.grandparent
             //grandparent
-            var currency_namespace = request.currency.currency.toLowerCase() + "." + request.currency.currency_namespace.toLowerCase();
+            var currency_namespace = request.currency.currency.toLowerCase()
+            if(request.currency.currency_namespace.toLowerCase() != ''){
+              currency_namespace += "." + request.currency.currency_namespace.toLowerCase();
+            }
             var parents = currency_namespace.toLowerCase().split('.');
             for(var i = 1; i < parents.length ;i++ ){ // start with second item
                 for(var j = i + 1; j < parents.length; j++){ //concatenate the rest
@@ -3193,11 +3234,11 @@ exports.currenciesPost = function(request, currenciesPostCallback) {
 //when you get a specific currency if found it adds it to your known currencies.
 exports.currenciesGet = function(request, currenciesGetCallback) {
     console.log(request);
-    openmoney_bucket.get('currencies~' + request.currency.toLowerCase() + '.' + request.namespace.toLowerCase(), function(err, results) {
+    openmoney_bucket.get('currencies~' + request.currency.toLowerCase(), function(err, results) {
         if (err) {
             currenciesGetCallback(err);
         } else {
-            console.log('currencies~' + request.currency.toLowerCase() + '.' + request.namespace.toLowerCase(),results);
+            console.log('currencies~' + request.currency.toLowerCase(),results);
             if(results.value.private) {
               var error = {};
               error.status = 403;
@@ -3273,7 +3314,10 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
     // request.currency.modified = new Date().getTime();
     // request.currency.modified_by = request.stewardname.toLowerCase();
 
-    request.currencies.id = "currencies~" + request.currencies.currency.toLowerCase() + "." + request.currencies.currency_namespace.toLowerCase();
+    request.currencies.id = "currencies~" + request.currencies.currency.toLowerCase();
+    if(request.currencies.currency_namespace.toLowerCase() != ''){
+      request.currencies.id += "." + request.currencies.currency_namespace.toLowerCase();
+    }
     request.currencies.type = "currencies";
 
     var currency = {};
@@ -3305,7 +3349,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
     }
 
     var old_currency = {};
-    old_currency.id = "currencies~" + request.currency.toLowerCase() + "." + request.namespace.toLowerCase();
+    old_currency.id = "currencies~" + request.currency.toLowerCase();
 
     openmoney_bucket.get(old_currency.id, function(err, oldCurrency){
         if(err) {
@@ -3512,7 +3556,25 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                 parallelTasks.namespace_check = function(callback) {
                     openmoney_bucket.get("namespaces~" + currency.currency_namespace.toLowerCase(), function(err, namespace){
                         if(err) {
-                            callback(err, null);
+                          if(err.code == 13){
+                            openmoney_bucket.get('namespaces~cc', function(err, cc){
+                              if(err){
+                                callback(err);
+                              } else {
+                                if(cc.value.stewards.indexOf('stewards~' + request.stewardname.toLowerCase()) === -1){
+                                  var error = {};
+                                  error.status = 403;
+                                  error.code = 3022;
+                                  error.message = "Currency namespace not found.";
+                                  callback(error);
+                                } else {
+                                  callback(null, cc);
+                                }
+                              }
+                            })
+                          } else {
+                            callback(err);
+                          }
                         } else {
                             callback(null,namespace);
                         }
@@ -3820,7 +3882,7 @@ exports.currenciesPut = function(request, currenciesPutCallback) {
                                                           });
 
                                                           //add the currency namespace to currency stewards list of known namespaces
-                                                          if(steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace.toLowerCase()) === -1){
+                                                          if(currency.currency_namespace != '' && steward_bucket.value.namespaces.indexOf('namespaces~' + currency.currency_namespace.toLowerCase()) === -1){
                                                             steward_bucket.value.namespaces.push('namespaces~' + currency.currency_namespace.toLowerCase());
 
                                                             //add all sub namespaces

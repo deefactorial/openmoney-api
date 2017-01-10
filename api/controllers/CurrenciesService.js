@@ -16,7 +16,7 @@ exports.currenciesList = function (req, res, next) {
 
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
-    request.namespace = req.swagger.params.namespace.value;
+    //request.namespace = req.swagger.params.namespace.value;
     request.publicKey = req.user.publicKey;
 
     MasterController.currenciesList(request, function (err, result) {
@@ -50,7 +50,7 @@ exports.currenciesPost = function (req, res, next) {
 
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
-    request.namespace = req.swagger.params.namespace.value;
+    //request.namespace = req.swagger.params.namespace.value;
     request.currency = req.swagger.params.currency.value;
     request.publicKey = req.user.publicKey;
 
@@ -85,7 +85,7 @@ exports.currenciesGet = function (req, res, next) {
 
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
-    request.namespace = req.swagger.params.namespace.value;
+    //request.namespace = req.swagger.params.namespace.value;
     request.currency = req.swagger.params.currency.value;
     request.publicKey = req.user.publicKey;
 
@@ -121,7 +121,7 @@ exports.currenciesPut = function (req, res, next) {
 
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
-    request.namespace = req.swagger.params.namespace.value;
+    //request.namespace = req.swagger.params.namespace.value;
     request.currency = req.swagger.params.currency.value;
     request.currencies = req.swagger.params.currencies.value;
     request.publicKey = req.user.publicKey;
@@ -159,7 +159,7 @@ exports.currenciesDelete = function (req, res, next) {
 
     var request = {};
     request.stewardname = req.swagger.params.stewardname.value;
-    request.namespace = req.swagger.params.namespace.value;
+    //request.namespace = req.swagger.params.namespace.value;
     request.currency = req.swagger.params.currency.value;
     request.publicKey = req.user.publicKey;
 
