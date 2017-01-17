@@ -1606,7 +1606,19 @@ exports.spacesPost = function(request, spacesPostCallback) {
               }
             } else {
                 //parent space exists
-                callback(null, parent);
+                if(parent.value.private){
+                  if(parent.value.stewards.indexOf('stewards~' + request.stewardname.toLowerCase()) === -1){
+                    var error = {};
+                    error.status = 403;
+                    error.code = 2024;
+                    error.message = "Cannot create namespace in another stewards private namespace.";
+                    callback(error);
+                  } else {
+                    callback(null, parent);
+                  }
+                } else {
+                  callback(null, parent);
+                }
             }
         });
     };
@@ -1626,7 +1638,7 @@ exports.spacesPost = function(request, spacesPostCallback) {
                 error.status = 403;
                 error.code = 2004;
                 error.message = "namespace exists with that name.";
-                callback(error, true);
+                callback(error);
             }
         });
     };
