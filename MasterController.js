@@ -1585,6 +1585,8 @@ exports.spacesPost = function(request, spacesPostCallback) {
     });
 
 
+
+
     parallelTasks.parent_namespace = function(callback) {
         //check if parent namespace exists
         openmoney_bucket.get("namespaces~" + request.space.parent_namespace, function (err, parent){
@@ -1622,6 +1624,32 @@ exports.spacesPost = function(request, spacesPostCallback) {
             }
         });
     };
+
+    var parent_namespaces = [];
+    var parent_namespace = request.space.parent_namespace;
+    while(parent_namespace.indexOf('.') !== -1){
+      parent_namespaces.push(parent_namespace);
+      parent_namespace = parent_namespace.substring(parent_namespace.indexOf('.')+1, parent_namespace.length);
+    }
+
+    parent_namespaces.forEach(function(namespace){
+      parallelTasks['parent_namespace_' + namespace] = function(callback){
+        //check if parent namespace exists
+        openmoney_bucket.get("namespaces~" + namespace, function (err, parent){
+            if(err) {
+              if(err.code == 13){
+                callback({status:403, code:2003, message: "Parent namespace does not exist."}, true);
+              } else {
+                callback(err);
+              }
+            } else {
+              callback(null,parent)
+            }
+        });
+      };
+    });
+
+
     parallelTasks.namespace = function(callback) {
         //check if namespace exists
         openmoney_bucket.get("namespaces~" + request.space.namespace, function (err, doc){
@@ -1823,10 +1851,12 @@ exports.spacesPost = function(request, spacesPostCallback) {
                   }
                 })
 
-                results.parent_namespace.value.stewards.forEach(function(steward){
-                  if(stewardsList.indexOf(steward) === -1){
-                    stewardsList.push(steward);
-                  }
+                parent_namespaces.forEach(function(namespace){
+                  results['parent_namespace_' + namespace].value.stewards.forEach(function(steward){
+                    if(stewardsList.indexOf(steward) === -1){
+                      stewardsList.push(steward);
+                    }
+                  })
                 })
 
                 stewardsList.forEach(function(steward){
