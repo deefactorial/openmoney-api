@@ -1851,13 +1851,20 @@ exports.spacesPost = function(request, spacesPostCallback) {
                   }
                 })
 
-                parent_namespaces.forEach(function(namespace){
-                  results['parent_namespace_' + namespace].value.stewards.forEach(function(steward){
-                    if(stewardsList.indexOf(steward) === -1){
-                      stewardsList.push(steward);
-                    }
-                  })
-                })
+                //All Parents get notified of namespace creation
+                // parent_namespaces.forEach(function(namespace){
+                //   results['parent_namespace_' + namespace].value.stewards.forEach(function(steward){
+                //     if(stewardsList.indexOf(steward) === -1){
+                //       stewardsList.push(steward);
+                //     }
+                //   })
+                // })
+
+                results['parent_namespace_' + request.space.parent_namespace].value.stewards.forEach(function(steward){
+                  if(stewardsList.indexOf(steward) === -1){
+                    stewardsList.push(steward);
+                  }
+                });
 
                 stewardsList.forEach(function(steward){
                     parallelInsertTasks[steward] = function(callback) {
