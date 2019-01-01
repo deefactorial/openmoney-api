@@ -1,7 +1,5 @@
-var model = module.exports,
-    couchbase = require('couchbase'),
-    serverAddress = '127.0.0.1',
-    cluster = new couchbase.Cluster('couchbase://' + serverAddress),
+var couchbase = require('couchbase'),
+    cluster = new couchbase.Cluster('couchbase://' + process.env.COUCHBASE_LO),
     openmoney_bucket = cluster.openBucket('openmoney_global');
 
 
@@ -11,9 +9,7 @@ var model = module.exports,
 //];
 
 exports.findByUsername = function(username, callback) {
-  console.info('in findByUsername (username: ' + username + ')');
   openmoney_bucket.get("stewards~" + username.toLowerCase(), function(err, user){
-    console.log('getStewards result:', err, user);
     if(err){
       if(err.code == 13){
         callback(null, null);

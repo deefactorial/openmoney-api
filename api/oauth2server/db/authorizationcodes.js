@@ -32,7 +32,6 @@ exports.save = function(code, clientID, redirectURI, userID, done) {
  */
 
 model.saveAuthCode = function (authCode, clientId, expires, user, redirect_uri, callback) {
-  console.log('in saveAuthCode (authCode: ' + authCode + ', clientId: ' + clientId + ', expires: ' + expires + ', user: ' + JSON.stringify(user) + ')');
   var code = {};
   code.code = authCode;
   code.clientID = clientId;
@@ -49,7 +48,6 @@ model.saveAuthCode = function (authCode, clientId, expires, user, redirect_uri, 
 };
 
 model.getAuthCode = function(code, callback){
-  console.log('in getAuthCode (authCode: ' + code + ')');
   oauth2Server.get('acode::' + code, function(err, authCode){
     if(err){
       if(err.code == 13){
@@ -64,7 +62,6 @@ model.getAuthCode = function(code, callback){
       } else if(typeof authCode.value.expires != 'undefined') {
         authCode.value.expires = new Date(authCode.value.expires);
       }
-      console.log(authCode.value);
       callback(null, authCode.value);
     }
   });

@@ -36,8 +36,14 @@
     "dotenv": "^1.2.0"
   },
   "scripts": {
-    "install": "node install",
-    "start": "DEBUG=swagger-tools:* node app.js",
-    "test": "mocha"
+    "install:db": "node install",
+    "start": "node app.js",
+    "start:debug": "DEBUG=swagger-tools:* node app.js",
+    "test": "mocha ./test/stewards ./test/spaces ./test/currencies ./test/accounts ./test/journals",
+    "test:stewards": "mocha ./test/stewards",
+    "test:spaces": "mocha ./test/spaces",
+    "test:currencies": "mocha ./test/currencies",
+    "test:accounts": "mocha ./test/accounts",
+    "test:journal": "mocha ./test/journal"
   }
 }

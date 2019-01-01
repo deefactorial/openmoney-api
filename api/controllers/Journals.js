@@ -1,15 +1,17 @@
 'use strict';
 
-var url = require('url');
-
-
-var Journals = require('./JournalsService');
-
+const JournalsList = require('./Journals/JournalsList');
+const JournalsPost = require('./Journals/JournalsPost');
+// const JournalsGet = require('./Journals/JournalsGet');
 
 module.exports.journalsList = function journalsList (req, res, next) {
-  Journals.journalsList(req, res, next);
+  JournalsList.journalsList(req, res, next);
 };
 
 module.exports.journalsPost = function journalsPost (req, res, next) {
-  Journals.journalsPost(req, res, next);
+  JournalsPost.journalsPost(req, res, next);
 };
+
+// module.exports.journalsGet = function journalsGet (req, res, next) {
+//   JournalsGet.journalsGet(req, res, next);
+// };
