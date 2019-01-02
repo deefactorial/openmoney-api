@@ -74,23 +74,18 @@ var config = {
   appRoot: __dirname, // required config
   swaggerSecurityHandlers: {
     oauth2Password: function(req, def, scopes, callback) {
-      console.log('in oauth2Password (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
     oauth2ImplicitSecurity: function(req, def, scopes, callback) {
-      console.log('in oauth2ImplicitSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
     oauth2ApplicationSecurity: function(req, def, scopes, callback) {
-      console.log('in oauth2ApplicationSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
     oauth2AccessCodeSecurity: function(req, def, scopes, callback) {
-      console.log('in oauth2AccessCodeSecurity (req:  + JSON.stringify(req.headers) + , def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       callback(new Error("Not Implemented"));
     },
     apiKeySecurity: function(req, def, scopes, callback) {
-      console.log('in apiKeySecurity (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       passport.authenticate('bearer', function (err, user, info) {
         if (err) {
           callback(new Error('Error in passport authenticate'));
@@ -104,7 +99,6 @@ var config = {
       })(req, null, callback);
     },
     basicAuthenticationSecurity: function(req, def, scopes, callback){
-      console.log('in basicAuthenticationSecurity (req: ' + JSON.stringify(req.headers) + ', def: ' + JSON.stringify(def) + ', scopes: ' + scopes + ')');
       passport.authenticate(['basic', 'oauth2-client-password'], function (err, user, info) {
         if (err) {
           callback(new Error('Error in passport authenticate'));
@@ -133,7 +127,6 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   app.use(middleware.swaggerSecurity(config.swaggerSecurityHandlers));
 
   app.use(function(err, req, res, next) {
-    console.error("Security Error Middleware: " + JSON.stringify(err));
     if(err.statusCode == 403){
       var error = {};
       error.code = 1006;
@@ -150,7 +143,6 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   }));
 
   app.use(function(err, req, res, next) {
-    console.error("Validation Error Middleware: " + JSON.stringify(err));
     if(err.code == 'SCHEMA_VALIDATION_FAILED'){
       var error = {};
       error.code = 1007;
@@ -166,7 +158,6 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
   app.post('/V2/stewards/:stewardname/oauth/token', oauth2.token);
 
   app.use(function(err, req, res, next) {
-    console.error("Validation Error Middleware: ", err);
     if(typeof err.originalResponse != "undefined"){
       var error = {};
       error.code = JSON.parse(err.originalResponse).error;
@@ -199,7 +190,7 @@ swagger.initializeMiddleware(swaggerObject, function (middleware) {
 
   var port = process.env.PORT || 8080;
   app.listen(port, function() {
-    console.log('The server is running on port:' + port);
+    console.info('The server is running on port:' + port);
   });
 
 });

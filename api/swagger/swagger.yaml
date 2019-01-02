@@ -907,7 +907,7 @@ paths:
           type: string
           required: true
           maxLength: 512
-          pattern: '^[A-Za-z0-9_-]+$'
+          pattern: '^[A-Za-z0-9_.-]+$'
           description: Currency name
       summary: Delete a currency
       tags:

@@ -124,11 +124,8 @@ server.exchange(oauth2orize.exchange.code(function(client, code, redirectURI, do
 // application issues an access token on behalf of the user who authorized the code.
 
 server.exchange(oauth2orize.exchange.password(function(client, username, password, scope, done) {
-    console.info(" in password exchange (client:" + JSON.stringify(client) + ", username:" + username + ", password:" + password + ", scope:" + scope + ")");
-
     //Validate the client
     db.clients.findByClientId(client.clientId, function(err, localClient) {
-        console.log('findByClientId:', client.clientId, err, localClient);
         if (err) { return done(err); }
         if(localClient === null) {
             return done(null, false);
@@ -138,7 +135,6 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
         }
         //Validate the user
         db.users.findByUsername(username, function(err, user) {
-            console.log('findByUsername', username, err, user);
             if (err) { return done(err); }
             if(user === null) {
                 return done(null, false);
@@ -149,13 +145,9 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
                 error.code = 1006;
                 error.status = 403;
                 error.message = 'Authorization Failed.';
-                console.log('password verification failed.', error);
                 return done(error);
-                //return done(null, false);
-                //return done(new Error('Failed to authenticate'))
             }
             //Everything validated, return the token
-            console.log('everything validated return token');
             utils.uid(256, function(err, token) {
                 if (err) {
                     return done(err);
@@ -189,7 +181,6 @@ server.exchange(oauth2orize.exchange.password(function(client, username, passwor
 // application issues an access token on behalf of the client who authorized the code.
 
 server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, done) {
-    console.log("in clientCredentials exchange (client:" + client + ", scope:" + scope + ")");
 
     //Validate the client
     db.clients.findByClientId(client.clientId, function(err, localClient) {
@@ -231,20 +222,16 @@ server.exchange(oauth2orize.exchange.clientCredentials(function(client, scope, d
  */
 
 server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken, scope, done) {
-    console.log("* Refresh access token client[", client, "] refreshToken[" + refreshToken + "] scope[" + scope + "]");
 
     db.accessTokens.findRefresh(refreshToken, function (err, accessTokenToRefresh) {
-        console.log('find refresh token err[' + err + '] accessToenToRefresh[' + JSON.stringify(accessTokenToRefresh) + ']');
         if (err) { return done(err); }
         if (accessTokenToRefresh === null) { return done(new Error("Refresh token not found."));}
         // if (accessTokenToRefresh.expires < new Date()) {
         //     return done(new Error("Refresh Token has expired."));
         // }
 
-        console.log("- refresh token valid");
 
         db.accessTokens.find(accessTokenToRefresh.accessToken, function (err, accessTokenDB) {
-            console.log('find accessToken results: err', err, accessTokenDB);
             if (err) { return done(err); }
             if (accessTokenDB == null) {
                 return done(new Error("Access Token not found."));
@@ -252,8 +239,6 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
             // if (accessTokenDB.expires < new Date()) {
             //     return done(new Error("Access Token has expired."));
             // }
-
-            console.log("- old access token found");
 
             utils.uid(256, function(err, token) {
                 if (err) {
@@ -271,14 +256,10 @@ server.exchange(oauth2orize.exchange.refreshToken(function(client, refreshToken,
                             return done(err);
                         }
 
-                        console.log("- new access/refresh token saved");
-
                         db.accessTokens.delete(accessTokenToRefresh.accessToken, function (err) {
                             if (err) {
                                 return done(err);
                             }
-
-                            console.log("- old access token deleted");
 
                             done(null, token, refreshToken, {scope: accessTokenDB.scope, 'expires': expires});
                         });

@@ -18,7 +18,6 @@ var scrypt = require("scrypt");
  */
 passport.use(new LocalStrategy(
   function(username, password, done) {
-      console.log('in local strategy:' + username);
     db.users.findByUsername(username, function(err, user) {
       if (err) { return done(err); }
       if (!user) { return done(null, false); }
@@ -54,7 +53,6 @@ passport.deserializeUser(function(id, done) {
 
 passport.use(new BasicStrategy(
   function(username, password, done) {
-    console.log("in BasicStrategy (username: " + username + ", password: " + password + ");");
     db.clients.findByClientId(username, function(err, client) {
       if (err) { return done(err); }
       if (!client) { return done(null, false); }
@@ -66,7 +64,6 @@ passport.use(new BasicStrategy(
 
 passport.use(new ClientPasswordStrategy(
   function(clientId, clientSecret, done) {
-    console.log('in ClientPasswordStrategy( clientId:' + clientId + ', clientSecret:' + clientSecret + ')');
     db.clients.findByClientId(clientId, function(err, client) {
       if (err) { return done(err); }
       if (!client) { return done(null, false); }
@@ -86,11 +83,9 @@ passport.use(new ClientPasswordStrategy(
  */
 passport.use(new BearerStrategy(
   function(accessToken, done) {
-    console.info('in Bearer Strategy (access_token: ' + accessToken + ')');
     db.accessTokens.find(accessToken, function(err, token) {
       if (err) { return done(err); }
       if (!token) { return done(null, false); }
-      console.info("token found (" + JSON.stringify(token) + ")");
       if(token.userId != null) {
           db.users.find(token.userId, function(err, user) {
               if (err) { return done(err); }

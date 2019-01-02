@@ -39,7 +39,6 @@ exports.delete = function(token, done) {
  */
 
 model.getAccessToken = function (bearerToken, callback) {
-  console.log('in getAccessToken (bearerToken: ' + bearerToken + ')');
   oauth2Server.get('atkn::' + bearerToken, function(err, token){
     if(err){
       if(err.code == 13){
@@ -57,7 +56,6 @@ model.getAccessToken = function (bearerToken, callback) {
 };
 
 model.getRefreshToken = function (bearerToken, callback) {
-  console.log('in getRefreshToken (bearerToken: ' + bearerToken + ')');
   oauth2Server.get('rtkn::' + bearerToken, function(err, token){
     if(err){
       if(err.code == 13){
@@ -76,7 +74,6 @@ model.getRefreshToken = function (bearerToken, callback) {
 
 // db will do cleanup of the document when it expires
 model.saveAccessToken = function (accessToken, refreshToken, userId, clientId, scopes, expires, callback) {
-  console.log('in saveAccessToken (token: ' + accessToken + ',refeshToken: ' + refreshToken + ', userId: ' + JSON.stringify(userId) + ', clientId: ' + clientId + ', scopes:' + JSON.stringify(scopes) + ', expires: ' + expires + ')');
   var oauthAccessToken = {};
   oauthAccessToken.accessToken = accessToken;
   oauthAccessToken.refreshToken = refreshToken;
@@ -89,7 +86,6 @@ model.saveAccessToken = function (accessToken, refreshToken, userId, clientId, s
   oauthAccessToken.scopes = scopes;
   oauthAccessToken.expires = expires;
 
-  console.log(oauthAccessToken);
   var parallel = {};
   parallel.atkn = function(cb){
     oauth2Server.insert('atkn::' + accessToken, oauthAccessToken, { expires: expires }, function(err, ok){
