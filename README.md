@@ -3,43 +3,38 @@
 The Openmoney API is a domain driven model of stewards, namespaces, currencies, accounts, and journals.
 Stewards are the patrons of these namespaces, currencies, accounts and journals.
 
-#Install
-
-- Go to [couchbase downloads](http://www.couchbase.com/nosql-databases/downloads) and install the latest couchbase community server.
-or install using the command line:
+#Install locally
 ```sh
-wget http://packages.couchbase.com/releases/3.1.3/couchbase-server-community_3.1.3-ubuntu12.04_amd64.deb
-sudo dpkg -i couchbase-server-community_3.1.3-ubuntu12.04_amd64.deb
-```
-goto: http://localhost:8091 and follow installation instructions. remember to keep free memory for new buckets.
-- Change Administrator and password in export commands below for your couchbase server administrator credentials.
-```sh
-git clone https://github.com/deefactorial/openmoney-api.git
+git clone https://github.com/deefactorial/openmoney-api
 cd openmoney-api
-npm install
-export COUCHBASE_ADMIN_USERNAME=Administrator
-export COUCHBASE_ADMIN_PASSWORD=password
-node install
+./install.sh
 ```
 
-#Run
-
+#Run locally on port 8080
 ```sh
-
-npm start
+npm run start
 #Control-C to quit
+```
+
+#Run in a background service
+```sh
 sudo npm install pm2 -g
 pm2 start app.js --name "openmoney-api"
 ```
 
 #Test
-
 ```sh
-
-mocha
-
+#ensure the server is running locally or in background then run
+npm run test
 ```
 
-#Documentation
+#Local Documentation
+http://localhost:8080/docs/
 
+#Remote Documentation
 https://cloud.openmoney.cc/docs/
+
+#Uninstall
+```sh
+./uninstall.sh
+```
