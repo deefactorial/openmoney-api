@@ -14,7 +14,6 @@ exports.find = function(key, done) {
 };
 
 exports.save = function(token, refreshToken, userID, clientID, scopes, expires, done) {
-
   model.saveAccessToken(token, refreshToken, userID, clientID, scopes, expires, done);
   //tokens[token] = { userID: userID, clientID: clientID };
   //return done(null);
@@ -39,6 +38,7 @@ exports.delete = function(token, done) {
  */
 
 model.getAccessToken = function (bearerToken, callback) {
+  console.log('getAccessToken', bearerToken)
   oauth2Server.get('atkn::' + bearerToken, function(err, token){
     if(err){
       if(err.code == 13){
@@ -74,6 +74,7 @@ model.getRefreshToken = function (bearerToken, callback) {
 
 // db will do cleanup of the document when it expires
 model.saveAccessToken = function (accessToken, refreshToken, userId, clientId, scopes, expires, callback) {
+  console.log('saveAccessToken', accessToken)
   var oauthAccessToken = {};
   oauthAccessToken.accessToken = accessToken;
   oauthAccessToken.refreshToken = refreshToken;
