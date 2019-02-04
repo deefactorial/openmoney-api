@@ -1,3 +1,4 @@
+require('dotenv').load();
 const couchbase = require('couchbase');
 const cluster = new couchbase.Cluster(`couchbase://${process.env.COUCHBASE_LO}`);
 exports.stewards_bucket = cluster.openBucket('openmoney_stewards');

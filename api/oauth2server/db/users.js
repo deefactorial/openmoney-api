@@ -1,6 +1,7 @@
-var couchbase = require('couchbase'),
-    cluster = new couchbase.Cluster('couchbase://' + process.env.COUCHBASE_LO),
-    openmoney_bucket = cluster.openBucket('openmoney_global');
+const couchbase = require('couchbase');
+require('dotenv').load();
+const cluster = new couchbase.Cluster('couchbase://' + process.env.COUCHBASE_LO);
+const openmoney_bucket = cluster.openBucket('openmoney_global');
 
 
 //var users = [

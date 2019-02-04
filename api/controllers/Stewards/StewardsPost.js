@@ -5,6 +5,7 @@ const crypto = require('../../helpers/crypto.helper');
 const scrypt = require("scrypt");
 const NodeRSA = require('node-rsa');
 const async = require('async');
+require('dotenv').load();
 const ROOT_SPACE = process.env.ROOT_SPACE;
 const ROOT_CURRENCY = process.env.ROOT_CURRENCY;
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
