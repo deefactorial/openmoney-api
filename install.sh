@@ -44,7 +44,14 @@ cat .env
 #
 #install dependency applications
 sudo apt-get update
-sudo apt-get install -y npm net-tools docker curl
+sudo apt-get install -y npm net-tools apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get update
+sudo apt-get install docker-ce
 curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
 sudo apt-get install -y nodejs
 sudo npm install -g n
