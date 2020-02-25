@@ -2,7 +2,7 @@
   "name": "oauth2orize-example",
   "version": "0.0.0",
   "dependencies": {
-    "express": "2.x.x",
+    "express": "4.x.x",
     "ejs": "0.7.x",
     "oauth2orize": "0.x.x",
     "passport": "~0.1.12",
