@@ -9,7 +9,7 @@ env:
   global:
     - COUCHBASE_ADMIN_USERNAME=admin
     - COUCHBASE_ADMIN_PASSWORD=password
-    - "COUCHBASE_IP=\"$(/sbin/ifconfig eth0 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')\""
+    - "COUCHBASE_IP=\"$(/sbin/ifconfig ens4 | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')\""
     - "COUCHBASE_LO=\"$(/sbin/ifconfig lo | grep 'inet addr' | cut -d: -f2 | awk '{print $1}')\""
     - ADMIN_USERNAME=admin
     - ADMIN_PASSWORD=password
@@ -18,13 +18,13 @@ env:
     - ROOT_CURRENCY=cc
 
 addons:
-  hostname: openmoney.dev
   apt:
     packages:
       - net-tools
       - npm
 
 before_install:
+  - /sbin/ifconfig
   - docker pull couchbase:community-2.2.0
   - docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-2.2.0
 
