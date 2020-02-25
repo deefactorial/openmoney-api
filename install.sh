@@ -64,7 +64,7 @@ sudo docker pull couchbase:community-2.2.0
 sudo docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-2.2.0
 #
 #Wait for it
-sleep 10s
+sleep 20s
 #
 #setup the couchbase server installation and buckets
 curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/nodes/self/controller/settings -H 'Content-Type: application/x-www-form-urlencoded' -d 'path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata&index_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata'
@@ -79,7 +79,7 @@ curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools
 curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools/default/buckets -H 'Content-Type: application/x-www-form-urlencoded' -d 'threadsNumber=3&replicaIndex=0&replicaNumber=2&ramQuotaMB=512&bucketType=membase&name=openmoney_stewards&authType=sasl&saslPassword='
 #
 #wait for it
-sleep 20s
+sleep 30s
 #
 #verify installation was correct
 sudo docker run couchbase:community-2.2.0 /bin/sh -c "cd /opt/couchbase/bin; couchbase-cli bucket-list -c ${COUCHBASE_IP} -u ${COUCHBASE_ADMIN_USERNAME} -p ${COUCHBASE_ADMIN_PASSWORD} -d"
