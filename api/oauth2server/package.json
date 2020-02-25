@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "dependencies": {
     "express": "2.x.x",
-    "ejs": "0.7.x",
+    "ejs": "3.0.x",
     "oauth2orize": "0.x.x",
     "passport": "~0.1.12",
     "passport-local": "0.1.x",
