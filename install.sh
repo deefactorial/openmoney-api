@@ -61,7 +61,7 @@ sudo n 8.11.3
 sudo docker pull couchbase:community-2.2.0
 #
 #run the docker container
-sudo docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-2.2.0
+sudo docker run -dit --restart unless-stopped -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-2.2.0
 #
 #Wait for it
 sleep 20s
