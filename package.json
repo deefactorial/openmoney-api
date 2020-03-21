@@ -37,8 +37,10 @@
   },
   "scripts": {
     "install:db": "node install",
+    "start:db": "sudo docker container start db",
     "start": "node app.js",
     "start:debug": "DEBUG=swagger-tools:* node app.js",
+    "stop:db": "sudo docker container stop db",
     "test": "mocha ./test/stewards ./test/spaces ./test/currencies ./test/accounts ./test/journals",
     "test:stewards": "mocha ./test/stewards",
     "test:spaces": "mocha ./test/spaces",
