@@ -16,16 +16,17 @@ if(typeof process.env.COUCHBASE_LO === 'undefined'){
     process.exit(1);
 }
 
-var couchbase = require('couchbase'),
-    async = require('async'),
-    tasks = {},
-    model = require('./installData');
+const couchbase = require('couchbase');
+const async = require('async');
+const tasks = {};
+const model = require('./installData');
 
 tasks.insert_initial_data = function(callback){
-    var insertTasks = {};
-    cluster = new couchbase.Cluster(`couchbase://${process.env.COUCHBASE_LO}?detailed_errcodes=1`);
-    openmoney_bucket = cluster.openBucket('openmoney_global');
-    stewards_bucket = cluster.openBucket('openmoney_stewards');
+    const insertTasks = {};
+    const cluster = new couchbase.Cluster(`couchbase://${process.env.COUCHBASE_LO}?detailed_errcodes=1`);
+    cluster.authenticate(process.env.COUCHBASE_ADMIN_USERNAME, process.env.COUCHBASE_ADMIN_PASSWORD);
+    const openmoney_bucket = cluster.openBucket('openmoney_global');
+    const stewards_bucket = cluster.openBucket('openmoney_stewards');
 
     Object.keys(model.openmoney_bucket_data).forEach(function (key) {
         var value = model.openmoney_bucket_data[key];

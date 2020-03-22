@@ -1,9 +1,9 @@
 
-var model = {},
-    couchbase = require('couchbase'),
-    serverAddress = '127.0.0.1',
-    cluster = new couchbase.Cluster('couchbase://' + serverAddress),
-    oauth2Server = cluster.openBucket('oauth2Server');
+const model = {};
+const couchbase = require('couchbase');
+const cluster = new couchbase.Cluster(`couchbase://${process.env.COUCHBASE_LO}`);
+      cluster.authenticate(process.env.COUCHBASE_ADMIN_USERNAME, process.env.COUCHBASE_ADMIN_PASSWORD);
+const oauth2Server = cluster.openBucket('oauth2Server');
 
 //var codes = {};
 
