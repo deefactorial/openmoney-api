@@ -58,10 +58,10 @@ sudo npm install -g n
 sudo n 8.11.3
 #
 #pull the couchbase database docker container
-sudo docker pull couchbase:community-5.1.1
+sudo docker pull couchbase:community-6.5.0
 #
 #run the docker container
-sudo docker run -dit --restart unless-stopped -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-5.1.1
+sudo docker run -dit --restart unless-stopped -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-6.5.0
 #
 #Wait for it
 sleep 20s
@@ -81,7 +81,7 @@ curl -b /tmp/cookie -w '\n%{http_code}\n' 'http://localhost:8091/pools/default/b
 sleep 30s
 #
 #verify installation was correct
-sudo docker run couchbase:community-5.1.1 /bin/sh -c "cd /opt/couchbase/bin; couchbase-cli bucket-list -c ${COUCHBASE_IP} -u ${COUCHBASE_ADMIN_USERNAME} -p ${COUCHBASE_ADMIN_PASSWORD} -d"
+sudo docker run couchbase:community-6.5.0 /bin/sh -c "cd /opt/couchbase/bin; couchbase-cli bucket-list -c ${COUCHBASE_IP} -u ${COUCHBASE_ADMIN_USERNAME} -p ${COUCHBASE_ADMIN_PASSWORD} -d"
 #
 #install dependencies
 npm install
