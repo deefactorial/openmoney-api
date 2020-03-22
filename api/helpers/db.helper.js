@@ -1,4 +1,4 @@
-require('dotenv').load();
+require('dotenv').config();
 const couchbase = require('couchbase');
 const cluster = new couchbase.Cluster(`couchbase://${process.env.COUCHBASE_LO}`);
 cluster.authenticate(process.env.COUCHBASE_ADMIN_USERNAME, process.env.COUCHBASE_ADMIN_PASSWORD);

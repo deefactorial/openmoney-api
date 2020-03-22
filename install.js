@@ -1,7 +1,7 @@
 /**
  * Created by deefactorial on 28/01/16.
  */
-require('dotenv').load();
+require('dotenv').config();
 
 if(typeof process.env.COUCHBASE_ADMIN_USERNAME === 'undefined'){
     console.error("Did you forget to set the COUCHBASE_ADMIN_USERNAME environment variable?");

@@ -2,7 +2,7 @@ const db = require('../../helpers/db.helper');
 const crypto = require('../../helpers/crypto.helper');
 const mail = require('../../helpers/mail.helper');
 const util = require('../../helpers/util.helper');
-require('dotenv').load();
+require('dotenv').config();
 
 exports.stewardsForgotPost = function (args, res, next) {
     /**
