@@ -43,19 +43,19 @@ EOF
 cat .env
 #
 #install dependency applications
-# sudo apt-get update
-# sudo apt-get install -y npm net-tools apt-transport-https ca-certificates curl software-properties-common
-# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-# sudo apt-key fingerprint 0EBFCD88
-# sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-#    $(lsb_release -cs) \
-#    stable"
-# sudo apt-get update
-# sudo apt-get install -y docker-ce
-# curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
-# sudo apt-get install -y nodejs
-# sudo npm install -g n
-# sudo n 8.11.3
+sudo apt-get update
+sudo apt-get install -y npm net-tools apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo apt-key fingerprint 0EBFCD88
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get update
+sudo apt-get install -y docker-ce
+curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
+sudo apt-get install -y nodejs
+sudo npm install -g n
+sudo n 8.11.3
 #
 #pull the couchbase database docker container
 sudo docker pull couchbase:community-4.5.0
