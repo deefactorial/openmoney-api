@@ -58,31 +58,30 @@ sudo npm install -g n
 sudo n 8.11.3
 #
 #pull the couchbase database docker container
-sudo docker pull couchbase:community-2.2.0
+sudo docker pull couchbase:community-3.0.1
 #
 #run the docker container
-sudo docker run -dit --restart unless-stopped -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-2.2.0
+sudo docker run -dit --restart unless-stopped -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-3.0.1
 #
 #Wait for it
 sleep 20s
 #
 #setup the couchbase server installation and buckets
 curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/nodes/self/controller/settings -H 'Content-Type: application/x-www-form-urlencoded' -d 'path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata&index_path=%2Fopt%2Fcouchbase%2Fvar%2Flib%2Fcouchbase%2Fdata'
-curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/node/controller/rename -H 'Content-Type: application/x-www-form-urlencoded' -d hostname=${COUCHBASE_IP}
 curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/pools/default -H 'Content-Type: application/x-www-form-urlencoded' -d memoryQuota=2048
 curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/settings/stats -H 'Content-Type: application/x-www-form-urlencoded' -d sendStats=false
 curl -f -w '\n%{http_code}\n' -X POST http://localhost:8091/settings/web -H 'Content-Type: application/x-www-form-urlencoded' -d "password=${COUCHBASE_ADMIN_PASSWORD}&username=${COUCHBASE_ADMIN_USERNAME}&port=SAME"
 curl -c /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/uilogin -H 'Content-Type: application/x-www-form-urlencoded' -d "user=${COUCHBASE_ADMIN_USERNAME}&password=${COUCHBASE_ADMIN_PASSWORD}"
-curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools/default/buckets -H 'Content-Type: application/x-www-form-urlencoded' -d 'threadsNumber=3&replicaIndex=0&replicaNumber=2&ramQuotaMB=512&bucketType=membase&name=default&authType=sasl&saslPassword='
-curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools/default/buckets -H 'Content-Type: application/x-www-form-urlencoded' -d 'threadsNumber=3&replicaIndex=0&replicaNumber=2&ramQuotaMB=512&bucketType=membase&name=oauth2Server&authType=sasl&saslPassword='
-curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools/default/buckets -H 'Content-Type: application/x-www-form-urlencoded' -d 'threadsNumber=3&replicaIndex=0&replicaNumber=2&ramQuotaMB=512&bucketType=membase&name=openmoney_global&authType=sasl&saslPassword='
-curl -b /tmp/cookie -w '\n%{http_code}\n' -f -X POST http://localhost:8091/pools/default/buckets -H 'Content-Type: application/x-www-form-urlencoded' -d 'threadsNumber=3&replicaIndex=0&replicaNumber=2&ramQuotaMB=512&bucketType=membase&name=openmoney_stewards&authType=sasl&saslPassword='
+curl -b /tmp/cookie -w '\n%{http_code}\n' 'http://localhost:8091/pools/default/buckets' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'invalid-auth-response: on' -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' -H 'ns_server-ui: yes' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: http://localhost:8091' -H 'Connection: keep-alive' -H 'Referer: http://localhost:8091/index.html' --data 'parallelDBAndViewCompaction=false&autoCompactionDefined=false&threadsNumber=3&replicaIndex=0&replicaNumber=0&saslPassword=&authType=sasl&evictionPolicy=fullEviction&ramQuotaMB=512&bucketType=membase&name=default'
+curl -b /tmp/cookie -w '\n%{http_code}\n' 'http://localhost:8091/pools/default/buckets' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'invalid-auth-response: on' -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' -H 'ns_server-ui: yes' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: http://localhost:8091' -H 'Connection: keep-alive' -H 'Referer: http://localhost:8091/index.html' --data 'parallelDBAndViewCompaction=false&autoCompactionDefined=false&threadsNumber=3&replicaIndex=0&replicaNumber=0&saslPassword=&authType=sasl&evictionPolicy=fullEviction&ramQuotaMB=512&bucketType=membase&name=oauth2Server'
+curl -b /tmp/cookie -w '\n%{http_code}\n' 'http://localhost:8091/pools/default/buckets' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'invalid-auth-response: on' -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' -H 'ns_server-ui: yes' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: http://localhost:8091' -H 'Connection: keep-alive' -H 'Referer: http://localhost:8091/index.html' --data 'parallelDBAndViewCompaction=false&autoCompactionDefined=false&threadsNumber=3&replicaIndex=0&replicaNumber=0&saslPassword=&authType=sasl&evictionPolicy=fullEviction&ramQuotaMB=512&bucketType=membase&name=openmoney_global'
+curl -b /tmp/cookie -w '\n%{http_code}\n' 'http://localhost:8091/pools/default/buckets' -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:74.0) Gecko/20100101 Firefox/74.0' -H 'Accept: application/json, text/javascript, */*; q=0.01' -H 'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3' --compressed -H 'Content-Type: application/x-www-form-urlencoded' -H 'invalid-auth-response: on' -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' -H 'ns_server-ui: yes' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: http://localhost:8091' -H 'Connection: keep-alive' -H 'Referer: http://localhost:8091/index.html' --data 'parallelDBAndViewCompaction=false&autoCompactionDefined=false&threadsNumber=3&replicaIndex=0&replicaNumber=0&saslPassword=&authType=sasl&evictionPolicy=fullEviction&ramQuotaMB=512&bucketType=membase&name=openmoney_stewards'
 #
 #wait for it
 sleep 30s
 #
 #verify installation was correct
-sudo docker run couchbase:community-2.2.0 /bin/sh -c "cd /opt/couchbase/bin; couchbase-cli bucket-list -c ${COUCHBASE_IP} -u ${COUCHBASE_ADMIN_USERNAME} -p ${COUCHBASE_ADMIN_PASSWORD} -d"
+sudo docker run couchbase:community-3.0.1 /bin/sh -c "cd /opt/couchbase/bin; couchbase-cli bucket-list -c ${COUCHBASE_IP} -u ${COUCHBASE_ADMIN_USERNAME} -p ${COUCHBASE_ADMIN_PASSWORD} -d"
 #
 #install dependencies
 npm install
