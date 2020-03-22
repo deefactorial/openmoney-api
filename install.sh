@@ -55,7 +55,10 @@ sudo apt-get install -y docker-ce
 curl -sL https://deb.nodesource.com/setup_8.x | sudo bash -
 sudo apt-get install -y nodejs
 sudo npm install -g n
-sudo n 8.11.3
+sudo n 10.19.0
+# NOTE: https://github.com/barrysteyn/node-scrypt/issues/193
+# is preventing upgrade to node v12
+# solution is to change implementation to native crypto module in node
 #
 #pull the couchbase database docker container
 sudo docker pull couchbase:community-6.5.0
