@@ -3,9 +3,12 @@ require('dotenv').load();
 
 const nodemailer = require('nodemailer');
 const smtpConfig = process.env.SMTP_CONFIG;
-const transporter = nodemailer.createTransport(smtpConfig);
+let transporter;
+if (smtpConfig)
+  transporter = nodemailer.createTransport(smtpConfig);
 
 exports.sendmail = function(to, cc, bcc, subject, messageHTML, callback){
+
   var messageText = messageHTML.replace(/<\/?[^>]+(>|$)/g, "");
 
   // setup e-mail data with unicode symbols

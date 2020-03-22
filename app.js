@@ -1,31 +1,8 @@
 'use strict';
-var util            = require('util'),
-    path            = require('path'),
-    express         = require('express');
-
-var app = express();
-var bodyParser = require('body-parser');
-var passport = require('passport');
-// var session = require('express-session');
-// var CouchbaseStore = require('connect-couchbase')(session);
-// var couchbaseStore = new CouchbaseStore({
-//   bucket:"oauth2Server",          //optional
-//   host:"127.0.0.1:8091",          //optional
-//   connectionTimeout: 2000,        //optional
-//   operationTimeout: 2000,         //optional
-//   cachefile: '',                  //optional
-//   ttl: 86400,                     //optional
-//   prefix: 'sess'                  //optional
-// });
-
-// couchbaseStore.on('connect', function() {
-//   console.info("Couchbase Session store is ready for use");
-// });
-//
-//
-// couchbaseStore.on('disconnect', function() {
-//   console.error("An error occurred connecting to Couchbase Session Storage");
-// });
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const passport = require('passport');
 
 function getRandomstring(length){
   var text = "";
@@ -41,13 +18,8 @@ if(typeof process.env.SESSION_SECRET == 'undefined'){
   process.env.SESSION_SECRET = getRandomstring(160);
 }
 
-// app.use(session({
-//   store: couchbaseStore,
-//   secret: process.env.SESSION_SECRET,
-//   cookie: {maxAge:24*60*60*1000} //stay open for 1 day of inactivity
-// }));
 
-app.use(require('morgan')('combined'));
+// app.use(require('morgan')('combined'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
@@ -59,8 +31,8 @@ require('./api/oauth2server/auth');
 
 var site = require('./api/oauth2server/site')
     , oauth2 = require('./api/oauth2server/oauth2')
-    , user = require('./api/oauth2server/user')
-    , client = require('./api/oauth2server/client');
+    // , user = require('./api/oauth2server/user')
+    // , client = require('./api/oauth2server/client');
 
 module.exports = app; // for testing
 
